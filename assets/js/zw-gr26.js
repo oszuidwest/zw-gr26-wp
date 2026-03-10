@@ -273,10 +273,9 @@
             : tileName
               ? tileName.textContent
               : key;
-        modalSub.textContent =
-            data && data.has_2026
-                ? 'Uitslag gemeenteraadsverkiezingen 2026'
-                : 'Huidige samenstelling gemeenteraad';
+        modalSub.textContent = data?.has_2026
+            ? 'Uitslag gemeenteraadsverkiezingen 2026'
+            : 'Huidige samenstelling gemeenteraad';
     }
 
     function renderOpkomst(data, is2026) {
@@ -403,7 +402,7 @@
             drawCoalDonut(getSelectedRows());
         } else {
             donutTotal.textContent = currentTotalZetels;
-            rows.forEach((row) => row.classList.remove('is-selected'));
+            for (const row of rows) row.classList.remove('is-selected');
             donutEl.classList.remove('has-majority');
             modal.classList.remove('has-majority');
             hadMajority = false;
@@ -411,30 +410,30 @@
     });
 
     coalReset.addEventListener('click', () => {
-        rows.forEach((row) => row.classList.remove('is-selected'));
+        for (const row of rows) row.classList.remove('is-selected');
         updateCoalition();
     });
 
     /* --- Open drawer on tile click/keypress --- */
     function openTile(tile) {
-                const key = tile.dataset.gemeente;
-                const data = zwGr26Resultaten[key] || null;
-                const is2026 = data ? data.has_2026 : false;
-                const partijen = data ? data.partijen : [];
-                const tileName = tile.querySelector('.zw-gr26-tile__name');
+        const key = tile.dataset.gemeente;
+        const data = zwGr26Resultaten[key] || null;
+        const is2026 = data ? data.has_2026 : false;
+        const partijen = data ? data.partijen : [];
+        const tileName = tile.querySelector('.zw-gr26-tile__name');
 
-                currentTotalZetels = data ? data.totaal_zetels : 0;
-                currentMajority = Math.floor(currentTotalZetels / 2) + 1;
+        currentTotalZetels = data ? data.totaal_zetels : 0;
+        currentMajority = Math.floor(currentTotalZetels / 2) + 1;
 
-                resetState(is2026);
-                renderHeader(data, key, tileName);
-                renderOpkomst(data, is2026);
-                renderDonut(partijen, is2026);
-                renderTable(partijen, is2026);
+        resetState(is2026);
+        renderHeader(data, key, tileName);
+        renderOpkomst(data, is2026);
+        renderDonut(partijen, is2026);
+        renderTable(partijen, is2026);
 
-                triggerElement = tile;
-                backdrop.classList.add('is-open');
-                modalClose.focus();
+        triggerElement = tile;
+        backdrop.classList.add('is-open');
+        modalClose.focus();
     }
 
     document
