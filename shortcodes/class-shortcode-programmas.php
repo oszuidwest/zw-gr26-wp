@@ -1,6 +1,6 @@
 <?php
 /**
- * Verkiezingsprogramma shortcodes.
+ * Verkiezingsprogramma shortcode.
  *
  * @package ZWGR26
  */
@@ -12,9 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Renders [zw_gr26_programmas], [zw_gr26_gemeente], and [zw_gr26_partij].
- *
- * Uses instance properties for parent-child communication between nested shortcodes.
+ * Renders [zw_gr26_programmas] — program links per municipality from the gemeente_uitslag CPT.
  */
 class Shortcode_Programmas {
 
@@ -33,38 +31,32 @@ class Shortcode_Programmas {
 	private Renderer $renderer;
 
 	/**
-	 * Parties collected while processing the current [zw_gr26_gemeente].
+	 * Data provider.
 	 *
-	 * @var array
+	 * @var Data_Provider
 	 */
-	private array $current_parties = [];
-
-	/**
-	 * Municipalities collected while processing [zw_gr26_programmas].
-	 *
-	 * @var array
-	 */
-	private array $gemeenten = [];
+	private Data_Provider $data;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param Assets   $assets   Asset manager.
-	 * @param Renderer $renderer Shared renderer.
+	 * @param Assets        $assets   Asset manager.
+	 * @param Renderer      $renderer Shared renderer.
+	 * @param Data_Provider $data     Data provider.
 	 */
-	public function __construct( Assets $assets, Renderer $renderer ) {
+	public function __construct( Assets $assets, Renderer $renderer, Data_Provider $data ) {
 		$this->assets   = $assets;
 		$this->renderer = $renderer;
+		$this->data     = $data;
 	}
 
 	/**
-	 * Render the [zw_gr26_programmas] wrapper shortcode.
+	 * Render the [zw_gr26_programmas] shortcode.
 	 *
-	 * @param array|string $atts    Shortcode attributes.
-	 * @param string|null  $content Enclosed shortcode content.
+	 * @param array|string $atts Shortcode attributes.
 	 * @return string
 	 */
-	public function render( $atts, ?string $content = null ): string {
+	public function render( $atts ): string {
 		$this->assets->enqueue();
 
 		$atts = shortcode_atts(
@@ -75,12 +67,10 @@ class Shortcode_Programmas {
 			'zw_gr26_programmas'
 		);
 
-		$this->gemeenten = [];
+		$gemeenten = $this->data->get_programmas();
 
-		do_shortcode( $content );
-
-		if ( empty( $this->gemeenten ) ) {
-			return '';
+		if ( empty( $gemeenten ) ) {
+			return '<!-- zw_gr26_programmas: geen gemeenten met programma-urls gevonden -->';
 		}
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
@@ -91,7 +81,7 @@ class Shortcode_Programmas {
 		$html .= '<select class="zwv-programma__select" data-zw-gr26-programma-select>';
 		$html .= '<option value="">Kies je gemeente...</option>';
 
-		foreach ( $this->gemeenten as $gemeente ) {
+		foreach ( $gemeenten as $gemeente ) {
 			$id    = 'zwv-prog-' . sanitize_title( $gemeente['naam'] );
 			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $gemeente['naam'] ) . '</option>';
 		}
@@ -99,7 +89,7 @@ class Shortcode_Programmas {
 		$html .= '</select></div>';
 
 		// Party lists per municipality.
-		foreach ( $this->gemeenten as $gemeente ) {
+		foreach ( $gemeenten as $gemeente ) {
 			$id    = 'zwv-prog-' . sanitize_title( $gemeente['naam'] );
 			$html .= '<div class="zwv-programma__list" id="' . esc_attr( $id ) . '">';
 
@@ -116,68 +106,6 @@ class Shortcode_Programmas {
 		$html .= '</nav>';
 		$html .= $this->renderer->section_close();
 
-		$this->gemeenten = [];
-
 		return $html;
-	}
-
-	/**
-	 * Render the [zw_gr26_gemeente] nested shortcode.
-	 *
-	 * @param array|string $atts    Shortcode attributes.
-	 * @param string|null  $content Enclosed shortcode content.
-	 * @return string Always empty — data is collected via instance properties.
-	 */
-	public function render_gemeente( $atts, ?string $content = null ): string {
-		$atts = shortcode_atts(
-			[
-				'naam' => '',
-			],
-			$atts,
-			'zw_gr26_gemeente'
-		);
-
-		if ( ! $atts['naam'] ) {
-			return '';
-		}
-
-		$this->current_parties = [];
-
-		do_shortcode( $content );
-
-		$this->gemeenten[] = [
-			'naam'     => $atts['naam'],
-			'partijen' => $this->current_parties,
-		];
-
-		$this->current_parties = [];
-
-		return '';
-	}
-
-	/**
-	 * Render the [zw_gr26_partij] nested shortcode.
-	 *
-	 * @param array|string $atts Shortcode attributes.
-	 * @return string Always empty — data is collected via instance properties.
-	 */
-	public function render_partij( $atts ): string {
-		$atts = shortcode_atts(
-			[
-				'naam' => '',
-				'url'  => '#',
-			],
-			$atts,
-			'zw_gr26_partij'
-		);
-
-		if ( $atts['naam'] ) {
-			$this->current_parties[] = [
-				'naam' => $atts['naam'],
-				'url'  => $atts['url'],
-			];
-		}
-
-		return '';
 	}
 }

@@ -366,6 +366,57 @@ class Data_Provider {
 	}
 
 	/**
+	 * Get program URLs per municipality from the gemeente_uitslag CPT.
+	 *
+	 * Returns all municipalities (publish + draft) that have at least one
+	 * party with a programma_url, sorted alphabetically by municipality name.
+	 *
+	 * @return array<int, array{naam: string, partijen: array<int, array{naam: string, url: string}>}>
+	 */
+	public function get_programmas(): array {
+		if ( ! post_type_exists( 'gemeente_uitslag' ) ) {
+			return [];
+		}
+
+		$posts = get_posts(
+			[
+				'post_type'   => 'gemeente_uitslag',
+				'post_status' => [ 'publish', 'draft' ],
+				'numberposts' => 20,
+				'orderby'     => 'title',
+				'order'       => 'ASC',
+			]
+		);
+
+		$gemeenten = [];
+		foreach ( $posts as $post ) {
+			$repeater = get_field( 'partijen', $post->ID );
+			if ( ! is_array( $repeater ) ) {
+				continue;
+			}
+
+			$partijen = [];
+			foreach ( $repeater as $row ) {
+				if ( ! empty( $row['programma_url'] ) ) {
+					$partijen[] = [
+						'naam' => $row['partij_naam'] ?? '',
+						'url'  => $row['programma_url'],
+					];
+				}
+			}
+
+			if ( ! empty( $partijen ) ) {
+				$gemeenten[] = [
+					'naam'     => $post->post_title,
+					'partijen' => $partijen,
+				];
+			}
+		}
+
+		return $gemeenten;
+	}
+
+	/**
 	 * Get all 10 municipalities (publish + draft) for tile rendering.
 	 *
 	 * @return array<string, string> slug => display name.
