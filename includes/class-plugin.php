@@ -73,7 +73,7 @@ class Plugin {
 	private Post_Type_Uitslag $uitslag;
 
 	/**
-	 * Return the singleton instance, creating it on first call.
+	 * Returns the singleton instance, creating it on first call.
 	 *
 	 * @return self
 	 */
@@ -85,7 +85,7 @@ class Plugin {
 	}
 
 	/**
-	 * Construct dependencies and register shortcodes.
+	 * Constructs dependencies and registers shortcodes.
 	 */
 	private function __construct() {
 		$this->assets   = new Assets();
@@ -103,7 +103,7 @@ class Plugin {
 	}
 
 	/**
-	 * Register all plugin shortcodes.
+	 * Registers all plugin shortcodes.
 	 *
 	 * @return void
 	 */

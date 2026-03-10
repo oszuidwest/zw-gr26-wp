@@ -24,7 +24,7 @@ class Assets {
 	private bool $enqueued = false;
 
 	/**
-	 * Hook asset registration into WordPress.
+	 * Hooks asset registration into WordPress.
 	 *
 	 * @return void
 	 */
@@ -33,7 +33,7 @@ class Assets {
 	}
 
 	/**
-	 * Register all plugin assets without enqueuing them.
+	 * Registers all plugin assets without enqueuing them.
 	 *
 	 * @return void
 	 */
@@ -66,7 +66,7 @@ class Assets {
 	}
 
 	/**
-	 * Enqueue all plugin assets (de-duplicated).
+	 * Enqueues all plugin assets (de-duplicated).
 	 *
 	 * @return void
 	 */

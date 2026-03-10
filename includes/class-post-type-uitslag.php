@@ -18,11 +18,15 @@ class Post_Type_Uitslag {
 
 	/**
 	 * Post type slug.
+	 *
+	 * @var string
 	 */
 	private const POST_TYPE = 'gemeente_uitslag';
 
 	/**
 	 * Fixed municipalities: slug => display name.
+	 *
+	 * @var array<string, string>
 	 */
 	private const MUNICIPALITIES = [
 		'roosendaal'     => 'Roosendaal',
@@ -38,7 +42,7 @@ class Post_Type_Uitslag {
 	];
 
 	/**
-	 * Wire up all hooks.
+	 * Wires up all hooks.
 	 *
 	 * @return void
 	 */
@@ -58,7 +62,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Register the custom post type.
+	 * Registers the custom post type.
 	 *
 	 * @return void
 	 */
@@ -88,7 +92,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Register the top-level admin menu and per-municipality submenu links.
+	 * Registers the top-level admin menu and per-municipality submenu links.
 	 *
 	 * @return void
 	 */
@@ -121,7 +125,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Register ACF field group for election results.
+	 * Registers ACF field group for election results.
 	 *
 	 * @return void
 	 */
@@ -254,7 +258,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Seed the 10 fixed municipalities as draft posts.
+	 * Seeds the 10 fixed municipalities as draft posts.
 	 *
 	 * @return void
 	 */
@@ -300,7 +304,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Seed municipalities on plugin activation.
+	 * Seeds municipalities on plugin activation.
 	 *
 	 * @return void
 	 */
@@ -311,7 +315,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Hide "Add New" button via CSS on the CPT overview screen.
+	 * Hides the Add New button via CSS on the CPT overview screen.
 	 *
 	 * @return void
 	 */
@@ -323,12 +327,12 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Block deletion of municipality posts.
+	 * Blocks deletion of municipality posts.
 	 *
 	 * @param array $allcaps All capabilities of the user.
 	 * @param array $caps    Required capabilities.
 	 * @param array $args    Arguments: [0] = requested cap, [1] = user ID, [2] = post ID.
-	 * @return array
+	 * @return array Modified capabilities.
 	 */
 	public function block_delete( array $allcaps, array $caps, array $args ): array {
 		if ( empty( $args[2] ) ) {
@@ -351,10 +355,10 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Fix parent menu highlighting when editing a municipality post.
+	 * Fixes parent menu highlighting when editing a municipality post.
 	 *
 	 * @param string $parent_file Current parent file.
-	 * @return string
+	 * @return string Corrected parent file.
 	 */
 	public function fix_parent_file( string $parent_file ): string {
 		$screen = get_current_screen();
@@ -365,10 +369,10 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Fix submenu highlighting when editing a specific municipality post.
+	 * Fixes submenu highlighting when editing a specific municipality post.
 	 *
 	 * @param string|null $submenu_file Current submenu file.
-	 * @return string|null
+	 * @return string|null Corrected submenu file.
 	 */
 	public function fix_submenu_file( ?string $submenu_file ): ?string {
 		$screen = get_current_screen();
@@ -386,7 +390,7 @@ class Post_Type_Uitslag {
 	}
 
 	/**
-	 * Get all municipality post IDs keyed by slug.
+	 * Gets all municipality post IDs keyed by slug.
 	 *
 	 * @return array<string, int>
 	 */

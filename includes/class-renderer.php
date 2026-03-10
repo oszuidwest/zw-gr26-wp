@@ -33,21 +33,21 @@ class Renderer {
 	}
 
 	/**
-	 * Build an <img> tag with proxy URLs, responsive srcset, and sizes.
+	 * Builds an img tag with proxy URLs, responsive srcset, and sizes.
 	 *
 	 * When imgproxy is configured, generates srcset with w-descriptors at 1x
 	 * and 2x of the base width. The browser uses the sizes attribute to pick
 	 * the best variant for the current viewport and device pixel ratio.
 	 *
-	 * When imgproxy is not configured, outputs a plain <img> with the original URL.
+	 * When imgproxy is not configured, outputs a plain img tag with the original URL.
 	 *
 	 * @param string $src       Original image URL.
 	 * @param string $alt       Alt text.
 	 * @param int    $width     Base display width in pixels (1x).
 	 * @param int    $height    Base display height in pixels (1x).
-	 * @param string $css_class Optional CSS class.
-	 * @param string $sizes     Optional CSS sizes attribute for responsive selection.
-	 * @return string
+	 * @param string $css_class Optional. CSS class. Default empty string.
+	 * @param string $sizes     Optional. CSS sizes attribute for responsive selection. Default empty string.
+	 * @return string HTML img element.
 	 */
 	public function img_tag( string $src, string $alt, int $width, int $height, string $css_class = '', string $sizes = '' ): string {
 		$src_1x = $this->proxy->url( $src, $width, $height );
@@ -70,18 +70,18 @@ class Renderer {
 		}
 
 		$html .= ' width="' . $width . '" height="' . $height . '"';
-		$html .= ' alt="' . esc_attr( $alt ) . '" loading="lazy">';
+		$html .= ' alt="' . esc_attr( $alt ) . '" loading="lazy" />';
 
 		return $html;
 	}
 
 	/**
-	 * Open a content section with a title and optional link.
+	 * Opens a content section with a title and optional link.
 	 *
 	 * @param string $title     Section heading.
-	 * @param string $link      Optional URL for the "more" link.
-	 * @param string $link_text Optional label for the "more" link.
-	 * @return string
+	 * @param string $link      Optional. URL for the "more" link. Default empty string.
+	 * @param string $link_text Optional. Label for the "more" link. Default empty string.
+	 * @return string Opening section HTML.
 	 */
 	public function section_open( string $title, string $link = '', string $link_text = '' ): string {
 		$html  = '<section class="zw-gr26-section">';
@@ -99,21 +99,21 @@ class Renderer {
 	}
 
 	/**
-	 * Close a content section.
+	 * Closes a content section.
 	 *
-	 * @return string
+	 * @return string Closing section tag.
 	 */
 	public function section_close(): string {
 		return '</section>';
 	}
 
 	/**
-	 * Render the hero header with background image.
+	 * Renders the hero header with background image.
 	 *
 	 * @param string $title    Main heading.
 	 * @param string $subtitle Subtitle text.
 	 * @param string $bg_image Background image URL.
-	 * @return string
+	 * @return string Hero header HTML.
 	 */
 	public function hero( string $title, string $subtitle, string $bg_image ): string {
 		$html  = '<header class="zw-gr26-hero">';
@@ -131,9 +131,9 @@ class Renderer {
 	}
 
 	/**
-	 * Render the red-white-blue decorative stripe.
+	 * Renders the red-white-blue decorative stripe.
 	 *
-	 * @return string
+	 * @return string Stripe HTML.
 	 */
 	public function stripe(): string {
 		return '<div class="zw-gr26-stripe">'
@@ -144,11 +144,18 @@ class Renderer {
 	}
 
 	/**
-	 * Render a video card with thumbnail, title, and optional "coming soon" state.
+	 * Renders a video card with thumbnail, title, and optional coming-soon state.
 	 *
-	 * @param array $video       Video data with titel, thumbnail, url, and optional meta.
+	 * @param array $video {
+	 *     Video data.
+	 *
+	 *     @type string $titel     Video title.
+	 *     @type string $thumbnail Thumbnail URL.
+	 *     @type string $url       Video URL.
+	 *     @type string $meta      Optional. Meta text.
+	 * }
 	 * @param bool  $coming_soon Whether the video is not yet available.
-	 * @return string
+	 * @return string Video card HTML.
 	 */
 	public function video_card( array $video, bool $coming_soon = false ): string {
 		$tag  = $coming_soon ? 'div' : 'a';
@@ -191,10 +198,17 @@ class Renderer {
 	}
 
 	/**
-	 * Render an explainer card (9:16 aspect ratio).
+	 * Renders an explainer card (9:16 aspect ratio).
 	 *
-	 * @param array $video Video data with titel, thumbnail, url, and optional binnenkort flag.
-	 * @return string
+	 * @param array $video {
+	 *     Video data.
+	 *
+	 *     @type string $titel      Video title.
+	 *     @type string $thumbnail  Thumbnail URL.
+	 *     @type string $url        Video URL.
+	 *     @type bool   $binnenkort Optional. Whether the video is upcoming.
+	 * }
+	 * @return string Explainer card HTML.
 	 */
 	public function explainer_card( array $video ): string {
 		$coming_soon = ! empty( $video['binnenkort'] );
@@ -230,10 +244,19 @@ class Renderer {
 	}
 
 	/**
-	 * Render a news article card.
+	 * Renders a news article card.
 	 *
-	 * @param array $item Article data with url, titel, datum, datum_iso, afbeelding, and regio.
-	 * @return string
+	 * @param array $item {
+	 *     Article data.
+	 *
+	 *     @type string $url        Article permalink.
+	 *     @type string $titel      Article title.
+	 *     @type string $datum      Display date.
+	 *     @type string $datum_iso  ISO 8601 date.
+	 *     @type string $afbeelding Featured image URL.
+	 *     @type string $regio      Region name.
+	 * }
+	 * @return string Article card HTML.
 	 */
 	public function article_card( array $item ): string {
 		$html  = '<article class="zw-gr26-acard">';

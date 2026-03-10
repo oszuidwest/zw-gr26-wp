@@ -76,7 +76,7 @@ class Schema {
 	}
 
 	/**
-	 * Register Yoast schema filters if Yoast is active.
+	 * Registers Yoast schema filters if Yoast is active.
 	 *
 	 * @return void
 	 */
@@ -90,7 +90,7 @@ class Schema {
 	}
 
 	/**
-	 * Change WebPage type to CollectionPage and add video/article references.
+	 * Changes WebPage type to CollectionPage and adds video and article references.
 	 *
 	 * @param array $data WebPage schema piece.
 	 * @return array Modified schema piece.
@@ -146,7 +146,7 @@ class Schema {
 	}
 
 	/**
-	 * Add VideoObject nodes to the schema graph.
+	 * Adds VideoObject nodes to the schema graph.
 	 *
 	 * @param array $graph The full schema graph array.
 	 * @return array Modified graph with VideoObject nodes appended.
@@ -167,9 +167,9 @@ class Schema {
 	}
 
 	/**
-	 * Check if the current post contains the election page shortcode.
+	 * Checks if the current post contains the election page shortcode.
 	 *
-	 * @return bool
+	 * @return bool True if the current post uses the election page shortcode.
 	 */
 	private function is_election_page(): bool {
 		$post = get_post();
@@ -181,9 +181,9 @@ class Schema {
 	}
 
 	/**
-	 * Get the canonical URL for the current page.
+	 * Gets the canonical URL for the current page.
 	 *
-	 * @return string
+	 * @return string Canonical URL.
 	 */
 	private function get_canonical(): string {
 		$canonical = wp_get_canonical_url( get_the_ID() );
@@ -192,7 +192,7 @@ class Schema {
 	}
 
 	/**
-	 * Parse all videos from the raw post content. Cached per request.
+	 * Parses all videos from the raw post content. Cached per request.
 	 *
 	 * @return array List of video arrays with keys: naam, videoid, library_id, datum.
 	 */
@@ -218,7 +218,7 @@ class Schema {
 	}
 
 	/**
-	 * Parse articles from the raw post content via Data_Provider. Cached per request.
+	 * Parses articles from the raw post content via Data_Provider. Cached per request.
 	 *
 	 * @return array List of article arrays with keys: url, titel, datum_iso.
 	 */
@@ -252,7 +252,7 @@ class Schema {
 	}
 
 	/**
-	 * Parse parent/child video shortcode blocks from raw content.
+	 * Parses parent and child video shortcode blocks from raw content.
 	 *
 	 * @param string $content     Raw post content.
 	 * @param string $parent_tag  Parent shortcode name (e.g. 'zw_gr26_debatten').
@@ -297,9 +297,16 @@ class Schema {
 	}
 
 	/**
-	 * Build a single VideoObject schema node.
+	 * Builds a single VideoObject schema node.
 	 *
-	 * @param array  $video     Video data with naam, videoid, library_id, datum.
+	 * @param array  $video {
+	 *     Video data.
+	 *
+	 *     @type string $naam       Video display name.
+	 *     @type string $videoid    Bunny video GUID.
+	 *     @type int    $library_id Bunny library ID.
+	 *     @type string $datum      Dutch date string.
+	 * }
 	 * @param string $canonical Canonical URL of the page.
 	 * @return array Schema.org VideoObject.
 	 */
@@ -325,7 +332,7 @@ class Schema {
 	}
 
 	/**
-	 * Parse a Dutch date string (e.g. "13 maart 2026") into ISO 8601 format.
+	 * Parses a Dutch date string (e.g. '13 maart 2026') into ISO 8601 format.
 	 *
 	 * Falls back to the current post's publication date.
 	 *

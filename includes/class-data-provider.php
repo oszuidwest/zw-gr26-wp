@@ -31,12 +31,12 @@ class Data_Provider {
 	private static ?array $all_municipalities = null;
 
 	/**
-	 * Fetch the latest dossier posts.
+	 * Fetches the latest dossier posts.
 	 *
 	 * @param string $dossier_slug Taxonomy slug for the dossier.
 	 * @param int    $count        Maximum number of posts to return.
 	 * @param string $regio_slug   Optional regio taxonomy slug to filter by.
-	 * @return array
+	 * @return array List of article data arrays.
 	 */
 	public function get_dossier_posts( string $dossier_slug, int $count = 6, string $regio_slug = '' ): array {
 		if ( ! taxonomy_exists( 'dossier' ) ) {
@@ -104,12 +104,12 @@ class Data_Provider {
 	}
 
 	/**
-	 * Load election results from published gemeente_uitslag posts.
+	 * Loads election results from published gemeente_uitslag posts.
 	 *
 	 * Returns only municipalities with status 'publish'.
 	 * Partijen are sorted by zetels 2026 descending.
 	 *
-	 * @return array
+	 * @return array Election results keyed by municipality slug.
 	 */
 	public function get_election_results(): array {
 		if ( null !== self::$election_results ) {
@@ -211,7 +211,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Fetch polling station locations from waarismijnstemlokaal.nl API.
+	 * Fetches polling station locations from waarismijnstemlokaal.nl API.
 	 *
 	 * Results are cached as a WP transient for 12 hours.
 	 *
@@ -241,7 +241,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Fetch and transform polling stations for a single municipality.
+	 * Fetches and transforms polling stations for a single municipality.
 	 *
 	 * @param string $gemeente Municipality name.
 	 * @return array{contact: string, website: string, locaties: array}
@@ -336,7 +336,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Extract HH:mm time from a datetime string like "2026-03-18T07:30:00".
+	 * Extracts HH:mm time from a datetime string like '2026-03-18T07:30:00'.
 	 *
 	 * @param string $datetime Raw datetime value.
 	 * @return string Time in HH:mm format, or original string if parsing fails.
@@ -355,7 +355,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Normalize a feature field: empty string becomes empty (unavailable),
+	 * Normalizes a feature field: empty string becomes empty (unavailable),
 	 * any other value is kept as-is (e.g. "ja", "ja, toegankelijk toilet", "op afstand").
 	 *
 	 * @param string $value Raw field value.
@@ -366,7 +366,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Get program URLs per municipality from the gemeente_uitslag CPT.
+	 * Gets program URLs per municipality from the gemeente_uitslag CPT.
 	 *
 	 * Returns all municipalities (publish + draft) that have at least one
 	 * party with a programma_url, sorted alphabetically by municipality name.
@@ -415,7 +415,7 @@ class Data_Provider {
 	}
 
 	/**
-	 * Get all 10 municipalities (publish + draft) for tile rendering.
+	 * Gets all 10 municipalities (publish and draft) for tile rendering.
 	 *
 	 * @return array<string, string> slug => display name.
 	 */

@@ -51,10 +51,10 @@ class Shortcode_Programmas {
 	}
 
 	/**
-	 * Render the [zw_gr26_programmas] shortcode.
+	 * Renders the [zw_gr26_programmas] shortcode.
 	 *
 	 * @param array|string $atts Shortcode attributes.
-	 * @return string
+	 * @return string Shortcode HTML output.
 	 */
 	public function render( $atts ): string {
 		$this->assets->enqueue();

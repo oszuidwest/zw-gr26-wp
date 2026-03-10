@@ -66,7 +66,7 @@ class Bunny_API {
 	private array $credentials_cache = [];
 
 	/**
-	 * Look up Bunny CDN credentials for a library from ACF theme options.
+	 * Looks up Bunny CDN credentials for a library from ACF theme options.
 	 *
 	 * @param int $library_id The Bunny library ID to look up.
 	 * @return array|null Credentials array or null if not found.
@@ -116,7 +116,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Fetch videos for a collection, with transient caching.
+	 * Fetches videos for a collection, with transient caching.
 	 *
 	 * @param int    $library_id    Bunny library ID.
 	 * @param string $collection_id Bunny collection GUID.
@@ -155,7 +155,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Format a duration in seconds as H:MM:SS or M:SS.
+	 * Formats a duration in seconds as H:MM:SS or M:SS.
 	 *
 	 * @param int $seconds Duration in seconds.
 	 * @return string Formatted duration or empty string if zero.
@@ -175,7 +175,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Get the full thumbnail URL for a single video by its GUID.
+	 * Gets the full thumbnail URL for a single video by its GUID.
 	 *
 	 * @param int    $library_id Bunny library ID.
 	 * @param string $video_id   Video GUID.
@@ -224,7 +224,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Paginate through the Bunny API to fetch all finished videos in a collection.
+	 * Paginates through the Bunny API to fetch all finished videos in a collection.
 	 *
 	 * @param array  $credentials  API credentials.
 	 * @param string $collection_id Collection GUID.
@@ -282,7 +282,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Normalize raw Bunny API video objects into a flat array format.
+	 * Normalizes raw Bunny API video objects into a flat array format.
 	 *
 	 * @param array  $videos      Raw video objects from the API.
 	 * @param array  $credentials API credentials including hostname.
@@ -319,7 +319,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Get video info (thumbnail URL and binnenkort status) for a single video.
+	 * Gets video info (thumbnail URL and binnenkort status) for a single video.
 	 *
 	 * @param int    $library_id Bunny library ID.
 	 * @param string $video_id   Video GUID.
@@ -380,7 +380,7 @@ class Bunny_API {
 	}
 
 	/**
-	 * Extract the broadcast date from a video's meta tags.
+	 * Extracts the broadcast date from a video's meta tags.
 	 *
 	 * @param object $video Bunny API video object.
 	 * @return \DateTime|null Parsed date or null if not found.

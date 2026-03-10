@@ -51,10 +51,10 @@ class Shortcode_Resultaten {
 	}
 
 	/**
-	 * Render the shortcode.
+	 * Renders the shortcode.
 	 *
 	 * @param array|string $atts Shortcode attributes.
-	 * @return string
+	 * @return string Shortcode HTML output.
 	 */
 	public function render( $atts ): string {
 		$this->assets->enqueue();

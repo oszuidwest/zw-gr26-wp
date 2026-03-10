@@ -60,11 +60,11 @@ class Shortcode_Explainers {
 	}
 
 	/**
-	 * Render the [zw_gr26_explainers] wrapper shortcode.
+	 * Renders the [zw_gr26_explainers] wrapper shortcode.
 	 *
 	 * @param array|string $atts    Shortcode attributes.
 	 * @param string|null  $content Enclosed shortcode content.
-	 * @return string
+	 * @return string Shortcode HTML output.
 	 */
 	public function render( $atts, ?string $content = null ): string {
 		$this->assets->enqueue();
@@ -131,7 +131,7 @@ class Shortcode_Explainers {
 	}
 
 	/**
-	 * Render the [zw_gr26_explainer] child shortcode.
+	 * Renders the [zw_gr26_explainer] child shortcode.
 	 *
 	 * @param array|string $atts Shortcode attributes.
 	 * @return string Always empty — data is collected via instance properties.

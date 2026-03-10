@@ -65,7 +65,7 @@ class Image_Proxy {
 	}
 
 	/**
-	 * Whether imgproxy is configured.
+	 * Determines whether imgproxy is configured.
 	 *
 	 * @return bool
 	 */
@@ -74,7 +74,7 @@ class Image_Proxy {
 	}
 
 	/**
-	 * Rewrite an image URL through imgproxy.
+	 * Rewrites an image URL through imgproxy.
 	 *
 	 * Returns the original URL unchanged when imgproxy is not configured
 	 * or when the source URL is empty.

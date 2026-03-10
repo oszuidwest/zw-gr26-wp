@@ -51,10 +51,10 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Render the [zw_gr26_stemlocaties] shortcode.
+	 * Renders the [zw_gr26_stemlocaties] shortcode.
 	 *
 	 * @param array|string $atts Shortcode attributes.
-	 * @return string
+	 * @return string Shortcode HTML output.
 	 */
 	public function render( $atts ): string {
 		$this->assets->enqueue();
@@ -113,10 +113,10 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Render accordion rows for a list of polling stations.
+	 * Renders accordion rows for a list of polling stations.
 	 *
 	 * @param array $locaties Location data.
-	 * @return string
+	 * @return string Accordion rows HTML.
 	 */
 	private function render_location_rows( array $locaties ): string {
 		$count = count( $locaties );
@@ -135,10 +135,10 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Render the always-visible header of an accordion row.
+	 * Renders the always-visible header of an accordion row.
 	 *
 	 * @param array $loc Single location data.
-	 * @return string
+	 * @return string Row header HTML.
 	 */
 	private function render_row_header( array $loc ): string {
 		$html = '<div class="zw-gr26-stem__header">';
@@ -201,10 +201,10 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Render the expandable body of an accordion row.
+	 * Renders the expandable body of an accordion row.
 	 *
 	 * @param array $loc Single location data.
-	 * @return string
+	 * @return string Row body HTML.
 	 */
 	private function render_row_body( array $loc ): string {
 		$features = $this->collect_features( $loc );
@@ -227,7 +227,7 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Collect non-empty accessibility features into a label list.
+	 * Collects non-empty accessibility features into a label list.
 	 *
 	 * @param array $loc Single location data.
 	 * @return string[]
@@ -257,11 +257,11 @@ class Shortcode_Stemlocaties {
 	}
 
 	/**
-	 * Render the municipality contact footer.
+	 * Renders the municipality contact footer.
 	 *
 	 * @param string $contact Contact info text.
 	 * @param string $website Municipality website URL.
-	 * @return string
+	 * @return string Footer HTML.
 	 */
 	private function render_contact_footer( string $contact, string $website ): string {
 		if ( ! $contact && ! $website ) {
