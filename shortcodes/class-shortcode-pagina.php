@@ -54,7 +54,7 @@ class Shortcode_Pagina {
 		$atts = shortcode_atts(
 			[
 				'titel'       => 'ZuidWest Kiest',
-				'ondertitel'  => 'Alles over de gemeente&shy;raads&shy;verkiezingen van 2026 in West-Brabant.',
+				'ondertitel'  => "Alles over de gemeente\xC2\xADraads\xC2\xADverkiezingen van 2026 in West-Brabant.",
 				'achtergrond' => 'https://www.zuidwestupdate.nl/wp-content/uploads/2022/03/potlood.jpg',
 			],
 			$atts,

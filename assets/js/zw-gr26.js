@@ -415,11 +415,8 @@
         updateCoalition();
     });
 
-    /* --- Open drawer on tile click --- */
-    document
-        .querySelectorAll('.zw-gr26-tile[data-gemeente]')
-        .forEach((tile) => {
-            tile.addEventListener('click', () => {
+    /* --- Open drawer on tile click/keypress --- */
+    function openTile(tile) {
                 const key = tile.dataset.gemeente;
                 const data = zwGr26Resultaten[key] || null;
                 const is2026 = data ? data.has_2026 : false;
@@ -438,6 +435,17 @@
                 triggerElement = tile;
                 backdrop.classList.add('is-open');
                 modalClose.focus();
+    }
+
+    document
+        .querySelectorAll('.zw-gr26-tile[data-gemeente]')
+        .forEach((tile) => {
+            tile.addEventListener('click', () => openTile(tile));
+            tile.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openTile(tile);
+                }
             });
         });
 

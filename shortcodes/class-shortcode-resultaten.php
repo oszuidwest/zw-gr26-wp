@@ -77,10 +77,8 @@ class Shortcode_Resultaten {
 		// Pass published election data to the front-end script.
 		// Use wp_add_inline_script instead of wp_localize_script to preserve
 		// numeric types (wp_localize_script casts everything to strings).
-		if ( ! empty( $results ) ) {
-			$json = wp_json_encode( $results, JSON_UNESCAPED_UNICODE );
-			wp_add_inline_script( 'zw-gr26', 'var zwGr26Resultaten=' . $json . ';', 'before' );
-		}
+		$json = wp_json_encode( $results, JSON_UNESCAPED_UNICODE );
+		wp_add_inline_script( 'zw-gr26', 'var zwGr26Resultaten=' . $json . ';', 'before' );
 
 		$html = $this->renderer->section_open( $atts['titel'] );
 
@@ -91,7 +89,7 @@ class Shortcode_Resultaten {
 			$has_2026 = $entry && ! empty( $entry['has_2026'] );
 			$status   = $has_2026 ? 'Bekijk uitslagen' : 'Nog geen uitslagen';
 
-			$html .= '<div class="zw-gr26-tile" data-gemeente="' . esc_attr( $slug ) . '">';
+			$html .= '<div class="zw-gr26-tile" data-gemeente="' . esc_attr( $slug ) . '" tabindex="0" role="button">';
 			$html .= '<h3 class="zw-gr26-tile__name">' . esc_html( $naam ) . '</h3>';
 			$html .= '<div class="zw-gr26-tile__status">' . esc_html( $status ) . '</div>';
 			$html .= '</div>';
