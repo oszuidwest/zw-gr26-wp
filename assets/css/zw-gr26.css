@@ -1278,9 +1278,11 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 10px;
-    line-height: 1;
-    padding-bottom: 1px;
+}
+
+.zwv-stem__accessible-icon svg {
+    width: 9px;
+    height: 9px;
 }
 
 .zwv-stem__accessible--ja .zwv-stem__accessible-icon {

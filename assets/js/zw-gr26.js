@@ -22,18 +22,6 @@
     );
     selects.forEach((select) => {
         const container = select.closest('.zwv-programma');
-        const options = select.querySelectorAll('option[value]');
-        const validOptions = Array.from(options).filter((o) => o.value);
-
-        if (validOptions.length) {
-            const random =
-                validOptions[Math.floor(Math.random() * validOptions.length)];
-            select.value = random.value;
-            const target = document.getElementById(random.value);
-            if (target) {
-                target.classList.add('active');
-            }
-        }
 
         select.addEventListener('change', (e) => {
             const scope = container || document;
