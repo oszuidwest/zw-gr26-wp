@@ -59,12 +59,23 @@ class Bunny_API {
 	private const TRANSIENT_PREFIX = 'zwgr26_bunny_';
 
 	/**
+	 * Per-request credential cache keyed by library ID.
+	 *
+	 * @var array<int, array|null>
+	 */
+	private array $credentials_cache = [];
+
+	/**
 	 * Look up Bunny CDN credentials for a library from ACF theme options.
 	 *
 	 * @param int $library_id The Bunny library ID to look up.
 	 * @return array|null Credentials array or null if not found.
 	 */
 	public function get_credentials( int $library_id ): ?array {
+		if ( array_key_exists( $library_id, $this->credentials_cache ) ) {
+			return $this->credentials_cache[ $library_id ];
+		}
+
 		if ( ! function_exists( 'get_field' ) ) {
 			return null;
 		}
@@ -88,15 +99,19 @@ class Bunny_API {
 				$hostname = get_field( $lib['hostname'], 'option' );
 				$api_key  = get_field( $lib['api_key'], 'option' );
 				if ( $hostname && $api_key ) {
-					return [
+					$result = [
 						'libraryId' => $library_id,
 						'hostname'  => rtrim( $hostname, '/' ),
 						'apiKey'    => $api_key,
 					];
+
+					$this->credentials_cache[ $library_id ] = $result;
+					return $result;
 				}
 			}
 		}
 
+		$this->credentials_cache[ $library_id ] = null;
 		return null;
 	}
 

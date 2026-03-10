@@ -276,7 +276,7 @@ class Data_Provider {
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 
-		if ( empty( $body['result']['records'] ) || ! is_array( $body['result']['records'] ) ) {
+		if ( ! is_array( $body ) || empty( $body['result']['records'] ) || ! is_array( $body['result']['records'] ) ) {
 			return $empty;
 		}
 

@@ -62,7 +62,6 @@ class Shortcode_Resultaten {
 		$atts = shortcode_atts(
 			[
 				'titel' => 'Uitslagen per gemeente',
-				'noot'  => '',
 			],
 			$atts,
 			'zw_gr26_resultaten'
@@ -103,10 +102,6 @@ class Shortcode_Resultaten {
 
 		// Render modal in wp_footer so it sits outside .zw-gr26-wrapper.
 		// The wrapper's CSS transform creates a new containing block, breaking position:fixed.
-		$note_html = $atts['noot']
-			? esc_html( $atts['noot'] )
-			: 'Bron: gemeente';
-
 		add_action(
 			'wp_footer',
 			function () {

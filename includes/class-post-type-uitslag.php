@@ -264,17 +264,27 @@ class Post_Type_Uitslag {
 			return;
 		}
 
-		foreach ( self::MUNICIPALITIES as $slug => $name ) {
-			$existing = get_posts(
-				[
-					'post_type'   => self::POST_TYPE,
-					'name'        => $slug,
-					'post_status' => [ 'publish', 'draft', 'pending', 'private' ],
-					'numberposts' => 1,
-				]
-			);
+		// Single query to find all existing municipality slugs.
+		$existing_posts = get_posts(
+			[
+				'post_type'   => self::POST_TYPE,
+				'post_status' => [ 'publish', 'draft', 'pending', 'private' ],
+				'numberposts' => 20,
+				'fields'      => 'ids',
+			]
+		);
 
-			if ( ! empty( $existing ) ) {
+		if ( count( $existing_posts ) >= count( self::MUNICIPALITIES ) ) {
+			return;
+		}
+
+		$existing_slugs = [];
+		foreach ( $existing_posts as $post_id ) {
+			$existing_slugs[] = get_post_field( 'post_name', $post_id );
+		}
+
+		foreach ( self::MUNICIPALITIES as $slug => $name ) {
+			if ( in_array( $slug, $existing_slugs, true ) ) {
 				continue;
 			}
 

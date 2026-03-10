@@ -75,7 +75,14 @@ class Shortcode_Livestream {
 		}
 
 		if ( $atts['thumbnail'] ) {
-			$html .= '<img src="' . esc_url( $atts['thumbnail'] ) . '" alt="' . esc_attr( $atts['naam'] ) . '">';
+			$html .= $this->renderer->img_tag(
+				$atts['thumbnail'],
+				$atts['naam'],
+				960,
+				540,
+				'',
+				'min(920px, calc(100vw - 40px))'
+			);
 		}
 
 		$html .= '<div class="zw-gr26-uitslagen__play">&#9654;</div>';

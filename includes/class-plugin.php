@@ -52,6 +52,13 @@ class Plugin {
 	private Schema $schema;
 
 	/**
+	 * Image proxy service.
+	 *
+	 * @var Image_Proxy
+	 */
+	private Image_Proxy $proxy;
+
+	/**
 	 * Shared HTML renderer.
 	 *
 	 * @var Renderer
@@ -84,7 +91,8 @@ class Plugin {
 		$this->assets   = new Assets();
 		$this->bunny    = new Bunny_API();
 		$this->data     = new Data_Provider();
-		$this->renderer = new Renderer();
+		$this->proxy    = new Image_Proxy();
+		$this->renderer = new Renderer( $this->proxy );
 		$this->schema   = new Schema( $this->bunny, $this->data );
 		$this->uitslag  = new Post_Type_Uitslag();
 

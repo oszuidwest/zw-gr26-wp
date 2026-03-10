@@ -210,8 +210,8 @@ class Schema {
 		$content = $post->post_content;
 
 		$this->videos = array_merge(
-			$this->parse_debatten( $content ),
-			$this->parse_explainers( $content )
+			$this->parse_video_shortcodes( $content, 'zw_gr26_debatten', 'zw_gr26_debat' ),
+			$this->parse_video_shortcodes( $content, 'zw_gr26_explainers', 'zw_gr26_explainer' )
 		);
 
 		return $this->videos;
@@ -252,29 +252,29 @@ class Schema {
 	}
 
 	/**
-	 * Parse [zw_gr26_debatten] blocks and their [zw_gr26_debat] children from raw content.
+	 * Parse parent/child video shortcode blocks from raw content.
 	 *
-	 * @param string $content Raw post content.
-	 * @return array Videos found in debatten blocks.
+	 * @param string $content     Raw post content.
+	 * @param string $parent_tag  Parent shortcode name (e.g. 'zw_gr26_debatten').
+	 * @param string $child_tag   Child shortcode name (e.g. 'zw_gr26_debat').
+	 * @return array Videos found in the blocks.
 	 */
-	private function parse_debatten( string $content ): array {
+	private function parse_video_shortcodes( string $content, string $parent_tag, string $child_tag ): array {
 		$videos = [];
 
-		if ( ! preg_match_all(
-			'/\[zw_gr26_debatten\s+([^\]]*)\](.*?)\[\/zw_gr26_debatten\]/s',
-			$content,
-			$parents,
-			PREG_SET_ORDER
-		) ) {
+		$parent_pattern = '/\[' . $parent_tag . '\s+([^\]]*)\](.*?)\[\/' . $parent_tag . '\]/s';
+		if ( ! preg_match_all( $parent_pattern, $content, $parents, PREG_SET_ORDER ) ) {
 			return $videos;
 		}
+
+		$child_pattern = '/\[' . $child_tag . '\s+([^\]]*)\]/';
 
 		foreach ( $parents as $parent ) {
 			$parent_atts = shortcode_parse_atts( $parent[1] );
 			$library_id  = ! empty( $parent_atts['bibliotheek'] ) ? (int) $parent_atts['bibliotheek'] : 0;
 			$inner       = $parent[2];
 
-			if ( ! preg_match_all( '/\[zw_gr26_debat\s+([^\]]*)\]/', $inner, $children, PREG_SET_ORDER ) ) {
+			if ( ! preg_match_all( $child_pattern, $inner, $children, PREG_SET_ORDER ) ) {
 				continue;
 			}
 
@@ -289,51 +289,6 @@ class Schema {
 					'videoid'    => $atts['videoid'],
 					'library_id' => $library_id,
 					'datum'      => $atts['datum'] ?? '',
-				];
-			}
-		}
-
-		return $videos;
-	}
-
-	/**
-	 * Parse [zw_gr26_explainers] blocks and their [zw_gr26_explainer] children from raw content.
-	 *
-	 * @param string $content Raw post content.
-	 * @return array Videos found in explainer blocks.
-	 */
-	private function parse_explainers( string $content ): array {
-		$videos = [];
-
-		if ( ! preg_match_all(
-			'/\[zw_gr26_explainers\s+([^\]]*)\](.*?)\[\/zw_gr26_explainers\]/s',
-			$content,
-			$parents,
-			PREG_SET_ORDER
-		) ) {
-			return $videos;
-		}
-
-		foreach ( $parents as $parent ) {
-			$parent_atts = shortcode_parse_atts( $parent[1] );
-			$library_id  = ! empty( $parent_atts['bibliotheek'] ) ? (int) $parent_atts['bibliotheek'] : 0;
-			$inner       = $parent[2];
-
-			if ( ! preg_match_all( '/\[zw_gr26_explainer\s+([^\]]*)\]/', $inner, $children, PREG_SET_ORDER ) ) {
-				continue;
-			}
-
-			foreach ( $children as $child ) {
-				$atts = shortcode_parse_atts( $child[1] );
-				if ( empty( $atts['videoid'] ) ) {
-					continue;
-				}
-
-				$videos[] = [
-					'naam'       => $atts['naam'] ?? '',
-					'videoid'    => $atts['videoid'],
-					'library_id' => $library_id,
-					'datum'      => '',
 				];
 			}
 		}

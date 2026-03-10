@@ -17,6 +17,65 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Renderer {
 
 	/**
+	 * Image proxy for on-the-fly resizing.
+	 *
+	 * @var Image_Proxy
+	 */
+	private Image_Proxy $proxy;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Image_Proxy $proxy Image proxy service.
+	 */
+	public function __construct( Image_Proxy $proxy ) {
+		$this->proxy = $proxy;
+	}
+
+	/**
+	 * Build an <img> tag with proxy URLs, responsive srcset, and sizes.
+	 *
+	 * When imgproxy is configured, generates srcset with w-descriptors at 1x
+	 * and 2x of the base width. The browser uses the sizes attribute to pick
+	 * the best variant for the current viewport and device pixel ratio.
+	 *
+	 * When imgproxy is not configured, outputs a plain <img> with the original URL.
+	 *
+	 * @param string $src       Original image URL.
+	 * @param string $alt       Alt text.
+	 * @param int    $width     Base display width in pixels (1x).
+	 * @param int    $height    Base display height in pixels (1x).
+	 * @param string $css_class Optional CSS class.
+	 * @param string $sizes     Optional CSS sizes attribute for responsive selection.
+	 * @return string
+	 */
+	public function img_tag( string $src, string $alt, int $width, int $height, string $css_class = '', string $sizes = '' ): string {
+		$src_1x = $this->proxy->url( $src, $width, $height );
+		$src_2x = $this->proxy->url( $src, $width * 2, $height * 2 );
+
+		$html = '<img';
+		if ( $css_class ) {
+			$html .= ' class="' . esc_attr( $css_class ) . '"';
+		}
+		$html .= ' src="' . esc_url( $src_1x ) . '"';
+
+		if ( $src_2x !== $src_1x ) {
+			$w1    = $width;
+			$w2    = $width * 2;
+			$html .= ' srcset="' . esc_url( $src_1x ) . " {$w1}w, "
+				. esc_url( $src_2x ) . " {$w2}w\"";
+			if ( $sizes ) {
+				$html .= ' sizes="' . esc_attr( $sizes ) . '"';
+			}
+		}
+
+		$html .= ' width="' . $width . '" height="' . $height . '"';
+		$html .= ' alt="' . esc_attr( $alt ) . '" loading="lazy">';
+
+		return $html;
+	}
+
+	/**
 	 * Open a content section with a title and optional link.
 	 *
 	 * @param string $title     Section heading.
@@ -58,7 +117,7 @@ class Renderer {
 	 */
 	public function hero( string $title, string $subtitle, string $bg_image ): string {
 		$html  = '<header class="zw-gr26-hero">';
-		$html .= '<div class="zw-gr26-hero__bg" style="background-image:url(' . esc_url( $bg_image ) . ')"></div>';
+		$html .= '<div class="zw-gr26-hero__bg" style="background-image:url(' . esc_url( $this->proxy->url( $bg_image, 1920, 1080 ) ) . ')"></div>';
 		$html .= '<div class="zw-gr26-hero__content">';
 		$html .= '<h1 class="zw-gr26-hero__title">' . esc_html( $title ) . '</h1>';
 
@@ -101,7 +160,14 @@ class Renderer {
 		$html .= '<' . $tag . $href . ' class="zw-gr26-vcard__link">';
 
 		if ( $has_thumb ) {
-			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
+			$html .= $this->img_tag(
+				$video['thumbnail'],
+				$video['titel'],
+				300,
+				188,
+				'zw-gr26-cover-img',
+				'(max-width: 480px) calc(100vw - 40px), (max-width: 768px) calc(50vw - 28px), 300px'
+			);
 		}
 
 		if ( $coming_soon ) {
@@ -140,7 +206,14 @@ class Renderer {
 		$html .= '<' . $tag . $href . ' class="zw-gr26-ecard__link">';
 
 		if ( $has_thumb ) {
-			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
+			$html .= $this->img_tag(
+				$video['thumbnail'],
+				$video['titel'],
+				200,
+				356,
+				'zw-gr26-cover-img',
+				'clamp(150px, 8vw + 110px, 200px)'
+			);
 		}
 
 		if ( $coming_soon ) {
@@ -168,7 +241,14 @@ class Renderer {
 		$html .= '<div class="zw-gr26-acard__thumb">';
 
 		if ( ! empty( $item['afbeelding'] ) ) {
-			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $item['afbeelding'] ) . '" alt="' . esc_attr( $item['titel'] ) . '" loading="lazy">';
+			$html .= $this->img_tag(
+				$item['afbeelding'],
+				$item['titel'],
+				300,
+				169,
+				'zw-gr26-cover-img',
+				'(max-width: 768px) calc(100vw - 40px), 300px'
+			);
 		}
 
 		$html .= '</div>';
