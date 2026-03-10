@@ -776,7 +776,7 @@
     right: 16px;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--zw-gr26-radius-sm);
     border: none;
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
@@ -1401,8 +1401,7 @@
 .zw-gr26-modal__close:focus-visible,
 .zw-gr26-coal-toggle:focus-visible,
 .zw-gr26-coal-status__reset:focus-visible {
-    outline: 2px solid var(--zw-gr26-blue);
-    outline-offset: 2px;
+    outline: none;
 }
 
 .zw-gr26-programma__select:focus-visible {
