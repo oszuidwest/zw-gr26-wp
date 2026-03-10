@@ -70,7 +70,7 @@ class Shortcode_Programmas {
 		$gemeenten = $this->data->get_programmas();
 
 		if ( empty( $gemeenten ) ) {
-			return '<!-- zw_gr26_programmas: geen gemeenten met programma-urls gevonden -->';
+			return '<!-- zw_gr26_programmas: geen gemeenten met partijen gevonden -->';
 		}
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
@@ -94,10 +94,17 @@ class Shortcode_Programmas {
 			$html .= '<div class="zwv-programma__list" id="' . esc_attr( $id ) . '">';
 
 			foreach ( $gemeente['partijen'] as $partij ) {
-				$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zwv-prow">';
-				$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-				$html .= '<span class="zwv-prow__link-text">Lees programma</span>';
-				$html .= '</a>';
+				if ( $partij['url'] ) {
+					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zwv-prow">';
+					$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+					$html .= '<span class="zwv-prow__link-text">Lees programma</span>';
+					$html .= '</a>';
+				} else {
+					$html .= '<div class="zwv-prow zwv-prow--disabled">';
+					$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+					$html .= '<span class="zwv-prow__link-text">Geen programma</span>';
+					$html .= '</div>';
+				}
 			}
 
 			$html .= '</div>';

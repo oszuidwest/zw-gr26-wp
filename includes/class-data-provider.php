@@ -397,12 +397,10 @@ class Data_Provider {
 
 			$partijen = [];
 			foreach ( $repeater as $row ) {
-				if ( ! empty( $row['programma_url'] ) ) {
-					$partijen[] = [
-						'naam' => $row['partij_naam'] ?? '',
-						'url'  => $row['programma_url'],
-					];
-				}
+				$partijen[] = [
+					'naam' => $row['partij_naam'] ?? '',
+					'url'  => ! empty( $row['programma_url'] ) ? $row['programma_url'] : '',
+				];
 			}
 
 			if ( ! empty( $partijen ) ) {
