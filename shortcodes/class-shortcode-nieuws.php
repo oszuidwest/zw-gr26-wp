@@ -92,7 +92,7 @@ class Shortcode_Nieuws {
 		$html = $this->renderer->section_open(
 			$atts['titel'],
 			$link,
-			'Bekijk alle artikelen'
+			'Alle nieuws'
 		);
 
 		$html .= '<div class="zwv-article-grid">';
