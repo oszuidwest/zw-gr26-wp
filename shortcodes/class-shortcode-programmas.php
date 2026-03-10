@@ -95,7 +95,7 @@ class Shortcode_Programmas {
 
 			foreach ( $gemeente['partijen'] as $partij ) {
 				if ( $partij['url'] ) {
-					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zwv-prow">';
+					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zwv-prow" target="_blank" rel="noopener noreferrer">';
 					$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
 					$html .= '<span class="zwv-prow__link-text">Lees programma</span>';
 					$html .= '</a>';
