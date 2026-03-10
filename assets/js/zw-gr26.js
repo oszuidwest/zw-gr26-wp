@@ -275,7 +275,7 @@
               : key;
         modalSub.textContent =
             data && data.has_2026
-                ? 'Gemeenteraadsverkiezingen 2026'
+                ? 'Uitslag gemeenteraadsverkiezingen 2026'
                 : 'Huidige samenstelling gemeenteraad';
     }
 
@@ -327,7 +327,7 @@
         if (p.zetels_2022 === null) {
             const span = document.createElement('span');
             span.className = 'zw-gr26-tbl__diff zw-gr26-tbl__diff--nieuw';
-            span.textContent = 'nieuw';
+            span.textContent = 'NW';
             td.appendChild(span);
         } else {
             const d = p.zetels - p.zetels_2022;
