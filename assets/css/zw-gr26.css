@@ -1172,7 +1172,7 @@
 }
 
 /* --- Wacht-state: hide +/- column --- */
-.zw-gr26-modal.is-wacht .zw-gr26-tbl thead th:nth-child(4) {
+.zw-gr26-modal.is-wacht .zw-gr26-tbl thead th:nth-child(3) {
     display: none;
 }
 
