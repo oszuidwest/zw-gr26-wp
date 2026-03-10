@@ -1,6 +1,9 @@
 /**
- * ZW-GR26 — ZuidWest Verkiezingen 2026
- * Programma-dropdown + resultaten-drawer met donut, tabel en coalitiebouwer
+ * ZuidWest Verkiezingen 2026 front-end interactie.
+ *
+ * Programma-dropdown, resultaten-drawer met donut, tabel, en coalitiebouwer.
+ *
+ * @package ZWGR26
  */
 (() => {
     /* === STEMLOCATIES ACCORDION === */
@@ -64,22 +67,55 @@
         return;
     }
 
+    /** @type {string} Default fallback color for parties without a specified color. */
     const DEFAULT_COLOR = '#90a4ae';
+
+    /** @type {number} Center X coordinate for the SVG donut chart. */
     const cx = 50;
+
+    /** @type {number} Center Y coordinate for the SVG donut chart. */
     const cy = 50;
+
+    /** @type {number} Radius of the SVG donut chart. */
     const r = 40;
+
+    /** @type {number} Circumference of the donut circle. */
     const circumference = 2 * Math.PI * r;
 
+    /** @type {?SVGSVGElement} SVG element for the results donut. */
     let svgResults = null;
+
+    /** @type {?SVGSVGElement} SVG element for the coalition donut overlay. */
     let svgCoal = null;
+
+    /** @type {HTMLTableRowElement[]} All party table rows in the current modal. */
     let rows = [];
+
+    /** @type {boolean} Whether the coalition builder mode is active. */
     let coalMode = false;
+
+    /** @type {boolean} Whether a majority was already reached in the current session. */
     let hadMajority = false;
+
+    /** @type {number} Total number of seats for the current municipality. */
     let currentTotalZetels = 0;
+
+    /** @type {number} Number of seats needed for a majority. */
     let currentMajority = 0;
+
+    /** @type {?HTMLElement} The tile element that opened the modal, used to restore focus. */
     let triggerElement = null;
 
     /* --- SVG helpers --- */
+
+    /**
+     * Creates an SVG element with a fixed viewBox and a CSS class.
+     *
+     * @access private
+     *
+     * @param {string} className CSS class to add to the SVG element.
+     * @return {SVGSVGElement} The created SVG element.
+     */
     function createSvg(className) {
         const svg = document.createElementNS(
             'http://www.w3.org/2000/svg',
@@ -90,6 +126,16 @@
         return svg;
     }
 
+    /**
+     * Appends a circle segment to an SVG donut chart.
+     *
+     * @access private
+     *
+     * @param {SVGSVGElement} svg    Target SVG element.
+     * @param {string}        kleur  Stroke color for the segment.
+     * @param {number}        pct    Fraction of the full circle (0–1).
+     * @param {number}        offset Dash offset to position the segment.
+     */
     function addCircle(svg, kleur, pct, offset) {
         const circle = document.createElementNS(
             'http://www.w3.org/2000/svg',
@@ -110,10 +156,26 @@
     }
 
     /* --- Coalition helpers --- */
+
+    /**
+     * Returns all table rows that are currently selected for the coalition.
+     *
+     * @access private
+     *
+     * @return {HTMLTableRowElement[]} Selected rows.
+     */
     function getSelectedRows() {
         return rows.filter((row) => row.classList.contains('is-selected'));
     }
 
+    /**
+     * Calculates the total number of seats for the given rows.
+     *
+     * @access private
+     *
+     * @param {HTMLTableRowElement[]} selected Rows to sum seats for.
+     * @return {number} Total seats.
+     */
     function getSelectedSeats(selected) {
         return selected.reduce(
             (sum, row) => sum + Number(row.dataset.zetels),
@@ -121,6 +183,15 @@
         );
     }
 
+    /**
+     * Draws the coalition donut chart from the selected party rows.
+     *
+     * Replaces the existing coalition SVG content and updates the seat counter.
+     *
+     * @access private
+     *
+     * @param {HTMLTableRowElement[]} selected Rows to visualize.
+     */
     function drawCoalDonut(selected) {
         svgCoal.replaceChildren();
         let coalOffset = 0;
@@ -147,6 +218,14 @@
         donutCoalLabel.textContent = `van ${currentTotalZetels}`;
     }
 
+    /**
+     * Updates the coalition display after a selection change.
+     *
+     * Redraws the coalition donut, checks for a majority, and triggers confetti
+     * when a majority is reached for the first time.
+     *
+     * @access private
+     */
     function updateCoalition() {
         const selected = getSelectedRows();
         const sum = getSelectedSeats(selected);
@@ -176,6 +255,15 @@
     }
 
     /* --- Confetti --- */
+
+    /**
+     * Launches a full-screen confetti animation.
+     *
+     * Creates a temporary canvas, spawns colored rectangles that fall with
+     * gravity, and removes the canvas after a fade-out.
+     *
+     * @access private
+     */
     function launchConfetti() {
         const canvas = document.createElement('canvas');
         canvas.className = 'zw-gr26-confetti-canvas';
@@ -218,6 +306,13 @@
         const fadeStart = 2500;
         const start = performance.now();
 
+        /**
+         * Renders a single animation frame of falling confetti.
+         *
+         * @access private
+         *
+         * @param {number} now Current timestamp from requestAnimationFrame.
+         */
         function draw(now) {
             const elapsed = now - start;
             ctx.clearRect(0, 0, W, H);
@@ -252,6 +347,14 @@
     }
 
     /* --- Modal content builders --- */
+
+    /**
+     * Resets the modal to its default state for a municipality.
+     *
+     * @access private
+     *
+     * @param {boolean} is2026 Whether 2026 results are available.
+     */
     function resetState(is2026) {
         coalMode = false;
         hadMajority = false;
@@ -267,6 +370,15 @@
             'Klik op partijen om een coalitie te vormen';
     }
 
+    /**
+     * Renders the modal header with the municipality name and subtitle.
+     *
+     * @access private
+     *
+     * @param {?Object}      data     Municipality data object, or null.
+     * @param {string}       key      Municipality slug used as fallback title.
+     * @param {?HTMLElement}  tileName Element containing the tile display name.
+     */
     function renderHeader(data, key, tileName) {
         modalTitle.textContent = data
             ? data.naam
@@ -278,6 +390,17 @@
             : 'Huidige samenstelling gemeenteraad';
     }
 
+    /**
+     * Renders voter turnout information in the modal.
+     *
+     * Displays the 2026 turnout percentage when available, with an optional
+     * 2022 reference. Falls back to showing only the 2022 turnout.
+     *
+     * @access private
+     *
+     * @param {?Object} data   Municipality data object, or null.
+     * @param {boolean} is2026 Whether 2026 results are available.
+     */
     function renderOpkomst(data, is2026) {
         opkomstEl.textContent = '';
 
@@ -297,6 +420,14 @@
         }
     }
 
+    /**
+     * Renders the seat distribution donut chart in the modal.
+     *
+     * @access private
+     *
+     * @param {Object[]} partijen Array of party objects with zetels, kleur, etc.
+     * @param {boolean}  is2026   Whether to show 2026 or 2022 seat counts.
+     */
     function renderDonut(partijen, is2026) {
         donutEl.classList.remove('has-majority');
         if (svgResults) svgResults.remove();
@@ -319,6 +450,15 @@
         donutTotal.textContent = currentTotalZetels;
     }
 
+    /**
+     * Creates a table cell showing the seat difference between 2026 and 2022.
+     *
+     * @access private
+     *
+     * @param {Object}  p      Party data object with zetels and zetels_2022.
+     * @param {boolean} is2026 Whether 2026 results are available.
+     * @return {HTMLTableCellElement} The constructed diff cell.
+     */
     function createDiffCell(p, is2026) {
         const td = document.createElement('td');
         if (!is2026) return td;
@@ -343,6 +483,17 @@
         return td;
     }
 
+    /**
+     * Renders the results table with a row for each party.
+     *
+     * Each row displays the party color dot, name, seat count, and optional
+     * seat difference. Rows are clickable in coalition mode.
+     *
+     * @access private
+     *
+     * @param {Object[]} partijen Array of party objects.
+     * @param {boolean}  is2026   Whether to show 2026 or 2022 seat counts.
+     */
     function renderTable(partijen, is2026) {
         tbody.replaceChildren();
         rows = [];
@@ -415,6 +566,17 @@
     });
 
     /* --- Open drawer on tile click/keypress --- */
+
+    /**
+     * Opens the results modal for a municipality tile.
+     *
+     * Loads municipality data, renders all modal sections, and moves focus
+     * to the close button.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} tile The clicked municipality tile element.
+     */
     function openTile(tile) {
         const key = tile.dataset.gemeente;
         const data = zwGr26Resultaten[key] || null;
@@ -473,6 +635,12 @@
     });
 
     /* --- Close drawer --- */
+
+    /**
+     * Closes the results modal and restores focus to the originating tile.
+     *
+     * @access private
+     */
     function closeModal() {
         backdrop.classList.remove('is-open');
         if (triggerElement) {
