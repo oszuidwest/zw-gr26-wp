@@ -1,0 +1,87 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.php"
+      - "**.js"
+      - "**.css"
+      - "composer.json"
+      - "composer.lock"
+      - "phpcs.xml"
+      - "phpstan.neon"
+      - "biome.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/lint.yml"
+  pull_request:
+    paths:
+      - "**.php"
+      - "**.js"
+      - "**.css"
+      - "composer.json"
+      - "composer.lock"
+      - "phpcs.xml"
+      - "phpstan.neon"
+      - "biome.json"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/lint.yml"
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.3", "8.4"]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: cs2pr
+
+      - name: Syntax check
+        run: find . -name "*.php" -not -path "./vendor/*" -exec php -l {} \;
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: PHPCS
+        run: vendor/bin/phpcs -q --report=checkstyle | cs2pr
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --error-format=checkstyle | cs2pr
+
+      - name: WordPress Plugin Check
+        if: matrix.php == '8.3'
+        uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: "."
+          exclude-checks: "late_escaping,plugin_review_phpcs,file_type,plugin_readme"
+
+  biome:
+    name: Biome (JS/CSS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint

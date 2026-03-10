@@ -1,0 +1,15 @@
+parameters:
+  level: 6
+  phpVersion: 80300
+  paths:
+    - zw-gr26.php
+    - includes
+    - shortcodes
+  excludePaths:
+    - vendor
+  bootstrapFiles:
+    - phpstan-bootstrap.php
+  parallel:
+    maximumNumberOfProcesses: 1
+  ignoreErrors:
+    - identifier: missingType.iterableValue

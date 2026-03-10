@@ -1,0 +1,397 @@
+<?php
+/**
+ * Bunny CDN Stream API client.
+ *
+ * @package ZWGR26
+ */
+
+namespace ZWGR26;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Fetches and normalizes video data from the Bunny CDN Stream API.
+ */
+class Bunny_API {
+
+	/**
+	 * Transient cache lifetime in seconds.
+	 *
+	 * @var int
+	 */
+	private const TRANSIENT_TTL = 10 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Number of items per API page.
+	 *
+	 * @var int
+	 */
+	private const ITEMS_PER_PAGE = 100;
+
+	/**
+	 * Bunny video status value for "finished encoding".
+	 *
+	 * @var int
+	 */
+	private const STATUS_FINISHED = 4;
+
+	/**
+	 * Base URL for the Bunny Stream API.
+	 *
+	 * @var string
+	 */
+	private const API_BASE = 'https://video.bunnycdn.com/library/';
+
+	/**
+	 * HTTP request timeout in seconds.
+	 *
+	 * @var int
+	 */
+	private const API_TIMEOUT = 30;
+
+	/**
+	 * Prefix for WordPress transient keys.
+	 *
+	 * @var string
+	 */
+	private const TRANSIENT_PREFIX = 'zwgr26_bunny_';
+
+	/**
+	 * Look up Bunny CDN credentials for a library from ACF theme options.
+	 *
+	 * @param int $library_id The Bunny library ID to look up.
+	 * @return array|null Credentials array or null if not found.
+	 */
+	public function get_credentials( int $library_id ): ?array {
+		if ( ! function_exists( 'get_field' ) ) {
+			return null;
+		}
+
+		$libraries = [
+			[
+				'id'       => 'bunny_cdn_library_id',
+				'hostname' => 'bunny_cdn_hostname',
+				'api_key'  => 'bunny_cdn_api_key',
+			],
+			[
+				'id'       => 'bunny_cdn_library_id_fragmenten',
+				'hostname' => 'bunny_cdn_hostname_fragmenten',
+				'api_key'  => 'bunny_cdn_api_key_fragmenten',
+			],
+		];
+
+		foreach ( $libraries as $lib ) {
+			$id = get_field( $lib['id'], 'option' );
+			if ( $id && (int) $id === $library_id ) {
+				$hostname = get_field( $lib['hostname'], 'option' );
+				$api_key  = get_field( $lib['api_key'], 'option' );
+				if ( $hostname && $api_key ) {
+					return [
+						'libraryId' => $library_id,
+						'hostname'  => rtrim( $hostname, '/' ),
+						'apiKey'    => $api_key,
+					];
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Fetch videos for a collection, with transient caching.
+	 *
+	 * @param int    $library_id    Bunny library ID.
+	 * @param string $collection_id Bunny collection GUID.
+	 * @param string $page_url      Optional page URL for video deep-links.
+	 * @return array|null Normalized video list or null on failure.
+	 */
+	public function get_videos( int $library_id, string $collection_id, string $page_url = '' ): ?array {
+		$transient_key = self::TRANSIENT_PREFIX . $library_id . '_' . md5( $collection_id );
+		$cached        = get_transient( $transient_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$credentials = $this->get_credentials( $library_id );
+		if ( ! $credentials ) {
+			return null;
+		}
+
+		$all = $this->fetch_all_videos( $credentials, $collection_id );
+		if ( null === $all ) {
+			return null;
+		}
+
+		$items = $this->normalize_videos( $all, $credentials, $page_url );
+
+		usort(
+			$items,
+			function ( array $a, array $b ): int {
+				return strtotime( $b['datum'] ) - strtotime( $a['datum'] );
+			}
+		);
+
+		set_transient( $transient_key, $items, self::TRANSIENT_TTL );
+
+		return $items;
+	}
+
+	/**
+	 * Format a duration in seconds as H:MM:SS or M:SS.
+	 *
+	 * @param int $seconds Duration in seconds.
+	 * @return string Formatted duration or empty string if zero.
+	 */
+	public function format_duration( int $seconds ): string {
+		if ( $seconds <= 0 ) {
+			return '';
+		}
+
+		$h = intdiv( $seconds, 3600 );
+		$m = intdiv( $seconds % 3600, 60 );
+		$s = $seconds % 60;
+
+		return $h > 0
+			? sprintf( '%d:%02d:%02d', $h, $m, $s )
+			: sprintf( '%d:%02d', $m, $s );
+	}
+
+	/**
+	 * Get the full thumbnail URL for a single video by its GUID.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @return string Thumbnail URL or empty string on failure.
+	 */
+	public function get_thumbnail_url( int $library_id, string $video_id ): string {
+		$transient_key = self::TRANSIENT_PREFIX . 'thumb_' . $video_id;
+		$cached        = get_transient( $transient_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$credentials = $this->get_credentials( $library_id );
+		if ( ! $credentials ) {
+			return '';
+		}
+
+		$api_url  = self::API_BASE . $credentials['libraryId'] . '/videos/' . $video_id;
+		$response = wp_remote_get(
+			$api_url,
+			[
+				'timeout' => self::API_TIMEOUT,
+				'headers' => [
+					'AccessKey' => $credentials['apiKey'],
+					'accept'    => 'application/json',
+				],
+			]
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return '';
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		if ( ! $body || empty( $body->thumbnailFileName ) ) {
+			return '';
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		$url = $credentials['hostname'] . '/' . $video_id . '/' . $body->thumbnailFileName;
+
+		set_transient( $transient_key, $url, self::TRANSIENT_TTL );
+
+		return $url;
+	}
+
+	/**
+	 * Paginate through the Bunny API to fetch all finished videos in a collection.
+	 *
+	 * @param array  $credentials  API credentials.
+	 * @param string $collection_id Collection GUID.
+	 * @return array|null List of video objects or null on failure.
+	 */
+	private function fetch_all_videos( array $credentials, string $collection_id ): ?array {
+		$api_url = self::API_BASE . $credentials['libraryId'] . '/videos';
+		$page    = 1;
+		$all     = [];
+
+		while ( true ) {
+			$response = wp_remote_get(
+				add_query_arg(
+					[
+						'collection'   => $collection_id,
+						'itemsPerPage' => self::ITEMS_PER_PAGE,
+						'page'         => $page,
+					],
+					$api_url
+				),
+				[
+					'timeout' => self::API_TIMEOUT,
+					'headers' => [
+						'AccessKey' => $credentials['apiKey'],
+						'accept'    => 'application/json',
+					],
+				]
+			);
+
+			if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+				return null;
+			}
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+			if ( ! $body || ! isset( $body->items ) ) {
+				return null;
+			}
+
+			$all = array_merge( $all, $body->items );
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+			if ( count( $all ) >= $body->totalItems ) {
+				break;
+			}
+			++$page;
+		}
+
+		return array_filter(
+			$all,
+			function ( $v ): bool {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+				return isset( $v->status ) && self::STATUS_FINISHED === $v->status;
+			}
+		);
+	}
+
+	/**
+	 * Normalize raw Bunny API video objects into a flat array format.
+	 *
+	 * @param array  $videos      Raw video objects from the API.
+	 * @param array  $credentials API credentials including hostname.
+	 * @param string $page_url    Optional page URL for deep-links.
+	 * @return array Normalized video data.
+	 */
+	private function normalize_videos( array $videos, array $credentials, string $page_url ): array {
+		$now   = new \DateTime( 'now', wp_timezone() );
+		$items = [];
+
+		foreach ( $videos as $v ) {
+			$broadcast = $this->extract_broadcast_date( $v );
+
+			if ( ! $broadcast || '2026' !== $broadcast->format( 'Y' ) ) {
+				continue;
+			}
+
+			// phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+			$items[] = [
+				'guid'       => $v->guid,
+				'titel'      => $v->title,
+				'thumbnail'  => $credentials['hostname'] . '/' . $v->guid . '/' . $v->thumbnailFileName,
+				'url'        => $page_url
+					? rtrim( $page_url, '/' ) . '/?v=' . $v->guid
+					: 'https://iframe.mediadelivery.net/play/' . $v->videoLibraryId . '/' . $v->guid,
+				'duur'       => isset( $v->length ) ? (int) $v->length : 0,
+				'datum'      => $broadcast->format( 'Y-m-d H:i:s' ),
+				'binnenkort' => $broadcast > $now,
+			];
+			// phpcs:enable
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get video info (thumbnail URL and binnenkort status) for a single video.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @return array|null Array with 'thumbnail' and 'binnenkort' keys, or null on failure.
+	 */
+	public function get_video_info( int $library_id, string $video_id ): ?array {
+		$transient_key = self::TRANSIENT_PREFIX . 'info_' . $video_id;
+		$cached        = get_transient( $transient_key );
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		$credentials = $this->get_credentials( $library_id );
+		if ( ! $credentials ) {
+			return null;
+		}
+
+		$api_url  = self::API_BASE . $credentials['libraryId'] . '/videos/' . $video_id;
+		$response = wp_remote_get(
+			$api_url,
+			[
+				'timeout' => self::API_TIMEOUT,
+				'headers' => [
+					'AccessKey' => $credentials['apiKey'],
+					'accept'    => 'application/json',
+				],
+			]
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return null;
+		}
+
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		if ( ! $body || empty( $body->thumbnailFileName ) ) {
+			return null;
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		$thumbnail = $credentials['hostname'] . '/' . $video_id . '/' . $body->thumbnailFileName;
+
+		$broadcast  = $this->extract_broadcast_date( $body );
+		$binnenkort = false;
+		if ( $broadcast ) {
+			$now        = new \DateTime( 'now', wp_timezone() );
+			$binnenkort = $broadcast > $now;
+		}
+
+		$info = [
+			'thumbnail'  => $thumbnail,
+			'binnenkort' => $binnenkort,
+		];
+
+		set_transient( $transient_key, $info, self::TRANSIENT_TTL );
+
+		return $info;
+	}
+
+	/**
+	 * Extract the broadcast date from a video's meta tags.
+	 *
+	 * @param object $video Bunny API video object.
+	 * @return \DateTime|null Parsed date or null if not found.
+	 */
+	private function extract_broadcast_date( object $video ): ?\DateTime {
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		if ( empty( $video->metaTags ) ) {
+			return null;
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		foreach ( $video->metaTags as $tag ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+			if ( isset( $tag->property ) && 'description' === $tag->property && ! empty( $tag->value ) ) {
+				// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+				if ( preg_match( '/^---\s*\n.*?broadcast_date:\s*(.+?)\s*\n.*?---/s', $tag->value, $m ) ) {
+					try {
+						return new \DateTime( trim( $m[1] ), wp_timezone() );
+					} catch ( \Exception $e ) {
+						return null;
+					}
+				}
+				break;
+			}
+		}
+
+		return null;
+	}
+}
