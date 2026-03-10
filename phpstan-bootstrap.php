@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	define( 'ABSPATH', __DIR__ . '/' );
 }
 
-define( 'ZWGR26_VERSION', '1.3.0' );
+define( 'ZWGR26_VERSION', '0.0.0-dev' );
 define( 'ZWGR26_PATH', __DIR__ . '/' );
 define( 'ZWGR26_URL', 'https://example.com/wp-content/plugins/zw-gr26/' );
 
