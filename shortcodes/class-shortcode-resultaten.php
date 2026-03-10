@@ -119,7 +119,7 @@ class Shortcode_Resultaten {
 				echo '<div class="zw-gr26-modal__body">';
 
 				// Wacht-state banner (hidden by default, shown via JS .is-wacht class).
-				echo '<div class="zw-gr26-modal__wacht-banner">Uitslagen volgen op verkiezingsavond</div>';
+				echo '<div class="zw-gr26-modal__wacht-banner">Hier verschijnen de uitslagen op 18 maart</div>';
 
 				// Donut section.
 				echo '<div class="zw-gr26-modal__section">';
