@@ -81,9 +81,17 @@ class Shortcode_Nieuws {
 			return '<!-- zw_gr26_nieuws: geen posts gevonden -->';
 		}
 
+		$link = $atts['link'];
+		if ( ! $link && taxonomy_exists( 'dossier' ) ) {
+			$term_link = get_term_link( $atts['dossier'], 'dossier' );
+			if ( ! is_wp_error( $term_link ) ) {
+				$link = $term_link;
+			}
+		}
+
 		$html = $this->renderer->section_open(
 			$atts['titel'],
-			$atts['link'],
+			$link,
 			'Bekijk alle artikelen'
 		);
 
