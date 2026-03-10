@@ -101,7 +101,7 @@ class Renderer {
 		$html .= '<' . $tag . $href . ' class="zw-gr26-vcard__link">';
 
 		if ( $has_thumb ) {
-			$html .= '<img src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
+			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
 		}
 
 		if ( $coming_soon ) {
@@ -140,7 +140,7 @@ class Renderer {
 		$html .= '<' . $tag . $href . ' class="zw-gr26-ecard__link">';
 
 		if ( $has_thumb ) {
-			$html .= '<img src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
+			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
 		}
 
 		if ( $coming_soon ) {
@@ -168,7 +168,7 @@ class Renderer {
 		$html .= '<div class="zw-gr26-acard__thumb">';
 
 		if ( ! empty( $item['afbeelding'] ) ) {
-			$html .= '<img src="' . esc_url( $item['afbeelding'] ) . '" alt="' . esc_attr( $item['titel'] ) . '" loading="lazy">';
+			$html .= '<img class="zw-gr26-cover-img" src="' . esc_url( $item['afbeelding'] ) . '" alt="' . esc_attr( $item['titel'] ) . '" loading="lazy">';
 		}
 
 		$html .= '</div>';

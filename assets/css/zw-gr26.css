@@ -12,6 +12,19 @@
     --zw-gr26-border: #f0f0f2;
     --zw-gr26-bg-light: #fafbfc;
     --zw-gr26-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --zw-gr26-radius: 4px;
+    --zw-gr26-font-heading: "Nunito", sans-serif;
+}
+
+/* === UTILITIES === */
+.zw-gr26-cover-img {
+    position: absolute !important;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
+    margin: 0 !important;
 }
 
 /* === RESETS === */
@@ -143,7 +156,7 @@
 }
 
 .zw-gr26-section__title {
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 28px;
     font-weight: 800;
     display: inline-flex;
@@ -179,7 +192,7 @@
 /* === INTRO TEXT === */
 .zw-gr26-intro {
     background: #fff;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     padding: 24px 28px;
     box-shadow: var(--zw-gr26-shadow-card);
     font-size: 15px;
@@ -200,7 +213,7 @@
 
 .zw-gr26-acard {
     background: #fff;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     overflow: hidden;
     box-shadow: var(--zw-gr26-shadow-card);
     transition: transform 0.2s ease;
@@ -224,23 +237,13 @@
     position: relative;
 }
 
-.zw-gr26-acard__thumb img {
-    position: absolute !important;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block;
-    margin: 0 !important;
-}
-
 .zw-gr26-acard__info {
     padding: 14px 16px;
 }
 
 .zw-gr26-acard__tag {
     display: inline-block;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 12px;
     font-weight: 900;
     color: #fff;
@@ -272,7 +275,7 @@
 }
 
 .zw-gr26-vcard {
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     overflow: hidden;
     position: relative;
     background: var(--zw-gr26-blue);
@@ -306,27 +309,17 @@
     opacity: 0.1;
 }
 
-.zw-gr26-vcard img {
-    position: absolute !important;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block;
-    margin: 0 !important;
-}
-
 .zw-gr26-vcard__play {
     position: absolute;
     top: 12px;
     right: 12px;
     background: var(--zw-gr26-red);
     color: #fff;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     z-index: 3;
     display: flex;
     align-items: center;
@@ -387,11 +380,11 @@
     right: 12px;
     background: rgba(255, 255, 255, 0.85);
     color: #666;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 11px;
     font-weight: 700;
     padding: 4px 10px;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     z-index: 3;
     display: flex;
     align-items: center;
@@ -428,7 +421,7 @@
 .zw-gr26-ecard {
     flex: 0 0 200px;
     scroll-snap-align: start;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     overflow: hidden;
     transition: transform 0.2s ease;
     color: #fff;
@@ -446,16 +439,6 @@
     text-decoration: none;
     color: inherit;
     height: 100%;
-}
-
-.zw-gr26-ecard img {
-    position: absolute !important;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block;
-    margin: 0 !important;
 }
 
 .zw-gr26-ecard::after {
@@ -505,7 +488,7 @@
 /* === PROGRAMMA TABEL === */
 .zw-gr26-programma {
     background: #fff;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     overflow: hidden;
     box-shadow: var(--zw-gr26-shadow-card);
 }
@@ -522,7 +505,7 @@
     font-weight: 600;
     font-family: inherit;
     border: 2px solid var(--zw-gr26-blue);
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     color: var(--zw-gr26-blue);
     background: #fff;
     cursor: pointer;
@@ -603,7 +586,7 @@
 
 /* === UITSLAGENAVOND === */
 .zw-gr26-uitslagen {
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     overflow: hidden;
 }
 
@@ -666,7 +649,7 @@
     background: var(--zw-gr26-red);
     color: #fff;
     padding: 3px 10px;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     margin-bottom: 8px;
 }
 
@@ -692,7 +675,7 @@
 .zw-gr26-tile {
     background: #fff;
     border: 2px dashed #c0c4cc;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
     padding: 16px 16px 14px;
     cursor: pointer;
     transition: border-color 0.2s ease;
@@ -802,7 +785,7 @@
 }
 
 .zw-gr26-modal__title {
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 24px;
     font-weight: 900;
     color: #fff;
@@ -830,7 +813,7 @@
     font-size: 13px;
     font-weight: 700;
     margin: 16px 16px 8px;
-    border-radius: 4px;
+    border-radius: var(--zw-gr26-radius);
 }
 
 .zw-gr26-modal.is-wacht .zw-gr26-modal__wacht-banner {
@@ -937,7 +920,7 @@
 }
 
 .zw-gr26-modal__donut-total {
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 30px;
     font-weight: 900;
     color: var(--zw-gr26-blue);
@@ -961,7 +944,7 @@
 
 .zw-gr26-modal__donut-majority-label {
     display: none;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     font-size: 13px;
     font-weight: 900;
     color: var(--zw-gr26-green);
@@ -1091,7 +1074,7 @@
 .zw-gr26-tbl__seats {
     font-weight: 800;
     font-size: 14px;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
 }
 
 .zw-gr26-tbl__diff {
@@ -1123,7 +1106,7 @@
     padding: 12px 24px;
     font-size: 14px;
     font-weight: 700;
-    font-family: "Nunito", sans-serif;
+    font-family: var(--zw-gr26-font-heading);
     color: var(--zw-gr26-blue);
     background: #f4f5f7;
     border: none;
