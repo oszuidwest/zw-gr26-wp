@@ -4,14 +4,16 @@
  */
 (() => {
     /* === STEMLOCATIES ACCORDION === */
-    document.querySelectorAll('.zwv-stem__row').forEach((row) => {
+    document.querySelectorAll('.zw-gr26-stem__row').forEach((row) => {
         row.addEventListener('click', () => {
-            const parent = row.closest('.zwv-stem__list');
-            parent.querySelectorAll('.zwv-stem__row.open').forEach((other) => {
-                if (other !== row) {
-                    other.classList.remove('open');
-                }
-            });
+            const parent = row.closest('.zw-gr26-stem__list');
+            parent
+                .querySelectorAll('.zw-gr26-stem__row.open')
+                .forEach((other) => {
+                    if (other !== row) {
+                        other.classList.remove('open');
+                    }
+                });
             row.classList.toggle('open');
         });
     });
@@ -21,11 +23,11 @@
         '[data-zw-gr26-programma-select]',
     );
     selects.forEach((select) => {
-        const container = select.closest('.zwv-programma');
+        const container = select.closest('.zw-gr26-programma');
 
         select.addEventListener('change', (e) => {
             const scope = container || document;
-            scope.querySelectorAll('.zwv-programma__list').forEach((el) => {
+            scope.querySelectorAll('.zw-gr26-programma__list').forEach((el) => {
                 el.classList.remove('active');
             });
             if (e.target.value) {
@@ -43,7 +45,7 @@
     }
 
     const backdrop = document.getElementById('zwvModal');
-    const modal = backdrop ? backdrop.querySelector('.zwv-modal') : null;
+    const modal = backdrop ? backdrop.querySelector('.zw-gr26-modal') : null;
     const modalTitle = document.getElementById('zwvModalTitle');
     const modalSub = document.getElementById('zwvModalSubtitle');
     const modalClose = document.getElementById('zwvModalClose');
@@ -176,7 +178,7 @@
     /* --- Confetti --- */
     function launchConfetti() {
         const canvas = document.createElement('canvas');
-        canvas.className = 'zwv-confetti-canvas';
+        canvas.className = 'zw-gr26-confetti-canvas';
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
 
@@ -279,131 +281,135 @@
     });
 
     /* --- Open drawer on tile click --- */
-    document.querySelectorAll('.zwv-tile[data-gemeente]').forEach((tile) => {
-        tile.addEventListener('click', () => {
-            const key = tile.dataset.gemeente;
-            const data = zwGr26Resultaten[key] || null;
-            const is2026 = data ? data.has_2026 : false;
-            const partijen = data ? data.partijen : [];
-            const tileName = tile.querySelector('.zwv-tile__name');
+    document
+        .querySelectorAll('.zw-gr26-tile[data-gemeente]')
+        .forEach((tile) => {
+            tile.addEventListener('click', () => {
+                const key = tile.dataset.gemeente;
+                const data = zwGr26Resultaten[key] || null;
+                const is2026 = data ? data.has_2026 : false;
+                const partijen = data ? data.partijen : [];
+                const tileName = tile.querySelector('.zw-gr26-tile__name');
 
-            currentTotalZetels = data ? data.totaal_zetels : 0;
-            currentMajority = Math.floor(currentTotalZetels / 2) + 1;
+                currentTotalZetels = data ? data.totaal_zetels : 0;
+                currentMajority = Math.floor(currentTotalZetels / 2) + 1;
 
-            // Reset coal mode.
-            coalMode = false;
-            modal.classList.remove('is-coal-mode', 'has-majority');
-            modal.classList.toggle('is-wacht', !is2026);
-            coalToggle.textContent = 'Bouw coalitie';
-            donutLabel.textContent = is2026
-                ? 'Zetelverdeling'
-                : 'Huidige zetelverdeling';
-            tableLabel.textContent = is2026 ? 'Resultaten' : 'Huidige raad';
-            hadMajority = false;
+                // Reset coal mode.
+                coalMode = false;
+                modal.classList.remove('is-coal-mode', 'has-majority');
+                modal.classList.toggle('is-wacht', !is2026);
+                coalToggle.textContent = 'Bouw coalitie';
+                donutLabel.textContent = is2026
+                    ? 'Zetelverdeling'
+                    : 'Huidige zetelverdeling';
+                tableLabel.textContent = is2026 ? 'Resultaten' : 'Huidige raad';
+                hadMajority = false;
 
-            // Show/hide coalition toggle.
-            coalToggle.style.display = is2026 ? '' : 'none';
+                // Show/hide coalition toggle.
+                coalToggle.style.display = is2026 ? '' : 'none';
 
-            // Header.
-            modalTitle.textContent = data
-                ? data.naam
-                : tileName
-                  ? tileName.textContent
-                  : key;
-            modalSub.textContent = is2026
-                ? 'Gemeenteraadsverkiezingen 2026'
-                : 'Huidige samenstelling gemeenteraad';
+                // Header.
+                modalTitle.textContent = data
+                    ? data.naam
+                    : tileName
+                      ? tileName.textContent
+                      : key;
+                modalSub.textContent = is2026
+                    ? 'Gemeenteraadsverkiezingen 2026'
+                    : 'Huidige samenstelling gemeenteraad';
 
-            // Opkomst.
-            if (is2026 && data.opkomst_2026 != null) {
-                let txt = `Opkomst: ${data.opkomst_2026}%`;
-                if (data.opkomst_2022 != null) {
-                    txt += ` <span class="zwv-modal__opkomst-ref">(2022: ${data.opkomst_2022}%)</span>`;
-                }
-                opkomstEl.innerHTML = txt;
-            } else if (data && data.opkomst_2022 != null) {
-                opkomstEl.innerHTML = `<span class="zwv-modal__opkomst-ref">Opkomst 2022: ${data.opkomst_2022}%</span>`;
-            } else {
-                opkomstEl.textContent = '';
-            }
-
-            // Build results donut.
-            donutEl.classList.remove('has-majority');
-            if (svgResults) svgResults.remove();
-            if (svgCoal) svgCoal.remove();
-
-            svgResults = createSvg('zwv-modal__donut-svg-results');
-            svgCoal = createSvg('zwv-modal__donut-svg-coal');
-
-            let offset = 0;
-            partijen.forEach((p) => {
-                const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
-                const pct = seats / currentTotalZetels;
-                addCircle(svgResults, p.kleur || '#90a4ae', pct, offset);
-                offset += pct * circumference;
-            });
-
-            const center = donutEl.querySelector('.zwv-modal__donut-center');
-            donutEl.insertBefore(svgCoal, center);
-            donutEl.insertBefore(svgResults, center);
-            donutTotal.textContent = currentTotalZetels;
-
-            // Build table.
-            tbody.innerHTML = '';
-            rows = [];
-            partijen.forEach((p) => {
-                const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
-                const tr = document.createElement('tr');
-                tr.dataset.zetels = seats;
-                tr.dataset.kleur = p.kleur || '#90a4ae';
-
-                const td1 = document.createElement('td');
-                td1.innerHTML = `<span class="zwv-tbl__dot" style="background:${p.kleur || '#90a4ae'}"></span><span class="zwv-tbl__name">${p.naam}</span>`;
-
-                const td2 = document.createElement('td');
-
-                const td3 = document.createElement('td');
-                td3.className = 'zwv-tbl__seats';
-                td3.textContent = seats;
-
-                const td4 = document.createElement('td');
-                if (is2026) {
-                    if (p.zetels_2022 === null) {
-                        td4.innerHTML =
-                            '<span class="zwv-tbl__diff zwv-tbl__diff--nieuw">nieuw</span>';
-                    } else {
-                        const d = p.zetels - p.zetels_2022;
-                        if (d !== 0) {
-                            const cls =
-                                d > 0
-                                    ? 'zwv-tbl__diff zwv-tbl__diff--plus'
-                                    : 'zwv-tbl__diff zwv-tbl__diff--min';
-                            td4.innerHTML = `<span class="${cls}">${d > 0 ? `+${d}` : d}</span>`;
-                        }
+                // Opkomst.
+                if (is2026 && data.opkomst_2026 != null) {
+                    let txt = `Opkomst: ${data.opkomst_2026}%`;
+                    if (data.opkomst_2022 != null) {
+                        txt += ` <span class="zw-gr26-modal__opkomst-ref">(2022: ${data.opkomst_2022}%)</span>`;
                     }
+                    opkomstEl.innerHTML = txt;
+                } else if (data && data.opkomst_2022 != null) {
+                    opkomstEl.innerHTML = `<span class="zw-gr26-modal__opkomst-ref">Opkomst 2022: ${data.opkomst_2022}%</span>`;
+                } else {
+                    opkomstEl.textContent = '';
                 }
 
-                tr.addEventListener('click', () => {
-                    if (!coalMode) return;
-                    tr.classList.toggle('is-selected');
-                    updateCoalition();
+                // Build results donut.
+                donutEl.classList.remove('has-majority');
+                if (svgResults) svgResults.remove();
+                if (svgCoal) svgCoal.remove();
+
+                svgResults = createSvg('zw-gr26-modal__donut-svg-results');
+                svgCoal = createSvg('zw-gr26-modal__donut-svg-coal');
+
+                let offset = 0;
+                partijen.forEach((p) => {
+                    const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                    const pct = seats / currentTotalZetels;
+                    addCircle(svgResults, p.kleur || '#90a4ae', pct, offset);
+                    offset += pct * circumference;
                 });
 
-                tr.appendChild(td1);
-                tr.appendChild(td2);
-                tr.appendChild(td3);
-                tr.appendChild(td4);
-                tbody.appendChild(tr);
-                rows.push(tr);
+                const center = donutEl.querySelector(
+                    '.zw-gr26-modal__donut-center',
+                );
+                donutEl.insertBefore(svgCoal, center);
+                donutEl.insertBefore(svgResults, center);
+                donutTotal.textContent = currentTotalZetels;
+
+                // Build table.
+                tbody.innerHTML = '';
+                rows = [];
+                partijen.forEach((p) => {
+                    const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                    const tr = document.createElement('tr');
+                    tr.dataset.zetels = seats;
+                    tr.dataset.kleur = p.kleur || '#90a4ae';
+
+                    const td1 = document.createElement('td');
+                    td1.innerHTML = `<span class="zw-gr26-tbl__dot" style="background:${p.kleur || '#90a4ae'}"></span><span class="zw-gr26-tbl__name">${p.naam}</span>`;
+
+                    const td2 = document.createElement('td');
+
+                    const td3 = document.createElement('td');
+                    td3.className = 'zw-gr26-tbl__seats';
+                    td3.textContent = seats;
+
+                    const td4 = document.createElement('td');
+                    if (is2026) {
+                        if (p.zetels_2022 === null) {
+                            td4.innerHTML =
+                                '<span class="zw-gr26-tbl__diff zw-gr26-tbl__diff--nieuw">nieuw</span>';
+                        } else {
+                            const d = p.zetels - p.zetels_2022;
+                            if (d !== 0) {
+                                const cls =
+                                    d > 0
+                                        ? 'zw-gr26-tbl__diff zw-gr26-tbl__diff--plus'
+                                        : 'zw-gr26-tbl__diff zw-gr26-tbl__diff--min';
+                                td4.innerHTML = `<span class="${cls}">${d > 0 ? `+${d}` : d}</span>`;
+                            }
+                        }
+                    }
+
+                    tr.addEventListener('click', () => {
+                        if (!coalMode) return;
+                        tr.classList.toggle('is-selected');
+                        updateCoalition();
+                    });
+
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    tr.appendChild(td4);
+                    tbody.appendChild(tr);
+                    rows.push(tr);
+                });
+
+                // Reset status.
+                coalStatusText.textContent =
+                    'Klik op partijen om een coalitie te vormen';
+
+                backdrop.classList.add('is-open');
             });
-
-            // Reset status.
-            coalStatusText.textContent =
-                'Klik op partijen om een coalitie te vormen';
-
-            backdrop.classList.add('is-open');
         });
-    });
 
     /* --- Close drawer --- */
     function closeModal() {

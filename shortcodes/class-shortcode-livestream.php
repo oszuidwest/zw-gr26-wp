@@ -66,27 +66,27 @@ class Shortcode_Livestream {
 
 		$html = $this->renderer->section_open( $atts['titel'] );
 
-		$html .= '<div class="zwv-uitslagen">';
+		$html .= '<div class="zw-gr26-uitslagen">';
 
 		if ( $atts['url'] ) {
-			$html .= '<a href="' . esc_url( $atts['url'] ) . '" class="zwv-uitslagen__player">';
+			$html .= '<a href="' . esc_url( $atts['url'] ) . '" class="zw-gr26-uitslagen__player">';
 		} else {
-			$html .= '<div class="zwv-uitslagen__player">';
+			$html .= '<div class="zw-gr26-uitslagen__player">';
 		}
 
 		if ( $atts['thumbnail'] ) {
 			$html .= '<img src="' . esc_url( $atts['thumbnail'] ) . '" alt="' . esc_attr( $atts['naam'] ) . '">';
 		}
 
-		$html .= '<div class="zwv-uitslagen__play">&#9654;</div>';
-		$html .= '<div class="zwv-uitslagen__overlay">';
+		$html .= '<div class="zw-gr26-uitslagen__play">&#9654;</div>';
+		$html .= '<div class="zw-gr26-uitslagen__overlay">';
 
 		if ( $atts['badge'] ) {
-			$html .= '<span class="zwv-uitslagen__badge">' . esc_html( $atts['badge'] ) . '</span>';
+			$html .= '<span class="zw-gr26-uitslagen__badge">' . esc_html( $atts['badge'] ) . '</span>';
 		}
 
-		$html .= '<div class="zwv-uitslagen__title">' . esc_html( $atts['naam'] ) . '</div>';
-		$html .= '<div class="zwv-uitslagen__sub">' . wp_kses_post( $atts['datum_tekst'] ) . '</div>';
+		$html .= '<div class="zw-gr26-uitslagen__title">' . esc_html( $atts['naam'] ) . '</div>';
+		$html .= '<div class="zw-gr26-uitslagen__sub">' . wp_kses_post( $atts['datum_tekst'] ) . '</div>';
 		$html .= '</div>';
 
 		$html .= $atts['url'] ? '</a>' : '</div>';

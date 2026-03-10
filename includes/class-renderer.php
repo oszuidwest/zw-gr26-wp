@@ -25,12 +25,12 @@ class Renderer {
 	 * @return string
 	 */
 	public function section_open( string $title, string $link = '', string $link_text = '' ): string {
-		$html  = '<section class="zwv-section">';
-		$html .= '<div class="zwv-section__header">';
-		$html .= '<h2 class="zwv-section__title">' . esc_html( $title ) . '</h2>';
+		$html  = '<section class="zw-gr26-section">';
+		$html .= '<div class="zw-gr26-section__header">';
+		$html .= '<h2 class="zw-gr26-section__title">' . esc_html( $title ) . '</h2>';
 
 		if ( $link ) {
-			$html .= '<a href="' . esc_url( $link ) . '" class="zwv-section__link">'
+			$html .= '<a href="' . esc_url( $link ) . '" class="zw-gr26-section__link">'
 				. esc_html( $link_text ? $link_text : 'Bekijk meer' ) . ' &rarr;</a>';
 		}
 
@@ -57,13 +57,13 @@ class Renderer {
 	 * @return string
 	 */
 	public function hero( string $title, string $subtitle, string $bg_image ): string {
-		$html  = '<header class="zwv-hero">';
-		$html .= '<div class="zwv-hero__bg" style="background-image:url(' . esc_url( $bg_image ) . ')"></div>';
-		$html .= '<div class="zwv-hero__content">';
-		$html .= '<h1 class="zwv-hero__title">' . esc_html( $title ) . '</h1>';
+		$html  = '<header class="zw-gr26-hero">';
+		$html .= '<div class="zw-gr26-hero__bg" style="background-image:url(' . esc_url( $bg_image ) . ')"></div>';
+		$html .= '<div class="zw-gr26-hero__content">';
+		$html .= '<h1 class="zw-gr26-hero__title">' . esc_html( $title ) . '</h1>';
 
 		if ( $subtitle ) {
-			$html .= '<p class="zwv-hero__subtitle">' . esc_html( $subtitle ) . '</p>';
+			$html .= '<p class="zw-gr26-hero__subtitle">' . esc_html( $subtitle ) . '</p>';
 		}
 
 		$html .= '</div></header>';
@@ -77,10 +77,10 @@ class Renderer {
 	 * @return string
 	 */
 	public function stripe(): string {
-		return '<div class="zwv-stripe">'
-			. '<span class="zwv-stripe--red"></span>'
-			. '<span class="zwv-stripe--white"></span>'
-			. '<span class="zwv-stripe--blue"></span>'
+		return '<div class="zw-gr26-stripe">'
+			. '<span class="zw-gr26-stripe--red"></span>'
+			. '<span class="zw-gr26-stripe--white"></span>'
+			. '<span class="zw-gr26-stripe--blue"></span>'
 			. '</div>';
 	}
 
@@ -97,24 +97,24 @@ class Renderer {
 
 		$has_thumb = ! empty( $video['thumbnail'] );
 
-		$html  = '<article class="zwv-vcard' . ( $coming_soon ? ' zwv-binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . ' class="zwv-vcard__link">';
+		$html  = '<article class="zw-gr26-vcard' . ( $coming_soon ? ' zw-gr26-binnenkort' : '' ) . '">';
+		$html .= '<' . $tag . $href . ' class="zw-gr26-vcard__link">';
 
 		if ( $has_thumb ) {
 			$html .= '<img src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
 		}
 
 		if ( $coming_soon ) {
-			$html .= '<span class="zwv-binnenkort__badge">Binnenkort</span>';
+			$html .= '<span class="zw-gr26-binnenkort__badge">Binnenkort</span>';
 		} else {
-			$html .= '<div class="zwv-vcard__play"><span>&#9654;&#xFE0E;</span> Bekijk</div>';
+			$html .= '<div class="zw-gr26-vcard__play"><span>&#9654;&#xFE0E;</span> Bekijk</div>';
 		}
 
-		$html .= '<div class="zwv-vcard__overlay">';
-		$html .= '<h3 class="zwv-vcard__title">' . esc_html( $video['titel'] ) . '</h3>';
+		$html .= '<div class="zw-gr26-vcard__overlay">';
+		$html .= '<h3 class="zw-gr26-vcard__title">' . esc_html( $video['titel'] ) . '</h3>';
 
 		if ( ! empty( $video['meta'] ) ) {
-			$html .= '<div class="zwv-vcard__meta">' . esc_html( $video['meta'] ) . '</div>';
+			$html .= '<div class="zw-gr26-vcard__meta">' . esc_html( $video['meta'] ) . '</div>';
 		}
 
 		$html .= '</div>';
@@ -136,19 +136,19 @@ class Renderer {
 		$tag         = $coming_soon ? 'div' : 'a';
 		$href        = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
 
-		$html  = '<article class="zwv-ecard' . ( $coming_soon ? ' zwv-ecard--binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . ' class="zwv-ecard__link">';
+		$html  = '<article class="zw-gr26-ecard' . ( $coming_soon ? ' zw-gr26-ecard--binnenkort' : '' ) . '">';
+		$html .= '<' . $tag . $href . ' class="zw-gr26-ecard__link">';
 
 		if ( $has_thumb ) {
 			$html .= '<img src="' . esc_url( $video['thumbnail'] ) . '" alt="' . esc_attr( $video['titel'] ) . '" loading="lazy">';
 		}
 
 		if ( $coming_soon ) {
-			$html .= '<span class="zwv-binnenkort__badge">Binnenkort</span>';
+			$html .= '<span class="zw-gr26-binnenkort__badge">Binnenkort</span>';
 		}
 
-		$html .= '<div class="zwv-ecard__info">';
-		$html .= '<h3 class="zwv-ecard__title">' . esc_html( $video['titel'] ) . '</h3>';
+		$html .= '<div class="zw-gr26-ecard__info">';
+		$html .= '<h3 class="zw-gr26-ecard__title">' . esc_html( $video['titel'] ) . '</h3>';
 		$html .= '</div>';
 		$html .= '</' . $tag . '>';
 		$html .= '</article>';
@@ -163,23 +163,23 @@ class Renderer {
 	 * @return string
 	 */
 	public function article_card( array $item ): string {
-		$html  = '<article class="zwv-acard">';
-		$html .= '<a href="' . esc_url( $item['url'] ) . '" class="zwv-acard__link">';
-		$html .= '<div class="zwv-acard__thumb">';
+		$html  = '<article class="zw-gr26-acard">';
+		$html .= '<a href="' . esc_url( $item['url'] ) . '" class="zw-gr26-acard__link">';
+		$html .= '<div class="zw-gr26-acard__thumb">';
 
 		if ( ! empty( $item['afbeelding'] ) ) {
 			$html .= '<img src="' . esc_url( $item['afbeelding'] ) . '" alt="' . esc_attr( $item['titel'] ) . '" loading="lazy">';
 		}
 
 		$html .= '</div>';
-		$html .= '<div class="zwv-acard__info">';
+		$html .= '<div class="zw-gr26-acard__info">';
 
 		if ( ! empty( $item['regio'] ) ) {
-			$html .= '<span class="zwv-acard__tag">' . esc_html( $item['regio'] ) . '</span>';
+			$html .= '<span class="zw-gr26-acard__tag">' . esc_html( $item['regio'] ) . '</span>';
 		}
 
-		$html .= '<h3 class="zwv-acard__title">' . esc_html( $item['titel'] ) . '</h3>';
-		$html .= '<time class="zwv-acard__meta" datetime="' . esc_attr( $item['datum_iso'] ) . '">'
+		$html .= '<h3 class="zw-gr26-acard__title">' . esc_html( $item['titel'] ) . '</h3>';
+		$html .= '<time class="zw-gr26-acard__meta" datetime="' . esc_attr( $item['datum_iso'] ) . '">'
 			. esc_html( $item['datum'] ) . '</time>';
 		$html .= '</div>';
 		$html .= '</a></article>';

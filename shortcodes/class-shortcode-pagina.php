@@ -67,14 +67,14 @@ class Shortcode_Pagina {
 		$inner = preg_replace( '/<br\s*\/?>\s*/', '', $inner );
 		$inner = preg_replace( '#<p>\s*</p>#', '', $inner );
 
-		$html  = '<main class="zwv-wrapper not-prose">';
+		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$html .= $this->renderer->hero(
 			$atts['titel'],
 			$atts['ondertitel'],
 			$atts['achtergrond']
 		);
 		$html .= $this->renderer->stripe();
-		$html .= '<div class="zwv-container">';
+		$html .= '<div class="zw-gr26-container">';
 
 		$html .= $inner;
 		$html .= '</div></main>';

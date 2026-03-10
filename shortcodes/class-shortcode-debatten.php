@@ -89,7 +89,7 @@ class Shortcode_Debatten {
 		}
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= '<div class="zwv-video-grid">';
+		$html .= '<div class="zw-gr26-video-grid">';
 
 		foreach ( $this->debatten as $debat ) {
 			$coming_soon = empty( $debat['videoid'] );

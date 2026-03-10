@@ -74,15 +74,15 @@ class Shortcode_Programmas {
 		}
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= '<nav class="zwv-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
+		$html .= '<nav class="zw-gr26-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
 
 		// Municipality dropdown.
-		$html .= '<div class="zwv-programma__select-wrap">';
-		$html .= '<select class="zwv-programma__select" data-zw-gr26-programma-select>';
+		$html .= '<div class="zw-gr26-programma__select-wrap">';
+		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select>';
 		$html .= '<option value="">Kies je gemeente...</option>';
 
 		foreach ( $gemeenten as $gemeente ) {
-			$id    = 'zwv-prog-' . sanitize_title( $gemeente['naam'] );
+			$id    = 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] );
 			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $gemeente['naam'] ) . '</option>';
 		}
 
@@ -90,19 +90,19 @@ class Shortcode_Programmas {
 
 		// Party lists per municipality.
 		foreach ( $gemeenten as $gemeente ) {
-			$id    = 'zwv-prog-' . sanitize_title( $gemeente['naam'] );
-			$html .= '<div class="zwv-programma__list" id="' . esc_attr( $id ) . '">';
+			$id    = 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] );
+			$html .= '<div class="zw-gr26-programma__list" id="' . esc_attr( $id ) . '">';
 
 			foreach ( $gemeente['partijen'] as $partij ) {
 				if ( $partij['url'] ) {
-					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zwv-prow" target="_blank" rel="noopener noreferrer">';
-					$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-					$html .= '<span class="zwv-prow__link-text">Lees programma</span>';
+					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zw-gr26-prow" target="_blank" rel="noopener noreferrer">';
+					$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+					$html .= '<span class="zw-gr26-prow__link-text">Lees programma</span>';
 					$html .= '</a>';
 				} else {
-					$html .= '<div class="zwv-prow zwv-prow--disabled">';
-					$html .= '<span class="zwv-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-					$html .= '<span class="zwv-prow__link-text">Geen programma</span>';
+					$html .= '<div class="zw-gr26-prow zw-gr26-prow--disabled">';
+					$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+					$html .= '<span class="zw-gr26-prow__link-text">Geen programma</span>';
 					$html .= '</div>';
 				}
 			}

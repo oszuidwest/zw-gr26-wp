@@ -59,8 +59,8 @@ class Shortcode_Tekst {
 			'zw_gr26_tekst'
 		);
 
-		$html  = $atts['titel'] ? $this->renderer->section_open( $atts['titel'] ) : '<section class="zwv-section">';
-		$html .= '<div class="zwv-intro">';
+		$html  = $atts['titel'] ? $this->renderer->section_open( $atts['titel'] ) : '<section class="zw-gr26-section">';
+		$html .= '<div class="zw-gr26-intro">';
 		$html .= wp_kses_post( wpautop( do_shortcode( $content ) ) );
 		$html .= '</div>';
 		$html .= $this->renderer->section_close();

@@ -86,22 +86,22 @@ class Shortcode_Resultaten {
 		$html = $this->renderer->section_open( $atts['titel'] );
 
 		// Municipality tiles — always show all 10, always clickable.
-		$html .= '<div class="zwv-tiles">';
+		$html .= '<div class="zw-gr26-tiles">';
 		foreach ( $municipalities as $slug => $naam ) {
 			$entry    = $results[ $slug ] ?? null;
 			$has_2026 = $entry && ! empty( $entry['has_2026'] );
 			$status   = $has_2026 ? 'Bekijk uitslagen' : 'Nog geen uitslagen';
 
-			$html .= '<div class="zwv-tile" data-gemeente="' . esc_attr( $slug ) . '">';
-			$html .= '<h3 class="zwv-tile__name">' . esc_html( $naam ) . '</h3>';
-			$html .= '<div class="zwv-tile__status">' . esc_html( $status ) . '</div>';
+			$html .= '<div class="zw-gr26-tile" data-gemeente="' . esc_attr( $slug ) . '">';
+			$html .= '<h3 class="zw-gr26-tile__name">' . esc_html( $naam ) . '</h3>';
+			$html .= '<div class="zw-gr26-tile__status">' . esc_html( $status ) . '</div>';
 			$html .= '</div>';
 		}
 		$html .= '</div>';
 
 		$html .= $this->renderer->section_close();
 
-		// Render modal in wp_footer so it sits outside .zwv-wrapper.
+		// Render modal in wp_footer so it sits outside .zw-gr26-wrapper.
 		// The wrapper's CSS transform creates a new containing block, breaking position:fixed.
 		$note_html = $atts['noot']
 			? esc_html( $atts['noot'] )
@@ -110,40 +110,40 @@ class Shortcode_Resultaten {
 		add_action(
 			'wp_footer',
 			function () {
-				echo '<div class="zwv-modal-backdrop" id="zwvModal" role="dialog" aria-modal="true" aria-labelledby="zwvModalTitle">';
-				echo '<div class="zwv-modal">';
+				echo '<div class="zw-gr26-modal-backdrop" id="zwvModal" role="dialog" aria-modal="true" aria-labelledby="zwvModalTitle">';
+				echo '<div class="zw-gr26-modal">';
 
 				// Header.
-				echo '<div class="zwv-modal__header">';
-				echo '<button class="zwv-modal__close" id="zwvModalClose">&times;</button>';
-				echo '<div class="zwv-modal__title" id="zwvModalTitle"></div>';
-				echo '<div class="zwv-modal__subtitle" id="zwvModalSubtitle"></div>';
+				echo '<div class="zw-gr26-modal__header">';
+				echo '<button class="zw-gr26-modal__close" id="zwvModalClose">&times;</button>';
+				echo '<div class="zw-gr26-modal__title" id="zwvModalTitle"></div>';
+				echo '<div class="zw-gr26-modal__subtitle" id="zwvModalSubtitle"></div>';
 				echo '</div>';
 
 				// Scrollable body.
-				echo '<div class="zwv-modal__body">';
+				echo '<div class="zw-gr26-modal__body">';
 
 				// Wacht-state banner (hidden by default, shown via JS .is-wacht class).
-				echo '<div class="zwv-modal__wacht-banner">Uitslagen volgen op verkiezingsavond</div>';
+				echo '<div class="zw-gr26-modal__wacht-banner">Uitslagen volgen op verkiezingsavond</div>';
 
 				// Donut section.
-				echo '<div class="zwv-modal__section">';
-				echo '<div class="zwv-modal__section-label" id="zwvDonutLabel">Zetelverdeling</div>';
-				echo '<div class="zwv-modal__donut-area">';
-				echo '<div class="zwv-modal__donut" id="zwvDonut">';
-				echo '<div class="zwv-modal__donut-center">';
-				echo '<div class="zwv-modal__donut-total" id="zwvDonutTotal"></div>';
-				echo '<div class="zwv-modal__donut-label">zetels</div>';
-				echo '<div class="zwv-modal__donut-coal-label" id="zwvDonutCoalLabel"></div>';
-				echo '<div class="zwv-modal__donut-majority-label">Meerderheid!</div>';
+				echo '<div class="zw-gr26-modal__section">';
+				echo '<div class="zw-gr26-modal__section-label" id="zwvDonutLabel">Zetelverdeling</div>';
+				echo '<div class="zw-gr26-modal__donut-area">';
+				echo '<div class="zw-gr26-modal__donut" id="zwvDonut">';
+				echo '<div class="zw-gr26-modal__donut-center">';
+				echo '<div class="zw-gr26-modal__donut-total" id="zwvDonutTotal"></div>';
+				echo '<div class="zw-gr26-modal__donut-label">zetels</div>';
+				echo '<div class="zw-gr26-modal__donut-coal-label" id="zwvDonutCoalLabel"></div>';
+				echo '<div class="zw-gr26-modal__donut-majority-label">Meerderheid!</div>';
 				echo '</div></div>';
-				echo '<div class="zwv-modal__opkomst" id="zwvOpkomst"></div>';
+				echo '<div class="zw-gr26-modal__opkomst" id="zwvOpkomst"></div>';
 				echo '</div></div>';
 
 				// Table section.
-				echo '<div class="zwv-modal__section">';
-				echo '<div class="zwv-modal__section-label" id="zwvTableLabel">Resultaten</div>';
-				echo '<table class="zwv-tbl">';
+				echo '<div class="zw-gr26-modal__section">';
+				echo '<div class="zw-gr26-modal__section-label" id="zwvTableLabel">Resultaten</div>';
+				echo '<table class="zw-gr26-tbl">';
 				echo '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/−</th></tr></thead>';
 				echo '<tbody id="zwvTbody"></tbody>';
 				echo '</table></div>';
@@ -151,12 +151,12 @@ class Shortcode_Resultaten {
 				echo '</div>'; // end body.
 
 				// Coalition toggle.
-				echo '<button class="zwv-coal-toggle" id="zwvCoalToggle" type="button">Bouw coalitie</button>';
+				echo '<button class="zw-gr26-coal-toggle" id="zwvCoalToggle" type="button">Bouw coalitie</button>';
 
 				// Coalition status bar.
-				echo '<div class="zwv-coal-status" id="zwvCoalStatus">';
-				echo '<span class="zwv-coal-status__text" id="zwvCoalStatusText">Klik op partijen om een coalitie te vormen</span>';
-				echo '<button class="zwv-coal-status__reset" id="zwvCoalReset" type="button">Wissen</button>';
+				echo '<div class="zw-gr26-coal-status" id="zwvCoalStatus">';
+				echo '<span class="zw-gr26-coal-status__text" id="zwvCoalStatusText">Klik op partijen om een coalitie te vormen</span>';
+				echo '<button class="zw-gr26-coal-status__reset" id="zwvCoalReset" type="button">Wissen</button>';
 				echo '</div>';
 
 				echo '</div></div>'; // end modal + backdrop.

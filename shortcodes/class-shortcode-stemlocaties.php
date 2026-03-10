@@ -76,16 +76,16 @@ class Shortcode_Stemlocaties {
 		$municipalities = $this->data->get_all_municipalities();
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= '<div class="zwv-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
+		$html .= '<div class="zw-gr26-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
 
 		// Municipality dropdown.
-		$html .= '<div class="zwv-programma__select-wrap">';
-		$html .= '<select class="zwv-programma__select" data-zw-gr26-programma-select>';
+		$html .= '<div class="zw-gr26-programma__select-wrap">';
+		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select>';
 		$html .= '<option value="">Kies je gemeente...</option>';
 
 		foreach ( $alle_data as $gem_slug => $gemeente_data ) {
 			$naam  = $municipalities[ $gem_slug ] ?? ucfirst( $gem_slug );
-			$id    = 'zwv-stem-' . sanitize_title( $gem_slug );
+			$id    = 'zw-gr26-stem-' . sanitize_title( $gem_slug );
 			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $naam ) . '</option>';
 		}
 
@@ -93,12 +93,12 @@ class Shortcode_Stemlocaties {
 
 		// Location lists per municipality.
 		foreach ( $alle_data as $gem_slug => $gemeente_data ) {
-			$id       = 'zwv-stem-' . sanitize_title( $gem_slug );
+			$id       = 'zw-gr26-stem-' . sanitize_title( $gem_slug );
 			$locaties = $gemeente_data['locaties'] ?? [];
 			$contact  = $gemeente_data['contact'] ?? '';
 			$website  = $gemeente_data['website'] ?? '';
 
-			$html .= '<div class="zwv-programma__list zwv-stem__list" id="' . esc_attr( $id ) . '">';
+			$html .= '<div class="zw-gr26-programma__list zw-gr26-stem__list" id="' . esc_attr( $id ) . '">';
 
 			$html .= $this->render_location_rows( $locaties );
 			$html .= $this->render_contact_footer( $contact, $website );
@@ -120,12 +120,12 @@ class Shortcode_Stemlocaties {
 	 */
 	private function render_location_rows( array $locaties ): string {
 		$count = count( $locaties );
-		$html  = '<div class="zwv-stem__count">'
+		$html  = '<div class="zw-gr26-stem__count">'
 			. esc_html( $count . ' stemlocatie' . ( 1 !== $count ? 's' : '' ) )
 			. '</div>';
 
 		foreach ( $locaties as $loc ) {
-			$html .= '<div class="zwv-stem__row">';
+			$html .= '<div class="zw-gr26-stem__row">';
 			$html .= $this->render_row_header( $loc );
 			$html .= $this->render_row_body( $loc );
 			$html .= '</div>';
@@ -141,22 +141,22 @@ class Shortcode_Stemlocaties {
 	 * @return string
 	 */
 	private function render_row_header( array $loc ): string {
-		$html = '<div class="zwv-stem__header">';
+		$html = '<div class="zw-gr26-stem__header">';
 
 		// Name + time + address.
-		$html .= '<div class="zwv-stem__info">';
-		$html .= '<div class="zwv-stem__name">' . esc_html( $loc['naam'] );
+		$html .= '<div class="zw-gr26-stem__info">';
+		$html .= '<div class="zw-gr26-stem__name">' . esc_html( $loc['naam'] );
 		if ( $loc['open'] && $loc['sluit'] ) {
-			$html .= ' <span class="zwv-stem__time">'
+			$html .= ' <span class="zw-gr26-stem__time">'
 				. '(' . esc_html( $loc['open'] . ' – ' . $loc['sluit'] ) . ')'
 				. '</span>';
 		}
 		$html .= '</div>';
-		$html .= '<div class="zwv-stem__adres">' . esc_html( $loc['adres'] ) . '</div>';
+		$html .= '<div class="zw-gr26-stem__adres">' . esc_html( $loc['adres'] ) . '</div>';
 		$html .= '</div>';
 
 		// Accessibility indicator.
-		$icon  = '<span class="zwv-stem__accessible-icon">'
+		$icon  = '<span class="zw-gr26-stem__accessible-icon">'
 			. '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"'
 			. ' fill="currentColor" aria-hidden="true">'
 			. '<path d="M256 112a56 56 0 1 1 56-56 56.06 56.06 0 0 1-56 56z"/>'
@@ -174,24 +174,24 @@ class Shortcode_Stemlocaties {
 			. ' 0 0 0 .08-.15c1.08-2 6-6.48 17.48-10.79l89.28-31.21a16.9'
 			. ' 16.9 0 0 0 1.62-.52c16-6 32-14.3 32-31.93s-19-37.99-38'
 			. '-33z"/></svg></span>';
-		$html .= '<div class="zwv-stem__summary">';
+		$html .= '<div class="zw-gr26-stem__summary">';
 		if ( 'nee' !== strtolower( $loc['toegankelijk'] ) && $loc['toegankelijk'] ) {
-			$html .= '<span class="zwv-stem__accessible zwv-stem__accessible--ja"'
+			$html .= '<span class="zw-gr26-stem__accessible zw-gr26-stem__accessible--ja"'
 				. ' title="Rolstoeltoegankelijk">'
 				. $icon
-				. '<span class="zwv-stem__accessible-label">Rolstoeltoegankelijk</span>'
+				. '<span class="zw-gr26-stem__accessible-label">Rolstoeltoegankelijk</span>'
 				. '</span>';
 		} else {
-			$html .= '<span class="zwv-stem__accessible zwv-stem__accessible--nee"'
+			$html .= '<span class="zw-gr26-stem__accessible zw-gr26-stem__accessible--nee"'
 				. ' title="Niet rolstoeltoegankelijk">'
 				. $icon
-				. '<span class="zwv-stem__accessible-label">Niet rolstoeltoegankelijk</span>'
+				. '<span class="zw-gr26-stem__accessible-label">Niet rolstoeltoegankelijk</span>'
 				. '</span>';
 		}
 		$html .= '</div>';
 
 		// Chevron.
-		$html .= '<svg class="zwv-stem__chevron" viewBox="0 0 20 20" fill="none"'
+		$html .= '<svg class="zw-gr26-stem__chevron" viewBox="0 0 20 20" fill="none"'
 			. ' stroke="currentColor" stroke-width="2" stroke-linecap="round">'
 			. '<path d="M5 8l5 5 5-5"/></svg>';
 
@@ -209,16 +209,16 @@ class Shortcode_Stemlocaties {
 	private function render_row_body( array $loc ): string {
 		$features = $this->collect_features( $loc );
 
-		$html = '<div class="zwv-stem__body"><div class="zwv-stem__details">';
+		$html = '<div class="zw-gr26-stem__body"><div class="zw-gr26-stem__details">';
 
 		if ( ! empty( $features ) ) {
-			$html .= '<div class="zwv-stem__features">';
+			$html .= '<div class="zw-gr26-stem__features">';
 			foreach ( $features as $label ) {
-				$html .= '<span class="zwv-stem__feature">' . esc_html( $label ) . '</span>';
+				$html .= '<span class="zw-gr26-stem__feature">' . esc_html( $label ) . '</span>';
 			}
 			$html .= '</div>';
 		} else {
-			$html .= '<p class="zwv-stem__no-features">Geen extra voorzieningen bekend</p>';
+			$html .= '<p class="zw-gr26-stem__no-features">Geen extra voorzieningen bekend</p>';
 		}
 
 		$html .= '</div></div>';
@@ -268,13 +268,13 @@ class Shortcode_Stemlocaties {
 			return '';
 		}
 
-		$html = '<div class="zwv-stem__footer">';
+		$html = '<div class="zw-gr26-stem__footer">';
 		if ( $website ) {
-			$html .= '<a href="' . esc_url( $website ) . '" class="zwv-stem__website"'
+			$html .= '<a href="' . esc_url( $website ) . '" class="zw-gr26-stem__website"'
 				. ' target="_blank" rel="noopener noreferrer">Verkiezingsinfo gemeente &rarr;</a>';
 		}
 		if ( $contact ) {
-			$html .= '<span class="zwv-stem__contact">' . esc_html( $contact ) . '</span>';
+			$html .= '<span class="zw-gr26-stem__contact">' . esc_html( $contact ) . '</span>';
 		}
 		$html .= '</div>';
 

@@ -24,7 +24,6 @@ require_once ZWGR26_PATH . 'includes/class-renderer.php';
 require_once ZWGR26_PATH . 'includes/class-bunny-api.php';
 require_once ZWGR26_PATH . 'includes/class-data-provider.php';
 require_once ZWGR26_PATH . 'includes/class-post-type-uitslag.php';
-require_once ZWGR26_PATH . 'includes/class-admin-import.php';
 require_once ZWGR26_PATH . 'includes/class-schema.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-pagina.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-livestream.php';
@@ -40,4 +39,3 @@ require_once ZWGR26_PATH . 'includes/class-plugin.php';
 register_activation_hook( __FILE__, [ 'ZWGR26\Post_Type_Uitslag', 'activate' ] );
 
 ZWGR26\Plugin::instance();
-ZWGR26\Admin_Import::register();

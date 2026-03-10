@@ -89,7 +89,7 @@ class Shortcode_Explainers {
 		}
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= '<div class="zwv-explainer-carousel">';
+		$html .= '<div class="zw-gr26-explainer-carousel">';
 
 		foreach ( $this->explainers as $explainer ) {
 			$coming_soon = empty( $explainer['videoid'] );

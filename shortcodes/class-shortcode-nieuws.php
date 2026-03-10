@@ -95,7 +95,7 @@ class Shortcode_Nieuws {
 			'Alle nieuws'
 		);
 
-		$html .= '<div class="zwv-article-grid">';
+		$html .= '<div class="zw-gr26-article-grid">';
 
 		foreach ( $items as $item ) {
 			$html .= $this->renderer->article_card( $item );
