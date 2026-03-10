@@ -96,15 +96,17 @@ class Shortcode_Explainers {
 
 			$video = [
 				'titel'     => $explainer['naam'],
-				'thumbnail' => '',
+				'thumbnail' => $explainer['thumbnail'],
 				'url'       => '',
 			];
 
 			if ( ! $coming_soon && $library_id ) {
 				$info = $this->bunny->get_video_info( $library_id, $explainer['videoid'] );
 				if ( $info ) {
-					$video['thumbnail'] = $info['thumbnail'];
-					$coming_soon        = $info['binnenkort'];
+					if ( ! $video['thumbnail'] ) {
+						$video['thumbnail'] = $info['thumbnail'];
+					}
+					$coming_soon = $info['binnenkort'];
 				} else {
 					$coming_soon = true;
 				}
@@ -137,8 +139,9 @@ class Shortcode_Explainers {
 	public function render_explainer( $atts ): string {
 		$atts = shortcode_atts(
 			[
-				'naam'    => '',
-				'videoid' => '',
+				'naam'      => '',
+				'videoid'   => '',
+				'thumbnail' => '',
 			],
 			$atts,
 			'zw_gr26_explainer'
@@ -146,8 +149,9 @@ class Shortcode_Explainers {
 
 		if ( $atts['naam'] ) {
 			$this->explainers[] = [
-				'naam'    => $atts['naam'],
-				'videoid' => $atts['videoid'],
+				'naam'      => $atts['naam'],
+				'videoid'   => $atts['videoid'],
+				'thumbnail' => $atts['thumbnail'],
 			];
 		}
 

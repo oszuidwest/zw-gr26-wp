@@ -96,7 +96,7 @@ class Shortcode_Debatten {
 
 			$video = [
 				'titel'     => $debat['naam'],
-				'thumbnail' => '',
+				'thumbnail' => $debat['thumbnail'],
 				'url'       => '',
 				'meta'      => $debat['datum'] . ' &bull; ' . $debat['kanaal'],
 			];
@@ -104,8 +104,10 @@ class Shortcode_Debatten {
 			if ( ! $coming_soon && $library_id ) {
 				$info = $this->bunny->get_video_info( $library_id, $debat['videoid'] );
 				if ( $info ) {
-					$video['thumbnail'] = $info['thumbnail'];
-					$coming_soon        = $info['binnenkort'];
+					if ( ! $video['thumbnail'] ) {
+						$video['thumbnail'] = $info['thumbnail'];
+					}
+					$coming_soon = $info['binnenkort'];
 				} else {
 					$coming_soon = true;
 				}
@@ -136,10 +138,11 @@ class Shortcode_Debatten {
 	public function render_debat( $atts ): string {
 		$atts = shortcode_atts(
 			[
-				'naam'    => '',
-				'datum'   => '',
-				'kanaal'  => '',
-				'videoid' => '',
+				'naam'      => '',
+				'datum'     => '',
+				'kanaal'    => '',
+				'videoid'   => '',
+				'thumbnail' => '',
 			],
 			$atts,
 			'zw_gr26_debat'
@@ -147,10 +150,11 @@ class Shortcode_Debatten {
 
 		if ( $atts['naam'] ) {
 			$this->debatten[] = [
-				'naam'    => $atts['naam'],
-				'datum'   => $atts['datum'],
-				'kanaal'  => $atts['kanaal'],
-				'videoid' => $atts['videoid'],
+				'naam'      => $atts['naam'],
+				'datum'     => $atts['datum'],
+				'kanaal'    => $atts['kanaal'],
+				'videoid'   => $atts['videoid'],
+				'thumbnail' => $atts['thumbnail'],
 			];
 		}
 
