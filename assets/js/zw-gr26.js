@@ -56,6 +56,9 @@
     /** @type {boolean} Whether the active modal pushed a history entry. */
     let historyPushed = false;
 
+    /** @type {boolean} Whether a history.back() close is in flight, awaiting popstate. */
+    let closePending = false;
+
     /**
      * Opens a modal, closing any previously active one first.
      *
@@ -69,6 +72,7 @@
         if (activeModal) activeModal.close();
         activeModal = modal;
         activeModal.trigger = trigger || null;
+        closePending = false;
         modal.open();
         document.body.classList.add('zw-gr26-modal-open');
         if (historyData) {
@@ -91,6 +95,7 @@
         if (activeModal) activeModal.close();
         activeModal = modal;
         activeModal.trigger = null;
+        closePending = false;
         modal.open();
         document.body.classList.add('zw-gr26-modal-open');
         historyPushed = true;
@@ -111,16 +116,22 @@
         }
         activeModal = null;
         historyPushed = false;
+        closePending = false;
     }
 
     /**
      * Closes the active modal and navigates back in history.
      *
+     * history.back() is async — popstate fires after the history traversal
+     * completes. The guard prevents a second call (e.g. rapid Escape presses)
+     * from pushing another history.back() before popstate has cleaned up.
+     *
      * @access private
      */
     function closeActiveModalWithHistory() {
-        if (!activeModal) return;
+        if (!activeModal || closePending) return;
         if (historyPushed) {
+            closePending = true;
             history.back();
         } else {
             closeActiveModal();
