@@ -628,17 +628,29 @@
 
     /* --- Open drawer on tile click/keypress --- */
 
+    /** @type {string} History state key for identifying modal entries. */
+    const HISTORY_KEY = 'zwgr26Modal';
+
     /**
-     * Opens the results modal for a municipality tile.
-     *
-     * Loads municipality data, renders all modal sections, and moves focus
-     * to the close button.
+     * Toggles the modal visibility and scroll lock on the body.
      *
      * @access private
      *
-     * @param {HTMLElement} tile The clicked municipality tile element.
+     * @param {boolean} open Whether the modal should be visible.
      */
-    function openTile(tile, fromPopstate) {
+    function setModalVisible(open) {
+        backdrop.classList.toggle('is-open', open);
+        document.body.classList.toggle('zw-gr26-modal-open', open);
+    }
+
+    /**
+     * Renders the results modal content for a municipality tile.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} tile The municipality tile element.
+     */
+    function renderTile(tile) {
         const key = tile.dataset.gemeente;
         const data = zwGr26Resultaten[key] || null;
         const is2026 = data ? data.has_2026 : false;
@@ -655,12 +667,20 @@
         renderTable(partijen, is2026);
 
         triggerElement = tile;
-        backdrop.classList.add('is-open');
-        document.body.classList.add('zw-gr26-modal-open');
-        if (!fromPopstate) {
-            history.pushState({ zwgr26Modal: key }, '');
-        }
+        setModalVisible(true);
         modalClose.focus();
+    }
+
+    /**
+     * Opens the results modal for a municipality tile and pushes a history entry.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} tile The clicked municipality tile element.
+     */
+    function openTile(tile) {
+        renderTile(tile);
+        history.pushState({ [HISTORY_KEY]: tile.dataset.gemeente }, '');
     }
 
     document
@@ -708,8 +728,7 @@
      */
     function closeModal() {
         if (!backdrop.classList.contains('is-open')) return;
-        backdrop.classList.remove('is-open');
-        document.body.classList.remove('zw-gr26-modal-open');
+        setModalVisible(false);
         if (triggerElement) {
             triggerElement.focus();
             triggerElement = null;
@@ -722,13 +741,13 @@
     }
 
     window.addEventListener('popstate', (e) => {
-        const key = e.state?.zwgr26Modal;
+        const key = e.state?.[HISTORY_KEY];
         if (key) {
             const tile = document.querySelector(
                 `.zw-gr26-tile[data-gemeente="${key}"]`,
             );
             if (tile) {
-                openTile(tile, true);
+                renderTile(tile);
                 return;
             }
         }
