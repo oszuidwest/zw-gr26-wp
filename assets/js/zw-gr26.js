@@ -73,14 +73,15 @@
         document.body.classList.add('zw-gr26-modal-open');
         if (historyData) {
             history.pushState({ [HISTORY_KEY]: historyData }, '');
-            historyPushed = true;
-        } else {
-            historyPushed = false;
         }
+        historyPushed = !!historyData;
     }
 
     /**
      * Restores a modal on forward navigation (no history push).
+     *
+     * The history entry already exists, so we skip the push but still
+     * mark historyPushed so the back button closes the modal.
      *
      * @access private
      *

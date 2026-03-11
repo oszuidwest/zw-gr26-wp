@@ -101,19 +101,11 @@ class Shortcode_Explainers {
 			];
 
 			if ( ! $coming_soon && $library_id ) {
-				$info = $this->bunny->get_video_info( $library_id, $explainer['videoid'] );
-				if ( $info ) {
-					if ( ! $video['thumbnail'] ) {
-						$video['thumbnail'] = $info['thumbnail'];
-					}
-					$coming_soon = $info['binnenkort'];
-				} else {
-					$coming_soon = true;
-				}
+				$resolved = $this->bunny->resolve_video_card( $library_id, $explainer['videoid'], $video['thumbnail'] );
 
-				if ( ! $coming_soon ) {
-					$video['url'] = $this->bunny->get_stream_url( $library_id, $explainer['videoid'] );
-				}
+				$video['thumbnail'] = $resolved['thumbnail'];
+				$video['url']       = $resolved['url'];
+				$coming_soon        = $resolved['binnenkort'];
 			}
 
 			$video['binnenkort'] = $coming_soon;

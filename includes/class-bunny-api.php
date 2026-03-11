@@ -409,6 +409,40 @@ class Bunny_API {
 	}
 
 	/**
+	 * Resolves display data for a video card: thumbnail, coming-soon status, and stream URL.
+	 *
+	 * Checks the video info from the API and determines whether the video is
+	 * upcoming ("binnenkort"). When it is not, it also resolves the HLS stream URL.
+	 * An existing thumbnail is preserved when already provided.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @param string $thumbnail  Existing thumbnail URL (preserved if non-empty).
+	 * @return array{thumbnail: string, binnenkort: bool, url: string} Resolved video display data.
+	 */
+	public function resolve_video_card( int $library_id, string $video_id, string $thumbnail = '' ): array {
+		$result = [
+			'thumbnail'  => $thumbnail,
+			'binnenkort' => true,
+			'url'        => '',
+		];
+
+		$info = $this->get_video_info( $library_id, $video_id );
+		if ( $info ) {
+			if ( ! $result['thumbnail'] ) {
+				$result['thumbnail'] = $info['thumbnail'];
+			}
+			$result['binnenkort'] = $info['binnenkort'];
+		}
+
+		if ( ! $result['binnenkort'] ) {
+			$result['url'] = $this->get_stream_url( $library_id, $video_id );
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Picks the highest resolution suitable for MP4 fallback from a comma-separated list.
 	 *
 	 * Bunny CDN generates MP4 fallback files only up to 720p, so resolutions
