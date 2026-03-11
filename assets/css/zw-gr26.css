@@ -1197,43 +1197,31 @@ body.zw-gr26-modal-open {
 /* === VIDEO MODAL === */
 .zw-gr26-video-modal {
     position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(900px, calc(100vw - 32px));
-    aspect-ratio: 16 / 9;
+    inset: 0;
     z-index: 1001;
     animation: zw-gr26-video-in 0.2s ease;
-}
-
-.zw-gr26-video-modal--portrait {
-    width: min(400px, calc(100vw - 32px));
-    aspect-ratio: 9 / 16;
-    max-height: calc(100vh - 32px);
 }
 
 .zw-gr26-video-modal__iframe {
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: var(--zw-gr26-radius);
     background: #000;
 }
 
 .zw-gr26-video-modal .zw-gr26-modal__close {
     position: absolute;
-    top: -44px;
-    right: 0;
+    top: 12px;
+    right: 12px;
+    z-index: 1;
 }
 
 @keyframes zw-gr26-video-in {
     from {
         opacity: 0;
-        transform: translate(-50%, -50%) scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
     }
 }
 

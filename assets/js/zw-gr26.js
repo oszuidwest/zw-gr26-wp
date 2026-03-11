@@ -262,11 +262,6 @@
                     const url = new URL(link.href);
                     url.searchParams.set('autoplay', 'true');
                     videoIframe.src = url.toString();
-                    const isPortrait = link.closest('.zw-gr26-ecard') !== null;
-                    videoPanel.classList.toggle(
-                        'zw-gr26-video-modal--portrait',
-                        isPortrait,
-                    );
                     openModal(
                         videoModal,
                         { type: 'video' },
