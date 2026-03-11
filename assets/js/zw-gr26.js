@@ -32,7 +32,7 @@
         function refresh() {
             cache = [
                 ...panel.querySelectorAll(
-                    'button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])',
+                    'button, [href], input, select, textarea, video, [tabindex]:not([tabindex="-1"])',
                 ),
             ].filter((el) => el.offsetWidth > 0);
         }
@@ -53,6 +53,9 @@
         return refresh;
     }
 
+    /** @type {boolean} Whether the active modal pushed a history entry. */
+    let historyPushed = false;
+
     /**
      * Opens a modal, closing any previously active one first.
      *
@@ -62,9 +65,6 @@
      * @param {Object}       historyData Data stored in the history state for restore.
      * @param {?HTMLElement}  trigger     Element to refocus when the modal closes.
      */
-    /** @type {boolean} Whether the active modal pushed a history entry. */
-    let historyPushed = false;
-
     function openModal(modal, historyData, trigger) {
         if (activeModal) activeModal.close();
         activeModal = modal;
@@ -92,6 +92,7 @@
         activeModal.trigger = null;
         modal.open();
         document.body.classList.add('zw-gr26-modal-open');
+        historyPushed = true;
     }
 
     /**
@@ -247,6 +248,28 @@
         /** @type {?Object} Video.js player instance, lazily initialized. */
         let player = null;
 
+        /**
+         * Initializes the Video.js player (if needed) and loads a source URL.
+         *
+         * @access private
+         *
+         * @param {string} src HLS stream URL to load.
+         */
+        function loadVideo(src) {
+            if (!player && typeof videojs !== 'undefined') {
+                player = videojs('zwgr26VideoPlayer', {
+                    autoplay: true,
+                    language: 'nl',
+                });
+            }
+            if (player) {
+                player.src({
+                    src: src,
+                    type: 'application/x-mpegURL',
+                });
+            }
+        }
+
         const videoModal = {
             open() {
                 videoBackdrop.classList.add('is-open');
@@ -256,8 +279,7 @@
             close() {
                 videoBackdrop.classList.remove('is-open');
                 if (player) {
-                    player.pause();
-                    player.src('');
+                    player.reset();
                 }
             },
         };
@@ -269,18 +291,7 @@
         videoClose.addEventListener('click', closeActiveModalWithHistory);
 
         modalRestorers.video = (data) => {
-            if (!player && typeof videojs !== 'undefined') {
-                player = videojs('zwgr26VideoPlayer', {
-                    autoplay: true,
-                    language: 'nl',
-                });
-            }
-            if (player) {
-                player.src({
-                    src: data.src,
-                    type: 'application/x-mpegURL',
-                });
-            }
+            loadVideo(data.src);
             restoreModal(videoModal);
         };
 
@@ -291,18 +302,7 @@
             .forEach((link) => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (!player && typeof videojs !== 'undefined') {
-                        player = videojs('zwgr26VideoPlayer', {
-                            autoplay: true,
-                            language: 'nl',
-                        });
-                    }
-                    if (player) {
-                        player.src({
-                            src: link.href,
-                            type: 'application/x-mpegURL',
-                        });
-                    }
+                    loadVideo(link.href);
                     openModal(
                         videoModal,
                         { type: 'video', src: link.href },
@@ -889,10 +889,29 @@
         );
     }
 
+    /**
+     * Finds a municipality tile by its data-gemeente value.
+     *
+     * Uses dataset comparison instead of string interpolation in a selector
+     * to avoid issues with special characters in history state values.
+     *
+     * @access private
+     *
+     * @param {string} gemeente The municipality slug to find.
+     * @return {?HTMLElement} The matching tile element, or null.
+     */
+    function findTileByGemeente(gemeente) {
+        const tiles = document.querySelectorAll('.zw-gr26-tile[data-gemeente]');
+        for (const tile of tiles) {
+            if (tile.dataset.gemeente === gemeente) {
+                return tile;
+            }
+        }
+        return null;
+    }
+
     modalRestorers.resultaten = (data) => {
-        const tile = document.querySelector(
-            `.zw-gr26-tile[data-gemeente="${data.gemeente}"]`,
-        );
+        const tile = findTileByGemeente(data.gemeente);
         if (tile) {
             renderTile(tile);
             restoreModal(resultsModal);
