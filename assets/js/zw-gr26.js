@@ -245,7 +245,13 @@
 
                 preloadCovers(covers).then(() => {
                     shuffleCovers();
-                    setInterval(shuffleCovers, 3000);
+                    const intervalId = setInterval(() => {
+                        if (!card.isConnected) {
+                            clearInterval(intervalId);
+                            return;
+                        }
+                        shuffleCovers();
+                    }, 3000);
                 });
             });
     }
