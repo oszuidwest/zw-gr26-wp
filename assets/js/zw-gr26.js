@@ -656,6 +656,7 @@
 
         triggerElement = tile;
         backdrop.classList.add('is-open');
+        document.body.classList.add('zwv-modal-open');
         history.pushState({ zwgr26Modal: true }, '');
         modalClose.focus();
     }
@@ -706,6 +707,7 @@
     function closeModal() {
         if (!backdrop.classList.contains('is-open')) return;
         backdrop.classList.remove('is-open');
+        document.body.classList.remove('zwv-modal-open');
         if (triggerElement) {
             triggerElement.focus();
             triggerElement = null;
