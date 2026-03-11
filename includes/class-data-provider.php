@@ -440,6 +440,7 @@ class Data_Provider {
 		);
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			set_transient( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
@@ -450,6 +451,7 @@ class Data_Provider {
 		libxml_clear_errors();
 
 		if ( false === $xml ) {
+			set_transient( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 

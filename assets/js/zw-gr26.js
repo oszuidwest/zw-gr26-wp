@@ -72,7 +72,7 @@
                 const imgs = card.querySelectorAll(
                     '.zw-gr26-podcast__polaroid img',
                 );
-                if (covers.length < imgs.length + 1) {
+                if (covers.length < imgs.length) {
                     return;
                 }
 
