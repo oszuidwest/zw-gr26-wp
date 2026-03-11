@@ -17,75 +17,130 @@ Optional:
 
 ## Shortcodes
 
-Full page wrapper:
+All shortcodes are nested inside `[zw_gr26_pagina]` and only render within it.
 
-```
-[zw_gr26_pagina titel="ZuidWest Kiest" ondertitel="Alles over de gemeenteraadsverkiezingen" achtergrond="https://example.com/bg.jpg"]
-  ... other shortcodes here ...
-[/zw_gr26_pagina]
-```
+### `[zw_gr26_pagina]`
 
-Livestream embed:
+Full-page wrapper with hero and inner shortcodes.
 
-```
-[zw_gr26_livestream titel="De uitslagenavond" badge="Live op 18 maart" naam="ZuidWest Kiest: De Uitslag" datum_tekst="Woensdag 18 maart &bull; Vanaf 21:00 &bull; Live" url="https://example.com/stream" thumbnail="https://example.com/thumb.jpg" tijd="21:00"]
-```
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `ZuidWest Kiest` |
+| `ondertitel` | `Alles over de gemeente­raads­verkiezingen van 2026 in West-Brabant.` |
+| `achtergrond` | *(default background image URL)* |
 
-Debates (parent/child, videos via Bunny CDN):
+### `[zw_gr26_livestream]`
 
-```
-[zw_gr26_debatten titel="Debatten" bibliotheek="12345"]
-  [zw_gr26_debat naam="Debat Roosendaal" datum="5 maart" kanaal="ZuidWest TV 1" videoid="abc-123" thumbnail="https://example.com/thumb.jpg"]
-  [zw_gr26_debat naam="Debat Bergen op Zoom" datum="6 maart" kanaal="ZuidWest TV 2" videoid="def-456"]
-[/zw_gr26_debatten]
-```
+Election night livestream player card.
 
-Explainer videos (parent/child, videos via Bunny CDN):
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `De uitslagenavond` |
+| `badge` | `Live op 18 maart` |
+| `naam` | `ZuidWest Kiest: De Uitslag` |
+| `datum_tekst` | `Woensdag 18 maart · Vanaf 21:00 · Live` |
+| `url` | — |
+| `thumbnail` | — |
+| `tijd` | — |
 
-```
-[zw_gr26_explainers titel="Explainers" bibliotheek="12345"]
-  [zw_gr26_explainer naam="Hoe werkt stemmen?" videoid="abc-123"]
-  [zw_gr26_explainer naam="Wat doet de gemeenteraad?" videoid="def-456" thumbnail="https://example.com/thumb.jpg"]
-[/zw_gr26_explainers]
-```
+### `[zw_gr26_debatten]` / `[zw_gr26_debat]`
 
-News from a dossier taxonomy:
+Debate video grid (parent/child, videos via Bunny CDN).
 
-```
-[zw_gr26_nieuws titel="Laatste nieuws" dossier="gemeenteraadsverkiezingen" aantal="6" link="https://example.com/dossier" regio="west-brabant"]
-```
+**Parent:**
 
-Podcast promotion card with polaroid-stack cover art:
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Debatten` |
+| `bibliotheek` | — |
 
-```
-[zw_gr26_podcast titel="Podcast" naam="Het Fractiehuis" label="Verkiezingspodcast" beschrijving="Benieuwd naar de lijsttrekkers?" feed="https://example.com/feed/rss" filter="gemeenteraad" spotify="https://open.spotify.com/show/..." apple="https://podcasts.apple.com/..."]
-```
+**Child:**
 
-Party programs (data from the gemeente_uitslag CPT):
+| Attribute | Default |
+|-----------|---------|
+| `naam` | — |
+| `datum` | — |
+| `kanaal` | — |
+| `videoid` | — |
+| `thumbnail` | — |
 
-```
-[zw_gr26_programmas titel="Verkiezingsprogramma's"]
-```
+### `[zw_gr26_explainers]` / `[zw_gr26_explainer]`
 
-Election results with interactive modal:
+Explainer video carousel (parent/child, videos via Bunny CDN).
 
-```
-[zw_gr26_resultaten titel="Uitslagen per gemeente"]
-```
+**Parent:**
 
-Polling station locations (from waarismijnstemlokaal.nl API):
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Explainers` |
+| `bibliotheek` | — |
 
-```
-[zw_gr26_stemlocaties titel="Stemlocaties"]
-```
+**Child:**
 
-Text section with optional title:
+| Attribute | Default |
+|-----------|---------|
+| `naam` | — |
+| `videoid` | — |
+| `thumbnail` | — |
 
-```
-[zw_gr26_tekst titel="Over de verkiezingen"]
-  Vrije tekst en <strong>HTML</strong> hier.
-[/zw_gr26_tekst]
-```
+### `[zw_gr26_nieuws]`
+
+News articles from a dossier taxonomy.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Laatste nieuws` |
+| `dossier` | — (required) |
+| `aantal` | `6` |
+| `link` | — (auto-detected from dossier term) |
+| `regio` | — |
+
+### `[zw_gr26_podcast]`
+
+Podcast promotion card with polaroid-stack cover art.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Podcast` |
+| `naam` | `Het Fractiehuis` |
+| `label` | — |
+| `beschrijving` | — |
+| `feed` | — (required) |
+| `filter` | — |
+| `spotify` | — |
+| `apple` | — |
+
+### `[zw_gr26_programmas]`
+
+Party program links per municipality (data from the `gemeente_uitslag` CPT).
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Verkiezingsprogramma's` |
+
+### `[zw_gr26_resultaten]`
+
+Election results with interactive modal, donut chart, and coalition builder.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Uitslagen per gemeente` |
+
+### `[zw_gr26_stemlocaties]`
+
+Polling station locations (from waarismijnstemlokaal.nl API).
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Stemlocaties` |
+
+### `[zw_gr26_tekst]`
+
+Free-form text/HTML block with optional title.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | — |
 
 ## Installation
 
