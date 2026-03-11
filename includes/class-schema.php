@@ -209,9 +209,23 @@ class Schema {
 
 		$content = $post->post_content;
 
-		$this->videos = array_merge(
+		$all_videos = array_merge(
 			$this->parse_video_shortcodes( $content, 'zw_gr26_debatten', 'zw_gr26_debat' ),
 			$this->parse_video_shortcodes( $content, 'zw_gr26_explainers', 'zw_gr26_explainer' )
+		);
+
+		// Exclude videos with a broadcast_date in the future.
+		$this->videos = array_values(
+			array_filter(
+				$all_videos,
+				function ( array $video ): bool {
+					if ( ! $video['library_id'] ) {
+						return true;
+					}
+					$info = $this->bunny->get_video_info( $video['library_id'], $video['videoid'] );
+					return null === $info || ! $info['binnenkort'];
+				}
+			)
 		);
 
 		return $this->videos;
@@ -313,12 +327,15 @@ class Schema {
 	private function build_video_object( array $video, string $canonical ): array {
 		$thumbnail = '';
 		if ( $video['library_id'] ) {
-			$thumbnail = $this->bunny->get_thumbnail_url( $video['library_id'], $video['videoid'] );
+			$info = $this->bunny->get_video_info( $video['library_id'], $video['videoid'] );
+			if ( $info ) {
+				$thumbnail = $info['thumbnail'];
+			}
 		}
 
 		$upload_date = $this->parse_dutch_date( $video['datum'] );
 
-		return [
+		$schema = [
 			'@type'            => 'VideoObject',
 			'@id'              => $canonical . '#/schema/VideoObject/' . $video['videoid'],
 			'name'             => $video['naam'],
@@ -329,6 +346,15 @@ class Schema {
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
 		];
+
+		if ( $video['library_id'] ) {
+			$mp4_url = $this->bunny->get_mp4_url( $video['library_id'], $video['videoid'] );
+			if ( $mp4_url ) {
+				$schema['contentUrl'] = $mp4_url;
+			}
+		}
+
+		return $schema;
 	}
 
 	/**

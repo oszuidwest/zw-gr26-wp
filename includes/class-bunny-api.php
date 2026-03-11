@@ -175,6 +175,24 @@ class Bunny_API {
 	}
 
 	/**
+	 * Builds the direct-play MP4 URL for a video.
+	 *
+	 * Requires the "Direct Play" feature to be enabled on the Bunny library.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @return string MP4 URL or empty string if credentials are unavailable.
+	 */
+	public function get_mp4_url( int $library_id, string $video_id ): string {
+		$credentials = $this->get_credentials( $library_id );
+		if ( ! $credentials ) {
+			return '';
+		}
+
+		return $credentials['hostname'] . '/' . $video_id . '/play_720p.mp4';
+	}
+
+	/**
 	 * Gets the full thumbnail URL for a single video by its GUID.
 	 *
 	 * @param int    $library_id Bunny library ID.
