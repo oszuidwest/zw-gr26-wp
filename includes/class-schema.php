@@ -209,9 +209,23 @@ class Schema {
 
 		$content = $post->post_content;
 
-		$this->videos = array_merge(
+		$all_videos = array_merge(
 			$this->parse_video_shortcodes( $content, 'zw_gr26_debatten', 'zw_gr26_debat' ),
 			$this->parse_video_shortcodes( $content, 'zw_gr26_explainers', 'zw_gr26_explainer' )
+		);
+
+		// Exclude videos with a broadcast_date in the future.
+		$this->videos = array_values(
+			array_filter(
+				$all_videos,
+				function ( array $video ): bool {
+					if ( ! $video['library_id'] ) {
+						return true;
+					}
+					$info = $this->bunny->get_video_info( $video['library_id'], $video['videoid'] );
+					return null === $info || ! $info['binnenkort'];
+				}
+			)
 		);
 
 		return $this->videos;
@@ -311,12 +325,23 @@ class Schema {
 	 * @return array Schema.org VideoObject.
 	 */
 	private function build_video_object( array $video, string $canonical ): array {
-		$thumbnail = '';
+		$thumbnail   = '';
+		$content_url = '';
+
 		if ( $video['library_id'] ) {
-			$thumbnail = $this->bunny->get_thumbnail_url( $video['library_id'], $video['videoid'] );
+			$info = $this->bunny->get_video_info( $video['library_id'], $video['videoid'] );
+			if ( $info ) {
+				$thumbnail   = $info['thumbnail'];
+				$content_url = $info['mp4_url'];
+			}
 		}
 
 		$upload_date = $this->parse_dutch_date( $video['datum'] );
+
+		$video_url_key   = $content_url ? 'contentUrl' : 'embedUrl';
+		$video_url_value = $content_url
+			? $content_url
+			: 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'];
 
 		return [
 			'@type'            => 'VideoObject',
@@ -324,7 +349,7 @@ class Schema {
 			'name'             => $video['naam'],
 			'description'      => $video['naam'],
 			'thumbnailUrl'     => $thumbnail,
-			'embedUrl'         => 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'],
+			$video_url_key     => $video_url_value,
 			'uploadDate'       => $upload_date,
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
