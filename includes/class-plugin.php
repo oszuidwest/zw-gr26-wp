@@ -100,67 +100,6 @@ class Plugin {
 		$this->schema->register();
 		$this->uitslag->register();
 		$this->register_shortcodes();
-		$this->register_admin_actions();
-	}
-
-	/**
-	 * Registers admin AJAX actions and toolbar items for cache management.
-	 *
-	 * @return void
-	 */
-	private function register_admin_actions(): void {
-		add_action( 'admin_action_zwgr26_flush_cache', [ $this, 'handle_flush_cache' ] );
-		add_action( 'admin_bar_menu', [ $this, 'add_toolbar_flush_link' ], 999 );
-	}
-
-	/**
-	 * Adds a "Flush GR26 cache" link to the admin toolbar.
-	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar Admin bar instance.
-	 * @return void
-	 */
-	public function add_toolbar_flush_link( \WP_Admin_Bar $wp_admin_bar ): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$wp_admin_bar->add_node(
-			[
-				'id'    => 'zwgr26-flush-cache',
-				'title' => 'Flush GR26 cache',
-				'href'  => wp_nonce_url( admin_url( 'admin.php?action=zwgr26_flush_cache' ), 'zwgr26_flush_cache' ),
-			]
-		);
-	}
-
-	/**
-	 * Handles the flush cache AJAX action.
-	 *
-	 * Deletes all zwgr26_ transients. Requires admin capability and valid nonce.
-	 * Accessible via: /wp-admin/admin.php?action=zwgr26_flush_cache&_wpnonce=...
-	 *
-	 * @return void
-	 */
-	public function handle_flush_cache(): void {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Geen toegang.', 'zw-gr26' ) );
-		}
-
-		check_admin_referer( 'zwgr26_flush_cache' );
-
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->query(
-			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
-				$wpdb->esc_like( '_transient_zwgr26_' ) . '%',
-				$wpdb->esc_like( '_transient_timeout_zwgr26_' ) . '%'
-			)
-		);
-
-		wp_safe_redirect( wp_get_referer() ? wp_get_referer() : admin_url() );
-		exit;
 	}
 
 	/**
