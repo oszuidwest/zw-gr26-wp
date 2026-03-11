@@ -415,6 +415,79 @@ class Data_Provider {
 	}
 
 	/**
+	 * Fetches unique episode cover images from a podcast RSS feed.
+	 *
+	 * Results are cached as a WP transient for 1 hour.
+	 *
+	 * @param string $feed_url     Podcast RSS feed URL.
+	 * @param string $title_filter Optional substring to match in episode titles.
+	 * @return string[] List of unique cover image URLs.
+	 */
+	public function get_podcast_covers( string $feed_url, string $title_filter = '' ): array {
+		$cache_key = 'zwgr26_podcast_' . md5( $feed_url . $title_filter );
+		$cached    = get_transient( $cache_key );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = wp_remote_get(
+			$feed_url,
+			[
+				'timeout' => 10,
+				'headers' => [ 'Accept' => 'application/rss+xml, application/xml, text/xml' ],
+			]
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return [];
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+
+		libxml_use_internal_errors( true );
+		$xml = simplexml_load_string( $body, 'SimpleXMLElement', LIBXML_NOCDATA );
+		libxml_clear_errors();
+
+		if ( false === $xml ) {
+			return [];
+		}
+
+		$covers     = [];
+		$namespaces = $xml->getNamespaces( true );
+		$ns         = $namespaces['itunes'] ?? 'http://www.itunes.com/dtds/podcast-1.0.dtd';
+
+		foreach ( $xml->channel->item as $item ) {
+			if ( '' !== $title_filter ) {
+				$title = (string) $item->title;
+				if ( false === stripos( $title, $title_filter ) ) {
+					continue;
+				}
+			}
+
+			$itunes_children = $item->children( $ns );
+
+			if ( ! isset( $itunes_children->image ) ) {
+				continue;
+			}
+
+			$href = (string) $itunes_children->image->attributes()['href'];
+
+			if ( '' !== $href ) {
+				$covers[] = $href;
+			}
+		}
+
+		$covers = array_values( array_unique( $covers ) );
+
+		if ( ! empty( $covers ) ) {
+			set_transient( $cache_key, $covers, HOUR_IN_SECONDS );
+		}
+
+		return $covers;
+	}
+
+	/**
 	 * Gets all 10 municipalities (publish and draft) for tile rendering.
 	 *
 	 * @return array<string, string> slug => display name.

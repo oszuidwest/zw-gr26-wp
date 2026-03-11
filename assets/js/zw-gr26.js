@@ -42,6 +42,55 @@
         });
     });
 
+    /* === PODCAST COVER SHUFFLE === */
+    if (typeof zwGr26PodcastCovers !== 'undefined') {
+        const podcastImgs = document.querySelectorAll(
+            '.zw-gr26-podcast__polaroid img',
+        );
+        const allCovers = zwGr26PodcastCovers;
+
+        function pickCovers(n) {
+            const pool = [...allCovers];
+            const picked = [];
+            for (let i = 0; i < n; i++) {
+                const j = Math.floor(Math.random() * pool.length);
+                picked.push(pool.splice(j, 1)[0]);
+            }
+            return picked;
+        }
+
+        function preloadCovers(covers) {
+            const loads = [];
+            for (const c of covers) {
+                for (const url of [c.src, c.src2x]) {
+                    loads.push(
+                        new Promise((resolve) => {
+                            const img = new Image();
+                            img.onload = img.onerror = resolve;
+                            img.src = url;
+                        }),
+                    );
+                }
+            }
+            return Promise.all(loads);
+        }
+
+        function shuffleCovers() {
+            const chosen = pickCovers(podcastImgs.length);
+            preloadCovers(chosen).then(() => {
+                podcastImgs.forEach((img, i) => {
+                    img.src = chosen[i].src;
+                    img.srcset = chosen[i].srcset;
+                });
+            });
+        }
+
+        preloadCovers(allCovers).then(() => {
+            shuffleCovers();
+            setInterval(shuffleCovers, 3000);
+        });
+    }
+
     /* === RESULTATEN DRAWER === */
     if (typeof zwGr26Resultaten === 'undefined') {
         return;

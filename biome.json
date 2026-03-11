@@ -20,7 +20,7 @@
             "quoteStyle": "single",
             "semicolons": "always"
         },
-        "globals": ["zwGr26Resultaten"]
+        "globals": ["zwGr26Resultaten", "zwGr26PodcastCovers"]
     },
     "css": {
         "formatter": {
