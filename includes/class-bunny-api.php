@@ -374,9 +374,9 @@ class Bunny_API {
 
 		$mp4_url = '';
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
-		if ( ! empty( $body->hasMP4Fallback ) && ! empty( $body->availableResolutions ) ) {
+		if ( ! empty( $body->hasMP4Fallback ) && ! empty( $body->hasDirectPlay ) && ! empty( $body->availableResolutions ) ) {
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
-			$best = $this->get_highest_resolution( $body->availableResolutions );
+			$best = $this->get_highest_mp4_resolution( $body->availableResolutions );
 			if ( $best ) {
 				$mp4_url = $credentials['hostname'] . '/' . $video_id . '/play_' . $best . '.mp4';
 			}
@@ -394,20 +394,24 @@ class Bunny_API {
 	}
 
 	/**
-	 * Picks the highest resolution from a comma-separated list (e.g. '240p,360p,720p,1080p').
+	 * Picks the highest resolution suitable for MP4 fallback from a comma-separated list.
 	 *
-	 * @param string $resolutions Comma-separated resolution string from the Bunny API.
-	 * @return string Highest resolution label (e.g. '1080p') or empty string if none found.
+	 * Bunny CDN generates MP4 fallback files only up to 720p, so resolutions
+	 * above that threshold are ignored to avoid pointing at non-existent files.
+	 *
+	 * @param string $resolutions Comma-separated resolution string from the Bunny API (e.g. '240p,360p,720p,1080p').
+	 * @return string Highest valid resolution label (e.g. '720p') or empty string if none found.
 	 */
-	private function get_highest_resolution( string $resolutions ): string {
-		$best        = '';
-		$best_height = 0;
+	private function get_highest_mp4_resolution( string $resolutions ): string {
+		$max_mp4_height = 720;
+		$best           = '';
+		$best_height    = 0;
 
 		foreach ( explode( ',', $resolutions ) as $res ) {
 			$res = trim( $res );
 			if ( preg_match( '/^(\d+)p$/', $res, $m ) ) {
 				$height = (int) $m[1];
-				if ( $height > $best_height ) {
+				if ( $height > $best_height && $height <= $max_mp4_height ) {
 					$best_height = $height;
 					$best        = $res;
 				}
