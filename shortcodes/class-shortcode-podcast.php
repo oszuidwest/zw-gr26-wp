@@ -108,7 +108,7 @@ class Shortcode_Podcast {
 		for ( $i = 0; $i < 3; $i++ ) {
 			$cover_url = isset( $covers[ $i ] ) ? $covers[ $i ] : '';
 			$html     .= '<div class="zw-gr26-podcast__polaroid">';
-			$html     .= $this->renderer->img_tag( $cover_url, __( 'Aflevering', 'zw-gr26' ), 110, 110 );
+			$html     .= $this->renderer->img_tag( $cover_url, 'Aflevering', 110, 110 );
 			$html     .= '</div>';
 		}
 		$html .= '</div>';
@@ -133,7 +133,7 @@ class Shortcode_Podcast {
 			$html .= $this->render_button(
 				$atts['spotify'],
 				'spotify',
-				__( 'Spotify', 'zw-gr26' )
+				'Spotify'
 			);
 		}
 
@@ -141,7 +141,7 @@ class Shortcode_Podcast {
 			$html .= $this->render_button(
 				$atts['apple'],
 				'apple',
-				__( 'Apple Podcasts', 'zw-gr26' )
+				'Apple Podcasts'
 			);
 		}
 
