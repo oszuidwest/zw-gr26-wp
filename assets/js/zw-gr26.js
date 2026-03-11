@@ -42,6 +42,67 @@
         });
     });
 
+    /* === PODCAST COVER SHUFFLE === */
+    if (typeof zwGr26PodcastInstances !== 'undefined') {
+        function preloadCovers(covers) {
+            const loads = [];
+            for (const c of covers) {
+                for (const url of [c.src, c.src2x]) {
+                    loads.push(
+                        new Promise((resolve) => {
+                            const img = new Image();
+                            img.onload = img.onerror = resolve;
+                            img.src = url;
+                        }),
+                    );
+                }
+            }
+            return Promise.all(loads);
+        }
+
+        document
+            .querySelectorAll('.zw-gr26-podcast__card[data-podcast-id]')
+            .forEach((card) => {
+                const id = card.dataset.podcastId;
+                const covers = zwGr26PodcastInstances[id];
+                if (!covers || covers.length === 0) {
+                    return;
+                }
+
+                const imgs = card.querySelectorAll(
+                    '.zw-gr26-podcast__polaroid img',
+                );
+                if (covers.length < imgs.length) {
+                    return;
+                }
+
+                function pickCovers(n) {
+                    const pool = [...covers];
+                    const picked = [];
+                    for (let i = 0; i < n; i++) {
+                        const j = Math.floor(Math.random() * pool.length);
+                        picked.push(pool.splice(j, 1)[0]);
+                    }
+                    return picked;
+                }
+
+                function shuffleCovers() {
+                    const chosen = pickCovers(imgs.length);
+                    preloadCovers(chosen).then(() => {
+                        imgs.forEach((img, i) => {
+                            img.src = chosen[i].src;
+                            img.srcset = chosen[i].srcset;
+                        });
+                    });
+                }
+
+                preloadCovers(covers).then(() => {
+                    shuffleCovers();
+                    setInterval(shuffleCovers, 3000);
+                });
+            });
+    }
+
     /* === RESULTATEN DRAWER === */
     if (typeof zwGr26Resultaten === 'undefined') {
         return;

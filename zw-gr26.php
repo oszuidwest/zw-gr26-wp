@@ -20,6 +20,7 @@ define( 'ZWGR26_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ZWGR26_URL', plugin_dir_url( __FILE__ ) );
 
 require_once ZWGR26_PATH . 'includes/class-assets.php';
+require_once ZWGR26_PATH . 'includes/class-icons.php';
 require_once ZWGR26_PATH . 'includes/class-image-proxy.php';
 require_once ZWGR26_PATH . 'includes/class-renderer.php';
 require_once ZWGR26_PATH . 'includes/class-bunny-api.php';
@@ -31,6 +32,7 @@ require_once ZWGR26_PATH . 'shortcodes/class-shortcode-livestream.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-debatten.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-explainers.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-nieuws.php';
+require_once ZWGR26_PATH . 'shortcodes/class-shortcode-podcast.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-programmas.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-resultaten.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-stemlocaties.php';

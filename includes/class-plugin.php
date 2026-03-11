@@ -113,6 +113,7 @@ class Plugin {
 		$debatten     = new Shortcode_Debatten( $this->assets, $this->renderer, $this->bunny );
 		$explainers   = new Shortcode_Explainers( $this->assets, $this->renderer, $this->bunny );
 		$nieuws       = new Shortcode_Nieuws( $this->assets, $this->renderer, $this->data );
+		$podcast      = new Shortcode_Podcast( $this->assets, $this->renderer, $this->data, $this->proxy );
 		$programmas   = new Shortcode_Programmas( $this->assets, $this->renderer, $this->data );
 		$resultaten   = new Shortcode_Resultaten( $this->assets, $this->renderer, $this->data );
 		$stemlocaties = new Shortcode_Stemlocaties( $this->assets, $this->renderer, $this->data );
@@ -125,6 +126,7 @@ class Plugin {
 		add_shortcode( 'zw_gr26_explainers', [ $explainers, 'render' ] );
 		add_shortcode( 'zw_gr26_explainer', [ $explainers, 'render_explainer' ] );
 		add_shortcode( 'zw_gr26_nieuws', [ $nieuws, 'render' ] );
+		add_shortcode( 'zw_gr26_podcast', [ $podcast, 'render' ] );
 		add_shortcode( 'zw_gr26_programmas', [ $programmas, 'render' ] );
 		add_shortcode( 'zw_gr26_resultaten', [ $resultaten, 'render' ] );
 		add_shortcode( 'zw_gr26_stemlocaties', [ $stemlocaties, 'render' ] );
