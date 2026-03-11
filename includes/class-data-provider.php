@@ -424,11 +424,18 @@ class Data_Provider {
 	 * @return string[] List of unique cover image URLs.
 	 */
 	public function get_podcast_covers( string $feed_url, string $title_filter = '' ): array {
-		$cache_key = 'zwgr26_podcast_' . md5( $feed_url . $title_filter );
+		$hash      = md5( $feed_url . $title_filter );
+		$cache_key = 'zwgr26_podcast_' . $hash;
+		$cd_key    = 'zwgr26_podcastcd_' . $hash;
 		$cached    = get_transient( $cache_key );
 
 		if ( is_array( $cached ) ) {
 			return $cached;
+		}
+
+		// Cooldown active — skip fetch, return empty without hammering the feed.
+		if ( false !== get_transient( $cd_key ) ) {
+			return [];
 		}
 
 		$response = wp_remote_get(
@@ -440,7 +447,7 @@ class Data_Provider {
 		);
 
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			set_transient( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			set_transient( $cd_key, 1, 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
@@ -451,7 +458,7 @@ class Data_Provider {
 		libxml_clear_errors();
 
 		if ( false === $xml ) {
-			set_transient( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			set_transient( $cd_key, 1, 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
@@ -482,8 +489,11 @@ class Data_Provider {
 
 		$covers = array_values( array_unique( $covers ) );
 
-		$ttl = ! empty( $covers ) ? HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS;
-		set_transient( $cache_key, $covers, $ttl );
+		if ( ! empty( $covers ) ) {
+			set_transient( $cache_key, $covers, HOUR_IN_SECONDS );
+		} else {
+			set_transient( $cd_key, 1, 5 * MINUTE_IN_SECONDS );
+		}
 
 		return $covers;
 	}
