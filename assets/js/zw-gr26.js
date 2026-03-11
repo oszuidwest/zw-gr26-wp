@@ -638,7 +638,7 @@
      *
      * @param {HTMLElement} tile The clicked municipality tile element.
      */
-    function openTile(tile) {
+    function openTile(tile, fromPopstate) {
         const key = tile.dataset.gemeente;
         const data = zwGr26Resultaten[key] || null;
         const is2026 = data ? data.has_2026 : false;
@@ -657,7 +657,9 @@
         triggerElement = tile;
         backdrop.classList.add('is-open');
         document.body.classList.add('zw-gr26-modal-open');
-        history.pushState({ zwgr26Modal: true }, '');
+        if (!fromPopstate) {
+            history.pushState({ zwgr26Modal: key }, '');
+        }
         modalClose.focus();
     }
 
@@ -719,10 +721,18 @@
         history.back();
     }
 
-    window.addEventListener('popstate', () => {
-        if (backdrop.classList.contains('is-open')) {
-            closeModal();
+    window.addEventListener('popstate', (e) => {
+        const key = e.state?.zwgr26Modal;
+        if (key) {
+            const tile = document.querySelector(
+                `.zw-gr26-tile[data-gemeente="${key}"]`,
+            );
+            if (tile) {
+                openTile(tile, true);
+                return;
+            }
         }
+        closeModal();
     });
 
     modalClose.addEventListener('click', closeModalWithHistory);
