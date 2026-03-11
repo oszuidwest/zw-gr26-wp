@@ -307,7 +307,7 @@
                     openModal(
                         videoModal,
                         { type: 'video', src: link.href },
-                        link.closest('.zw-gr26-vcard, .zw-gr26-ecard'),
+                        link,
                     );
                 });
             });

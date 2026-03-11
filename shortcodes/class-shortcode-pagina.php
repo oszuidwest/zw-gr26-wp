@@ -17,6 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcode_Pagina {
 
 	/**
+	 * Whether the pagina shortcode is currently rendering.
+	 *
+	 * Child shortcodes check this flag and return empty output
+	 * when used outside [zw_gr26_pagina].
+	 *
+	 * @var bool
+	 */
+	public static bool $active = false;
+
+	/**
 	 * Asset manager.
 	 *
 	 * @var Assets
@@ -61,7 +71,12 @@ class Shortcode_Pagina {
 			'zw_gr26_pagina'
 		);
 
-		$inner = do_shortcode( $content );
+		self::$active = true;
+		try {
+			$inner = do_shortcode( $content );
+		} finally {
+			self::$active = false;
+		}
 
 		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
 		$inner = preg_replace( '/<br\s*\/?>\s*/', '', $inner );
