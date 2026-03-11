@@ -62,13 +62,21 @@
      * @param {Object}       historyData Data stored in the history state for restore.
      * @param {?HTMLElement}  trigger     Element to refocus when the modal closes.
      */
+    /** @type {boolean} Whether the active modal pushed a history entry. */
+    let historyPushed = false;
+
     function openModal(modal, historyData, trigger) {
         if (activeModal) activeModal.close();
         activeModal = modal;
         activeModal.trigger = trigger || null;
         modal.open();
         document.body.classList.add('zw-gr26-modal-open');
-        history.pushState({ [HISTORY_KEY]: historyData }, '');
+        if (historyData) {
+            history.pushState({ [HISTORY_KEY]: historyData }, '');
+            historyPushed = true;
+        } else {
+            historyPushed = false;
+        }
     }
 
     /**
@@ -100,6 +108,7 @@
             activeModal.trigger = null;
         }
         activeModal = null;
+        historyPushed = false;
     }
 
     /**
@@ -109,7 +118,11 @@
      */
     function closeActiveModalWithHistory() {
         if (!activeModal) return;
-        history.back();
+        if (historyPushed) {
+            history.back();
+        } else {
+            closeActiveModal();
+        }
     }
 
     document.addEventListener('keydown', (e) => {
@@ -242,9 +255,7 @@
             },
             close() {
                 videoBackdrop.classList.remove('is-open');
-                setTimeout(() => {
-                    videoIframe.src = '';
-                }, 50);
+                videoIframe.src = '';
             },
         };
 
@@ -267,7 +278,7 @@
                     videoIframe.src = url.toString();
                     openModal(
                         videoModal,
-                        { type: 'video' },
+                        null,
                         link.closest('.zw-gr26-vcard, .zw-gr26-ecard'),
                     );
                 });
