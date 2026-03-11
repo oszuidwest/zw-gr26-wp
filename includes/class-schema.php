@@ -338,23 +338,22 @@ class Schema {
 
 		$upload_date = $this->parse_dutch_date( $video['datum'] );
 
-		$schema = [
+		$video_url_key   = $content_url ? 'contentUrl' : 'embedUrl';
+		$video_url_value = $content_url
+			? $content_url
+			: 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'];
+
+		return [
 			'@type'            => 'VideoObject',
 			'@id'              => $canonical . '#/schema/VideoObject/' . $video['videoid'],
 			'name'             => $video['naam'],
 			'description'      => $video['naam'],
 			'thumbnailUrl'     => $thumbnail,
-			'embedUrl'         => 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'],
+			$video_url_key     => $video_url_value,
 			'uploadDate'       => $upload_date,
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
 		];
-
-		if ( $content_url ) {
-			$schema['contentUrl'] = $content_url;
-		}
-
-		return $schema;
 	}
 
 	/**
