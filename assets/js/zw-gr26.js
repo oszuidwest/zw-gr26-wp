@@ -628,17 +628,29 @@
 
     /* --- Open drawer on tile click/keypress --- */
 
+    /** @type {string} History state key for identifying modal entries. */
+    const HISTORY_KEY = 'zwgr26Modal';
+
     /**
-     * Opens the results modal for a municipality tile.
-     *
-     * Loads municipality data, renders all modal sections, and moves focus
-     * to the close button.
+     * Toggles the modal visibility and scroll lock on the body.
      *
      * @access private
      *
-     * @param {HTMLElement} tile The clicked municipality tile element.
+     * @param {boolean} open Whether the modal should be visible.
      */
-    function openTile(tile) {
+    function setModalVisible(open) {
+        backdrop.classList.toggle('is-open', open);
+        document.body.classList.toggle('zw-gr26-modal-open', open);
+    }
+
+    /**
+     * Renders the results modal content for a municipality tile.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} tile The municipality tile element.
+     */
+    function renderTile(tile) {
         const key = tile.dataset.gemeente;
         const data = zwGr26Resultaten[key] || null;
         const is2026 = data ? data.has_2026 : false;
@@ -655,8 +667,20 @@
         renderTable(partijen, is2026);
 
         triggerElement = tile;
-        backdrop.classList.add('is-open');
+        setModalVisible(true);
         modalClose.focus();
+    }
+
+    /**
+     * Opens the results modal for a municipality tile and pushes a history entry.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} tile The clicked municipality tile element.
+     */
+    function openTile(tile) {
+        renderTile(tile);
+        history.pushState({ [HISTORY_KEY]: tile.dataset.gemeente }, '');
     }
 
     document
@@ -703,24 +727,44 @@
      * @access private
      */
     function closeModal() {
-        backdrop.classList.remove('is-open');
+        if (!backdrop.classList.contains('is-open')) return;
+        setModalVisible(false);
         if (triggerElement) {
             triggerElement.focus();
             triggerElement = null;
         }
     }
 
-    modalClose.addEventListener('click', closeModal);
+    function closeModalWithHistory() {
+        if (!backdrop.classList.contains('is-open')) return;
+        history.back();
+    }
+
+    window.addEventListener('popstate', (e) => {
+        const key = e.state?.[HISTORY_KEY];
+        if (key) {
+            const tile = document.querySelector(
+                `.zw-gr26-tile[data-gemeente="${key}"]`,
+            );
+            if (tile) {
+                renderTile(tile);
+                return;
+            }
+        }
+        closeModal();
+    });
+
+    modalClose.addEventListener('click', closeModalWithHistory);
 
     backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
-            closeModal();
+            closeModalWithHistory();
         }
     });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && backdrop.classList.contains('is-open')) {
-            closeModal();
+            closeModalWithHistory();
         }
     });
 })();

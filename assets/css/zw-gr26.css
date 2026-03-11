@@ -734,6 +734,10 @@
     z-index: 1000;
 }
 
+body.zw-gr26-modal-open {
+    overflow: hidden;
+}
+
 .zw-gr26-modal-backdrop.is-open {
     display: block;
 }
