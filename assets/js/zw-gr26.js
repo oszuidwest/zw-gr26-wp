@@ -176,6 +176,19 @@
     /** @type {HTMLElement[]} Cached focusable elements inside the modal for the focus trap. */
     let focusableCache = [];
 
+    /**
+     * Rebuilds the cached list of focusable elements inside the modal.
+     *
+     * @access private
+     */
+    function refreshFocusableCache() {
+        focusableCache = [
+            ...modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            ),
+        ].filter((el) => el.offsetWidth > 0);
+    }
+
     /* --- SVG helpers --- */
 
     /**
@@ -628,6 +641,8 @@
             modal.classList.remove('has-majority');
             hadMajority = false;
         }
+
+        refreshFocusableCache();
     });
 
     coalReset.addEventListener('click', () => {
@@ -677,11 +692,7 @@
 
         triggerElement = tile;
         setModalVisible(true);
-        focusableCache = [
-            ...modal.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-            ),
-        ].filter((el) => el.offsetWidth > 0);
+        refreshFocusableCache();
         modalClose.focus();
     }
 
