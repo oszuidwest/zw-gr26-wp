@@ -1,11 +1,132 @@
 /**
  * ZuidWest Verkiezingen 2026 front-end interactie.
  *
- * Programma-dropdown, resultaten-drawer met donut, tabel, en coalitiebouwer.
+ * Centrale modal helper, video modal, programma-dropdown,
+ * resultaten-drawer met donut, tabel, en coalitiebouwer.
  *
  * @package ZWGR26
  */
 (() => {
+    /* === MODAL HELPER === */
+
+    /** @type {string} History state key used by all modals. */
+    const HISTORY_KEY = 'zwgr26Modal';
+
+    /** @type {?Object} Currently active modal instance. */
+    let activeModal = null;
+
+    /** @type {Object<string, Function>} Restore callbacks for forward navigation, keyed by modal type. */
+    const modalRestorers = {};
+
+    /**
+     * Creates a keyboard focus trap for a modal panel.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} panel The panel element to trap focus within.
+     * @return {Function} Callback to rebuild the cached focusable-element list.
+     */
+    function createFocusTrap(panel) {
+        let cache = [];
+
+        function refresh() {
+            cache = [
+                ...panel.querySelectorAll(
+                    'button, [href], input, select, textarea, iframe, [tabindex]:not([tabindex="-1"])',
+                ),
+            ].filter((el) => el.offsetWidth > 0);
+        }
+
+        panel.addEventListener('keydown', (e) => {
+            if (e.key !== 'Tab' || cache.length === 0) return;
+            const first = cache[0];
+            const last = cache[cache.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        });
+
+        return refresh;
+    }
+
+    /**
+     * Opens a modal, closing any previously active one first.
+     *
+     * @access private
+     *
+     * @param {Object}       modal       Modal descriptor with open() and close() methods.
+     * @param {Object}       historyData Data stored in the history state for restore.
+     * @param {?HTMLElement}  trigger     Element to refocus when the modal closes.
+     */
+    function openModal(modal, historyData, trigger) {
+        if (activeModal) activeModal.close();
+        activeModal = modal;
+        activeModal.trigger = trigger || null;
+        modal.open();
+        document.body.classList.add('zw-gr26-modal-open');
+        history.pushState({ [HISTORY_KEY]: historyData }, '');
+    }
+
+    /**
+     * Restores a modal on forward navigation (no history push).
+     *
+     * @access private
+     *
+     * @param {Object} modal Modal descriptor.
+     */
+    function restoreModal(modal) {
+        if (activeModal) activeModal.close();
+        activeModal = modal;
+        activeModal.trigger = null;
+        modal.open();
+        document.body.classList.add('zw-gr26-modal-open');
+    }
+
+    /**
+     * Closes the active modal (DOM only, no history navigation).
+     *
+     * @access private
+     */
+    function closeActiveModal() {
+        if (!activeModal) return;
+        activeModal.close();
+        document.body.classList.remove('zw-gr26-modal-open');
+        if (activeModal.trigger) {
+            activeModal.trigger.focus();
+            activeModal.trigger = null;
+        }
+        activeModal = null;
+    }
+
+    /**
+     * Closes the active modal and navigates back in history.
+     *
+     * @access private
+     */
+    function closeActiveModalWithHistory() {
+        if (!activeModal) return;
+        history.back();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && activeModal) {
+            closeActiveModalWithHistory();
+        }
+    });
+
+    window.addEventListener('popstate', (e) => {
+        const data = e.state?.[HISTORY_KEY];
+        if (data?.type && modalRestorers[data.type]) {
+            modalRestorers[data.type](data);
+        } else {
+            closeActiveModal();
+        }
+    });
+
     /* === STEMLOCATIES ACCORDION === */
     document.querySelectorAll('.zw-gr26-stem__row').forEach((row) => {
         row.addEventListener('click', () => {
@@ -103,6 +224,58 @@
             });
     }
 
+    /* === VIDEO MODAL === */
+    const videoBackdrop = document.getElementById('zwgr26VideoModal');
+    if (videoBackdrop) {
+        const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
+        const videoIframe = videoBackdrop.querySelector(
+            '.zw-gr26-video-modal__iframe',
+        );
+        const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
+        const refreshVideoFocus = createFocusTrap(videoPanel);
+
+        const videoModal = {
+            open() {
+                videoBackdrop.classList.add('is-open');
+                refreshVideoFocus();
+                videoClose.focus();
+            },
+            close() {
+                videoBackdrop.classList.remove('is-open');
+                videoIframe.src = '';
+            },
+        };
+
+        videoBackdrop.addEventListener('click', (e) => {
+            if (e.target === videoBackdrop) closeActiveModalWithHistory();
+        });
+
+        videoClose.addEventListener('click', closeActiveModalWithHistory);
+
+        document
+            .querySelectorAll(
+                '.zw-gr26-vcard__link[href], .zw-gr26-ecard__link[href]',
+            )
+            .forEach((link) => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const url = new URL(link.href);
+                    url.searchParams.set('autoplay', 'true');
+                    videoIframe.src = url.toString();
+                    const isPortrait = link.closest('.zw-gr26-ecard') !== null;
+                    videoPanel.classList.toggle(
+                        'zw-gr26-video-modal--portrait',
+                        isPortrait,
+                    );
+                    openModal(
+                        videoModal,
+                        { type: 'video' },
+                        link.closest('.zw-gr26-vcard, .zw-gr26-ecard'),
+                    );
+                });
+            });
+    }
+
     /* === RESULTATEN DRAWER === */
     if (typeof zwGr26Resultaten === 'undefined') {
         return;
@@ -127,6 +300,8 @@
     if (!backdrop || !modalTitle) {
         return;
     }
+
+    const refreshResultsFocus = createFocusTrap(modal);
 
     /** @type {string} Default fallback color for parties without a specified color. */
     const DEFAULT_COLOR = '#90a4ae';
@@ -163,9 +338,6 @@
 
     /** @type {number} Number of seats needed for a majority. */
     let currentMajority = 0;
-
-    /** @type {?HTMLElement} The tile element that opened the modal, used to restore focus. */
-    let triggerElement = null;
 
     /* --- SVG helpers --- */
 
@@ -619,6 +791,8 @@
             modal.classList.remove('has-majority');
             hadMajority = false;
         }
+
+        refreshResultsFocus();
     });
 
     coalReset.addEventListener('click', () => {
@@ -626,22 +800,18 @@
         updateCoalition();
     });
 
-    /* --- Open drawer on tile click/keypress --- */
+    /* --- Results modal --- */
 
-    /** @type {string} History state key for identifying modal entries. */
-    const HISTORY_KEY = 'zwgr26Modal';
-
-    /**
-     * Toggles the modal visibility and scroll lock on the body.
-     *
-     * @access private
-     *
-     * @param {boolean} open Whether the modal should be visible.
-     */
-    function setModalVisible(open) {
-        backdrop.classList.toggle('is-open', open);
-        document.body.classList.toggle('zw-gr26-modal-open', open);
-    }
+    const resultsModal = {
+        open() {
+            backdrop.classList.add('is-open');
+            refreshResultsFocus();
+            modalClose.focus();
+        },
+        close() {
+            backdrop.classList.remove('is-open');
+        },
+    };
 
     /**
      * Renders the results modal content for a municipality tile.
@@ -665,14 +835,10 @@
         renderOpkomst(data, is2026);
         renderDonut(partijen, is2026);
         renderTable(partijen, is2026);
-
-        triggerElement = tile;
-        setModalVisible(true);
-        modalClose.focus();
     }
 
     /**
-     * Opens the results modal for a municipality tile and pushes a history entry.
+     * Opens the results modal for a municipality tile.
      *
      * @access private
      *
@@ -680,8 +846,22 @@
      */
     function openTile(tile) {
         renderTile(tile);
-        history.pushState({ [HISTORY_KEY]: tile.dataset.gemeente }, '');
+        openModal(
+            resultsModal,
+            { type: 'resultaten', gemeente: tile.dataset.gemeente },
+            tile,
+        );
     }
+
+    modalRestorers.resultaten = (data) => {
+        const tile = document.querySelector(
+            `.zw-gr26-tile[data-gemeente="${data.gemeente}"]`,
+        );
+        if (tile) {
+            renderTile(tile);
+            restoreModal(resultsModal);
+        }
+    };
 
     document
         .querySelectorAll('.zw-gr26-tile[data-gemeente]')
@@ -695,76 +875,11 @@
             });
         });
 
-    /* --- Focus trap --- */
-    modal.addEventListener('keydown', (e) => {
-        if (e.key !== 'Tab') return;
-
-        const focusable = [
-            ...modal.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-            ),
-        ].filter((el) => el.offsetWidth > 0);
-
-        if (focusable.length === 0) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey && document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-        }
-    });
-
-    /* --- Close drawer --- */
-
-    /**
-     * Closes the results modal and restores focus to the originating tile.
-     *
-     * @access private
-     */
-    function closeModal() {
-        if (!backdrop.classList.contains('is-open')) return;
-        setModalVisible(false);
-        if (triggerElement) {
-            triggerElement.focus();
-            triggerElement = null;
-        }
-    }
-
-    function closeModalWithHistory() {
-        if (!backdrop.classList.contains('is-open')) return;
-        history.back();
-    }
-
-    window.addEventListener('popstate', (e) => {
-        const key = e.state?.[HISTORY_KEY];
-        if (key) {
-            const tile = document.querySelector(
-                `.zw-gr26-tile[data-gemeente="${key}"]`,
-            );
-            if (tile) {
-                renderTile(tile);
-                return;
-            }
-        }
-        closeModal();
-    });
-
-    modalClose.addEventListener('click', closeModalWithHistory);
+    modalClose.addEventListener('click', closeActiveModalWithHistory);
 
     backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
-            closeModalWithHistory();
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && backdrop.classList.contains('is-open')) {
-            closeModalWithHistory();
+            closeActiveModalWithHistory();
         }
     });
 })();

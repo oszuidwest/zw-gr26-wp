@@ -67,6 +67,18 @@ class Shortcode_Pagina {
 		$inner = preg_replace( '/<br\s*\/?>\s*/', '', $inner );
 		$inner = preg_replace( '#<p>\s*</p>#', '', $inner );
 
+		// Render video modal in wp_footer so it sits outside .zw-gr26-wrapper.
+		add_action(
+			'wp_footer',
+			static function () {
+				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
+				echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video">';
+				echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
+				echo '<iframe class="zw-gr26-video-modal__iframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>';
+				echo '</div></div>';
+			}
+		);
+
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$html .= $this->renderer->hero(
 			$atts['titel'],
