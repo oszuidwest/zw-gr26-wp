@@ -55,6 +55,12 @@ News from a dossier taxonomy:
 [zw_gr26_nieuws titel="Laatste nieuws" dossier="gemeenteraadsverkiezingen" aantal="6" link="https://example.com/dossier" regio="west-brabant"]
 ```
 
+Podcast promotion card with polaroid-stack cover art:
+
+```
+[zw_gr26_podcast titel="Podcast" naam="Het Fractiehuis" label="Verkiezingspodcast" beschrijving="Benieuwd naar de lijsttrekkers?" feed="https://example.com/feed/rss" filter="gemeenteraad" spotify="https://open.spotify.com/show/..." apple="https://podcasts.apple.com/..."]
+```
+
 Party programs (data from the gemeente_uitslag CPT):
 
 ```
