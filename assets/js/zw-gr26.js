@@ -261,6 +261,7 @@
                     e.preventDefault();
                     const url = new URL(link.href);
                     url.searchParams.set('autoplay', 'true');
+                    url.searchParams.set('preload', 'true');
                     videoIframe.src = url.toString();
                     openModal(
                         videoModal,
