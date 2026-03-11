@@ -17,6 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcode_Pagina {
 
 	/**
+	 * Whether the pagina shortcode is currently rendering.
+	 *
+	 * Child shortcodes check this flag and return empty output
+	 * when used outside [zw_gr26_pagina].
+	 *
+	 * @var bool
+	 */
+	public static bool $active = false;
+
+	/**
+	 * Whether the video modal has already been added to the footer.
+	 *
+	 * @var bool
+	 */
+	private static bool $video_modal_added = false;
+
+	/**
 	 * Asset manager.
 	 *
 	 * @var Assets
@@ -61,11 +78,31 @@ class Shortcode_Pagina {
 			'zw_gr26_pagina'
 		);
 
-		$inner = do_shortcode( $content );
+		self::$active = true;
+		try {
+			$inner = do_shortcode( $content );
+		} finally {
+			self::$active = false;
+		}
 
 		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
 		$inner = preg_replace( '/<br\s*\/?>\s*/', '', $inner );
 		$inner = preg_replace( '#<p>\s*</p>#', '', $inner );
+
+		// Render video modal in wp_footer so it sits outside .zw-gr26-wrapper.
+		if ( ! self::$video_modal_added ) {
+			self::$video_modal_added = true;
+			add_action(
+				'wp_footer',
+				static function () {
+					echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
+					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video">';
+					echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
+					echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
+					echo '</div></div>';
+				}
+			);
+		}
 
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$html .= $this->renderer->hero(

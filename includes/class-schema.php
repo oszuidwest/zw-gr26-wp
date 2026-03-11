@@ -341,7 +341,7 @@ class Schema {
 		$video_url_key   = $content_url ? 'contentUrl' : 'embedUrl';
 		$video_url_value = $content_url
 			? $content_url
-			: 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'];
+			: $this->bunny->get_player_url( $video['library_id'], $video['videoid'] );
 
 		return [
 			'@type'            => 'VideoObject',

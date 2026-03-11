@@ -102,20 +102,12 @@ class Shortcode_Debatten {
 			];
 
 			if ( ! $coming_soon && $library_id ) {
-				$info = $this->bunny->get_video_info( $library_id, $debat['videoid'] );
-				if ( $info ) {
-					if ( ! $video['thumbnail'] ) {
-						$video['thumbnail'] = $info['thumbnail'];
-					}
-					$coming_soon = $info['binnenkort'];
-				} else {
-					$coming_soon = true;
-				}
+				$resolved = $this->bunny->resolve_video_card( $library_id, $debat['videoid'], $video['thumbnail'] );
 
-				if ( ! $coming_soon ) {
-					$video['url'] = 'https://iframe.mediadelivery.net/play/'
-						. $library_id . '/' . $debat['videoid'];
-				}
+				$video['thumbnail']  = $resolved['thumbnail'];
+				$video['url']        = $resolved['url'];
+				$video['stream_url'] = $resolved['stream_url'];
+				$coming_soon         = $resolved['binnenkort'];
 			}
 
 			$html .= $this->renderer->video_card( $video, $coming_soon );

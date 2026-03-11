@@ -120,16 +120,36 @@ class Plugin {
 		$tekst        = new Shortcode_Tekst( $this->assets, $this->renderer );
 
 		add_shortcode( 'zw_gr26_pagina', [ $pagina, 'render' ] );
-		add_shortcode( 'zw_gr26_livestream', [ $livestream, 'render' ] );
-		add_shortcode( 'zw_gr26_debatten', [ $debatten, 'render' ] );
-		add_shortcode( 'zw_gr26_debat', [ $debatten, 'render_debat' ] );
-		add_shortcode( 'zw_gr26_explainers', [ $explainers, 'render' ] );
-		add_shortcode( 'zw_gr26_explainer', [ $explainers, 'render_explainer' ] );
-		add_shortcode( 'zw_gr26_nieuws', [ $nieuws, 'render' ] );
-		add_shortcode( 'zw_gr26_podcast', [ $podcast, 'render' ] );
-		add_shortcode( 'zw_gr26_programmas', [ $programmas, 'render' ] );
-		add_shortcode( 'zw_gr26_resultaten', [ $resultaten, 'render' ] );
-		add_shortcode( 'zw_gr26_stemlocaties', [ $stemlocaties, 'render' ] );
-		add_shortcode( 'zw_gr26_tekst', [ $tekst, 'render' ] );
+
+		// All other shortcodes only render inside [zw_gr26_pagina].
+		$this->add_nested_shortcode( 'zw_gr26_livestream', [ $livestream, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_debatten', [ $debatten, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_debat', [ $debatten, 'render_debat' ] );
+		$this->add_nested_shortcode( 'zw_gr26_explainers', [ $explainers, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_explainer', [ $explainers, 'render_explainer' ] );
+		$this->add_nested_shortcode( 'zw_gr26_nieuws', [ $nieuws, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_podcast', [ $podcast, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_programmas', [ $programmas, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_resultaten', [ $resultaten, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_stemlocaties', [ $stemlocaties, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_tekst', [ $tekst, 'render' ] );
+	}
+
+	/**
+	 * Registers a shortcode that only renders inside [zw_gr26_pagina].
+	 *
+	 * @param string   $tag      Shortcode tag.
+	 * @param callable $callback Render callback.
+	 */
+	private function add_nested_shortcode( string $tag, callable $callback ): void {
+		add_shortcode(
+			$tag,
+			static function ( $atts, $content = null ) use ( $callback ) {
+				if ( ! Shortcode_Pagina::$active ) {
+					return '';
+				}
+				return $callback( $atts, $content );
+			}
+		);
 	}
 }

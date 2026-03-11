@@ -149,22 +149,24 @@ class Renderer {
 	 * @param array $video {
 	 *     Video data.
 	 *
-	 *     @type string $titel     Video title.
-	 *     @type string $thumbnail Thumbnail URL.
-	 *     @type string $url       Video URL.
-	 *     @type string $meta      Optional. Meta text.
+	 *     @type string $titel      Video title.
+	 *     @type string $thumbnail  Thumbnail URL.
+	 *     @type string $url        Video player page URL (fallback for no-JS).
+	 *     @type string $stream_url Optional. HLS stream URL for inline playback.
+	 *     @type string $meta       Optional. Meta text.
 	 * }
 	 * @param bool  $coming_soon Whether the video is not yet available.
 	 * @return string Video card HTML.
 	 */
 	public function video_card( array $video, bool $coming_soon = false ): string {
-		$tag  = $coming_soon ? 'div' : 'a';
-		$href = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
+		$tag    = $coming_soon ? 'div' : 'a';
+		$href   = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
+		$stream = ! empty( $video['stream_url'] ) ? ' data-stream="' . esc_url( $video['stream_url'] ) . '"' : '';
 
 		$has_thumb = ! empty( $video['thumbnail'] );
 
 		$html  = '<article class="zw-gr26-vcard' . ( $coming_soon ? ' zw-gr26-binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . ' class="zw-gr26-vcard__link">';
+		$html .= '<' . $tag . $href . $stream . ' class="zw-gr26-vcard__link">';
 
 		if ( $has_thumb ) {
 			$html .= $this->img_tag(
@@ -205,7 +207,8 @@ class Renderer {
 	 *
 	 *     @type string $titel      Video title.
 	 *     @type string $thumbnail  Thumbnail URL.
-	 *     @type string $url        Video URL.
+	 *     @type string $url        Video player page URL (fallback for no-JS).
+	 *     @type string $stream_url Optional. HLS stream URL for inline playback.
 	 *     @type bool   $binnenkort Optional. Whether the video is upcoming.
 	 * }
 	 * @return string Explainer card HTML.
@@ -215,9 +218,10 @@ class Renderer {
 		$has_thumb   = ! empty( $video['thumbnail'] );
 		$tag         = $coming_soon ? 'div' : 'a';
 		$href        = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
+		$stream      = ! empty( $video['stream_url'] ) ? ' data-stream="' . esc_url( $video['stream_url'] ) . '"' : '';
 
 		$html  = '<article class="zw-gr26-ecard' . ( $coming_soon ? ' zw-gr26-ecard--binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . ' class="zw-gr26-ecard__link">';
+		$html .= '<' . $tag . $href . $stream . ' class="zw-gr26-ecard__link">';
 
 		if ( $has_thumb ) {
 			$html .= $this->img_tag(
