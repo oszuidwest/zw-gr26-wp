@@ -307,7 +307,7 @@ class Bunny_API {
 				'thumbnail'  => $credentials['hostname'] . '/' . $v->guid . '/' . $v->thumbnailFileName,
 				'url'        => $page_url
 					? rtrim( $page_url, '/' ) . '/?v=' . $v->guid
-					: 'https://iframe.mediadelivery.net/play/' . $v->videoLibraryId . '/' . $v->guid,
+					: $this->get_player_url( $v->videoLibraryId, $v->guid ),
 				'duur'       => isset( $v->length ) ? (int) $v->length : 0,
 				'datum'      => $broadcast->format( 'Y-m-d H:i:s' ),
 				'binnenkort' => $broadcast > $now,
@@ -394,6 +394,17 @@ class Bunny_API {
 	}
 
 	/**
+	 * Returns the Bunny iframe player URL for a video.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @return string Iframe player URL.
+	 */
+	public function get_player_url( int $library_id, string $video_id ): string {
+		return 'https://iframe.mediadelivery.net/play/' . $library_id . '/' . $video_id;
+	}
+
+	/**
 	 * Returns the HLS playlist URL for a video.
 	 *
 	 * @param int    $library_id Bunny library ID.
@@ -418,13 +429,14 @@ class Bunny_API {
 	 * @param int    $library_id Bunny library ID.
 	 * @param string $video_id   Video GUID.
 	 * @param string $thumbnail  Existing thumbnail URL (preserved if non-empty).
-	 * @return array{thumbnail: string, binnenkort: bool, url: string} Resolved video display data.
+	 * @return array{thumbnail: string, binnenkort: bool, url: string, stream_url: string} Resolved video display data.
 	 */
 	public function resolve_video_card( int $library_id, string $video_id, string $thumbnail = '' ): array {
 		$result = [
 			'thumbnail'  => $thumbnail,
 			'binnenkort' => true,
 			'url'        => '',
+			'stream_url' => '',
 		];
 
 		$info = $this->get_video_info( $library_id, $video_id );
@@ -436,7 +448,8 @@ class Bunny_API {
 		}
 
 		if ( ! $result['binnenkort'] ) {
-			$result['url'] = $this->get_stream_url( $library_id, $video_id );
+			$result['url']        = $this->get_player_url( $library_id, $video_id );
+			$result['stream_url'] = $this->get_stream_url( $library_id, $video_id );
 		}
 
 		return $result;

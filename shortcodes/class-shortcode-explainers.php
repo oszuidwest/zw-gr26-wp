@@ -103,9 +103,10 @@ class Shortcode_Explainers {
 			if ( ! $coming_soon && $library_id ) {
 				$resolved = $this->bunny->resolve_video_card( $library_id, $explainer['videoid'], $video['thumbnail'] );
 
-				$video['thumbnail'] = $resolved['thumbnail'];
-				$video['url']       = $resolved['url'];
-				$coming_soon        = $resolved['binnenkort'];
+				$video['thumbnail']  = $resolved['thumbnail'];
+				$video['url']        = $resolved['url'];
+				$video['stream_url'] = $resolved['stream_url'];
+				$coming_soon         = $resolved['binnenkort'];
 			}
 
 			$video['binnenkort'] = $coming_soon;

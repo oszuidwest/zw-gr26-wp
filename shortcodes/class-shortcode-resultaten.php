@@ -17,6 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcode_Resultaten {
 
 	/**
+	 * Whether the results modal has already been added to the footer.
+	 *
+	 * @var bool
+	 */
+	private static bool $modal_added = false;
+
+	/**
 	 * Asset manager.
 	 *
 	 * @var Assets
@@ -100,6 +107,10 @@ class Shortcode_Resultaten {
 
 		// Render modal in wp_footer so it sits outside .zw-gr26-wrapper.
 		// The wrapper's CSS transform creates a new containing block, breaking position:fixed.
+		if ( self::$modal_added ) {
+			return $html;
+		}
+		self::$modal_added = true;
 		add_action(
 			'wp_footer',
 			function () {

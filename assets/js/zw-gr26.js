@@ -241,7 +241,7 @@
 
     /* === VIDEO MODAL === */
     const videoBackdrop = document.getElementById('zwgr26VideoModal');
-    if (videoBackdrop) {
+    if (videoBackdrop && typeof videojs !== 'undefined') {
         const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
         const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
         const refreshVideoFocus = createFocusTrap(videoPanel);
@@ -257,18 +257,13 @@
          * @param {string} src HLS stream URL to load.
          */
         function loadVideo(src) {
-            if (!player && typeof videojs !== 'undefined') {
+            if (!player) {
                 player = videojs('zwgr26VideoPlayer', {
                     autoplay: true,
                     language: 'nl',
                 });
             }
-            if (player) {
-                player.src({
-                    src: src,
-                    type: 'application/x-mpegURL',
-                });
-            }
+            player.src({ src: src, type: 'application/x-mpegURL' });
         }
 
         const videoModal = {
@@ -298,17 +293,14 @@
 
         document
             .querySelectorAll(
-                '.zw-gr26-vcard__link[href], .zw-gr26-ecard__link[href]',
+                '.zw-gr26-vcard__link[data-stream], .zw-gr26-ecard__link[data-stream]',
             )
             .forEach((link) => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    loadVideo(link.href);
-                    openModal(
-                        videoModal,
-                        { type: 'video', src: link.href },
-                        link,
-                    );
+                    const src = link.dataset.stream;
+                    loadVideo(src);
+                    openModal(videoModal, { type: 'video', src: src }, link);
                 });
             });
     }
