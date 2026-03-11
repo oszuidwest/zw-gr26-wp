@@ -480,9 +480,8 @@ class Data_Provider {
 
 		$covers = array_values( array_unique( $covers ) );
 
-		if ( ! empty( $covers ) ) {
-			set_transient( $cache_key, $covers, HOUR_IN_SECONDS );
-		}
+		$ttl = ! empty( $covers ) ? HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS;
+		set_transient( $cache_key, $covers, $ttl );
 
 		return $covers;
 	}

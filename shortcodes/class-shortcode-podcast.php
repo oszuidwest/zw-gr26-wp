@@ -17,6 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcode_Podcast {
 
 	/**
+	 * Instance counter for scoping cover data per shortcode.
+	 *
+	 * @var int
+	 */
+	private static int $instance_count = 0;
+
+	/**
 	 * Asset manager.
 	 *
 	 * @var Assets
@@ -89,9 +96,12 @@ class Shortcode_Podcast {
 
 		$covers = $this->data->get_podcast_covers( $atts['feed'], $atts['filter'] );
 
+		++self::$instance_count;
+		$instance_id = self::$instance_count;
+
 		$html = $this->renderer->section_open( $atts['titel'] );
 
-		$html .= '<div class="zw-gr26-podcast__card">';
+		$html .= '<div class="zw-gr26-podcast__card" data-podcast-id="' . esc_attr( (string) $instance_id ) . '">';
 
 		// Polaroid stack — render with srcset via Renderer::img_tag().
 		$html .= '<div class="zw-gr26-podcast__polaroids">';
@@ -141,7 +151,7 @@ class Shortcode_Podcast {
 
 		$html .= $this->renderer->section_close();
 
-		// Pass covers to JS for shuffle (1x and 2x URLs for srcset).
+		// Pass covers to JS for shuffle, scoped per instance.
 		if ( ! empty( $covers ) ) {
 			$js_covers = [];
 			foreach ( $covers as $url ) {
@@ -155,7 +165,8 @@ class Shortcode_Podcast {
 			}
 			wp_add_inline_script(
 				'zw-gr26',
-				'var zwGr26PodcastCovers = ' . wp_json_encode( $js_covers ) . ';',
+				'window.zwGr26PodcastInstances = window.zwGr26PodcastInstances || {};'
+				. ' zwGr26PodcastInstances[' . $instance_id . '] = ' . wp_json_encode( $js_covers ) . ';',
 				'before'
 			);
 		}

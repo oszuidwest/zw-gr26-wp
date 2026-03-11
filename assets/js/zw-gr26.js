@@ -43,22 +43,7 @@
     });
 
     /* === PODCAST COVER SHUFFLE === */
-    if (typeof zwGr26PodcastCovers !== 'undefined') {
-        const podcastImgs = document.querySelectorAll(
-            '.zw-gr26-podcast__polaroid img',
-        );
-        const allCovers = zwGr26PodcastCovers;
-
-        function pickCovers(n) {
-            const pool = [...allCovers];
-            const picked = [];
-            for (let i = 0; i < n; i++) {
-                const j = Math.floor(Math.random() * pool.length);
-                picked.push(pool.splice(j, 1)[0]);
-            }
-            return picked;
-        }
-
+    if (typeof zwGr26PodcastInstances !== 'undefined') {
         function preloadCovers(covers) {
             const loads = [];
             for (const c of covers) {
@@ -75,20 +60,47 @@
             return Promise.all(loads);
         }
 
-        function shuffleCovers() {
-            const chosen = pickCovers(podcastImgs.length);
-            preloadCovers(chosen).then(() => {
-                podcastImgs.forEach((img, i) => {
-                    img.src = chosen[i].src;
-                    img.srcset = chosen[i].srcset;
+        document
+            .querySelectorAll('.zw-gr26-podcast__card[data-podcast-id]')
+            .forEach((card) => {
+                const id = card.dataset.podcastId;
+                const covers = zwGr26PodcastInstances[id];
+                if (!covers || covers.length === 0) {
+                    return;
+                }
+
+                const imgs = card.querySelectorAll(
+                    '.zw-gr26-podcast__polaroid img',
+                );
+                if (covers.length < imgs.length + 1) {
+                    return;
+                }
+
+                function pickCovers(n) {
+                    const pool = [...covers];
+                    const picked = [];
+                    for (let i = 0; i < n; i++) {
+                        const j = Math.floor(Math.random() * pool.length);
+                        picked.push(pool.splice(j, 1)[0]);
+                    }
+                    return picked;
+                }
+
+                function shuffleCovers() {
+                    const chosen = pickCovers(imgs.length);
+                    preloadCovers(chosen).then(() => {
+                        imgs.forEach((img, i) => {
+                            img.src = chosen[i].src;
+                            img.srcset = chosen[i].srcset;
+                        });
+                    });
+                }
+
+                preloadCovers(covers).then(() => {
+                    shuffleCovers();
+                    setInterval(shuffleCovers, 3000);
                 });
             });
-        }
-
-        preloadCovers(allCovers).then(() => {
-            shuffleCovers();
-            setInterval(shuffleCovers, 3000);
-        });
     }
 
     /* === RESULTATEN DRAWER === */
