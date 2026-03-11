@@ -98,7 +98,13 @@
 
                 preloadCovers(covers).then(() => {
                     shuffleCovers();
-                    setInterval(shuffleCovers, 3000);
+                    const intervalId = setInterval(() => {
+                        if (!card.isConnected) {
+                            clearInterval(intervalId);
+                            return;
+                        }
+                        shuffleCovers();
+                    }, 3000);
                 });
             });
     }
@@ -166,6 +172,9 @@
 
     /** @type {?HTMLElement} The tile element that opened the modal, used to restore focus. */
     let triggerElement = null;
+
+    /** @type {HTMLElement[]} Cached focusable elements inside the modal for the focus trap. */
+    let focusableCache = [];
 
     /* --- SVG helpers --- */
 
@@ -668,6 +677,11 @@
 
         triggerElement = tile;
         setModalVisible(true);
+        focusableCache = [
+            ...modal.querySelectorAll(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            ),
+        ].filter((el) => el.offsetWidth > 0);
         modalClose.focus();
     }
 
@@ -697,18 +711,10 @@
 
     /* --- Focus trap --- */
     modal.addEventListener('keydown', (e) => {
-        if (e.key !== 'Tab') return;
+        if (e.key !== 'Tab' || focusableCache.length === 0) return;
 
-        const focusable = [
-            ...modal.querySelectorAll(
-                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-            ),
-        ].filter((el) => el.offsetWidth > 0);
-
-        if (focusable.length === 0) return;
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
+        const first = focusableCache[0];
+        const last = focusableCache[focusableCache.length - 1];
 
         if (e.shiftKey && document.activeElement === first) {
             e.preventDefault();
