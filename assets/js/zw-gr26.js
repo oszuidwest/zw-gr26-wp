@@ -242,7 +242,9 @@
             },
             close() {
                 videoBackdrop.classList.remove('is-open');
-                videoIframe.src = '';
+                setTimeout(() => {
+                    videoIframe.src = '';
+                }, 50);
             },
         };
 
