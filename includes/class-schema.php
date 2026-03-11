@@ -325,33 +325,36 @@ class Schema {
 	 * @return array Schema.org VideoObject.
 	 */
 	private function build_video_object( array $video, string $canonical ): array {
-		$thumbnail = '';
+		$thumbnail   = '';
+		$content_url = '';
+
 		if ( $video['library_id'] ) {
 			$info = $this->bunny->get_video_info( $video['library_id'], $video['videoid'] );
 			if ( $info ) {
-				$thumbnail = $info['thumbnail'];
+				$thumbnail   = $info['thumbnail'];
+				$content_url = $info['mp4_url'];
 			}
 		}
 
 		$upload_date = $this->parse_dutch_date( $video['datum'] );
 
-		$content_url = '';
-		if ( $video['library_id'] ) {
-			$content_url = $this->bunny->get_mp4_url( $video['library_id'], $video['videoid'] );
-		}
-
-		return [
+		$schema = [
 			'@type'            => 'VideoObject',
 			'@id'              => $canonical . '#/schema/VideoObject/' . $video['videoid'],
 			'name'             => $video['naam'],
 			'description'      => $video['naam'],
 			'thumbnailUrl'     => $thumbnail,
-			'contentUrl'       => $content_url,
 			'embedUrl'         => 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'],
 			'uploadDate'       => $upload_date,
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
 		];
+
+		if ( $content_url ) {
+			$schema['contentUrl'] = $content_url;
+		}
+
+		return $schema;
 	}
 
 	/**

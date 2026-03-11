@@ -175,24 +175,6 @@ class Bunny_API {
 	}
 
 	/**
-	 * Builds the direct-play MP4 URL for a video.
-	 *
-	 * Requires the "Direct Play" feature to be enabled on the Bunny library.
-	 *
-	 * @param int    $library_id Bunny library ID.
-	 * @param string $video_id   Video GUID.
-	 * @return string MP4 URL or empty string if credentials are unavailable.
-	 */
-	public function get_mp4_url( int $library_id, string $video_id ): string {
-		$credentials = $this->get_credentials( $library_id );
-		if ( ! $credentials ) {
-			return '';
-		}
-
-		return $credentials['hostname'] . '/' . $video_id . '/play_720p.mp4';
-	}
-
-	/**
 	 * Gets the full thumbnail URL for a single video by its GUID.
 	 *
 	 * @param int    $library_id Bunny library ID.
@@ -337,11 +319,14 @@ class Bunny_API {
 	}
 
 	/**
-	 * Gets video info (thumbnail URL and binnenkort status) for a single video.
+	 * Gets video info (thumbnail URL, binnenkort status, and MP4 URL) for a single video.
+	 *
+	 * The MP4 URL points to the highest available resolution and is only set
+	 * when the library has MP4 fallback files generated for this video.
 	 *
 	 * @param int    $library_id Bunny library ID.
 	 * @param string $video_id   Video GUID.
-	 * @return array|null Array with 'thumbnail' and 'binnenkort' keys, or null on failure.
+	 * @return array|null Array with 'thumbnail', 'binnenkort', and 'mp4_url' keys, or null on failure.
 	 */
 	public function get_video_info( int $library_id, string $video_id ): ?array {
 		$transient_key = self::TRANSIENT_PREFIX . 'info_' . $video_id;
@@ -387,14 +372,49 @@ class Bunny_API {
 			$binnenkort = $broadcast > $now;
 		}
 
+		$mp4_url = '';
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+		if ( ! empty( $body->hasMP4Fallback ) && ! empty( $body->availableResolutions ) ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
+			$best = $this->get_highest_resolution( $body->availableResolutions );
+			if ( $best ) {
+				$mp4_url = $credentials['hostname'] . '/' . $video_id . '/play_' . $best . '.mp4';
+			}
+		}
+
 		$info = [
 			'thumbnail'  => $thumbnail,
 			'binnenkort' => $binnenkort,
+			'mp4_url'    => $mp4_url,
 		];
 
 		set_transient( $transient_key, $info, self::TRANSIENT_TTL );
 
 		return $info;
+	}
+
+	/**
+	 * Picks the highest resolution from a comma-separated list (e.g. '240p,360p,720p,1080p').
+	 *
+	 * @param string $resolutions Comma-separated resolution string from the Bunny API.
+	 * @return string Highest resolution label (e.g. '1080p') or empty string if none found.
+	 */
+	private function get_highest_resolution( string $resolutions ): string {
+		$best        = '';
+		$best_height = 0;
+
+		foreach ( explode( ',', $resolutions ) as $res ) {
+			$res = trim( $res );
+			if ( preg_match( '/^(\d+)p$/', $res, $m ) ) {
+				$height = (int) $m[1];
+				if ( $height > $best_height ) {
+					$best_height = $height;
+					$best        = $res;
+				}
+			}
+		}
+
+		return $best;
 	}
 
 	/**
