@@ -347,6 +347,7 @@ class Schema {
 			'description'      => $video['naam'],
 			'thumbnailUrl'     => $thumbnail,
 			'contentUrl'       => $content_url,
+			'embedUrl'         => 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'],
 			'uploadDate'       => $upload_date,
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
