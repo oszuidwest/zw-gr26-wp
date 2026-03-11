@@ -74,7 +74,7 @@ class Shortcode_Pagina {
 				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
 				echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video">';
 				echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
-				echo '<iframe class="zw-gr26-video-modal__iframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>';
+				echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
 				echo '</div></div>';
 			}
 		);

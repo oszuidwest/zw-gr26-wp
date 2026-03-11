@@ -241,11 +241,11 @@
     const videoBackdrop = document.getElementById('zwgr26VideoModal');
     if (videoBackdrop) {
         const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
-        const videoIframe = videoBackdrop.querySelector(
-            '.zw-gr26-video-modal__iframe',
-        );
         const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
         const refreshVideoFocus = createFocusTrap(videoPanel);
+
+        /** @type {?Object} Video.js player instance, lazily initialized. */
+        let player = null;
 
         const videoModal = {
             open() {
@@ -255,7 +255,10 @@
             },
             close() {
                 videoBackdrop.classList.remove('is-open');
-                videoIframe.src = '';
+                if (player) {
+                    player.pause();
+                    player.src('');
+                }
             },
         };
 
@@ -265,6 +268,22 @@
 
         videoClose.addEventListener('click', closeActiveModalWithHistory);
 
+        modalRestorers.video = (data) => {
+            if (!player && typeof videojs !== 'undefined') {
+                player = videojs('zwgr26VideoPlayer', {
+                    autoplay: true,
+                    language: 'nl',
+                });
+            }
+            if (player) {
+                player.src({
+                    src: data.src,
+                    type: 'application/x-mpegURL',
+                });
+            }
+            restoreModal(videoModal);
+        };
+
         document
             .querySelectorAll(
                 '.zw-gr26-vcard__link[href], .zw-gr26-ecard__link[href]',
@@ -272,13 +291,21 @@
             .forEach((link) => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const url = new URL(link.href);
-                    url.searchParams.set('autoplay', 'true');
-                    url.searchParams.set('preload', 'true');
-                    videoIframe.src = url.toString();
+                    if (!player && typeof videojs !== 'undefined') {
+                        player = videojs('zwgr26VideoPlayer', {
+                            autoplay: true,
+                            language: 'nl',
+                        });
+                    }
+                    if (player) {
+                        player.src({
+                            src: link.href,
+                            type: 'application/x-mpegURL',
+                        });
+                    }
                     openModal(
                         videoModal,
-                        null,
+                        { type: 'video', src: link.href },
                         link.closest('.zw-gr26-vcard, .zw-gr26-ecard'),
                     );
                 });

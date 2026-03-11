@@ -394,6 +394,21 @@ class Bunny_API {
 	}
 
 	/**
+	 * Returns the HLS playlist URL for a video.
+	 *
+	 * @param int    $library_id Bunny library ID.
+	 * @param string $video_id   Video GUID.
+	 * @return string HLS playlist URL or empty string on failure.
+	 */
+	public function get_stream_url( int $library_id, string $video_id ): string {
+		$credentials = $this->get_credentials( $library_id );
+		if ( ! $credentials ) {
+			return '';
+		}
+		return $credentials['hostname'] . '/' . $video_id . '/playlist.m3u8';
+	}
+
+	/**
 	 * Picks the highest resolution suitable for MP4 fallback from a comma-separated list.
 	 *
 	 * Bunny CDN generates MP4 fallback files only up to 720p, so resolutions

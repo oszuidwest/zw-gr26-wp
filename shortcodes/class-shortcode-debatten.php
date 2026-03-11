@@ -113,8 +113,7 @@ class Shortcode_Debatten {
 				}
 
 				if ( ! $coming_soon ) {
-					$video['url'] = 'https://iframe.mediadelivery.net/play/'
-						. $library_id . '/' . $debat['videoid'];
+					$video['url'] = $this->bunny->get_stream_url( $library_id, $debat['videoid'] );
 				}
 			}
 
