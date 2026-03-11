@@ -374,7 +374,7 @@ class Bunny_API {
 
 		$mp4_url = '';
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
-		if ( ! empty( $body->hasMP4Fallback ) && ! empty( $body->hasDirectPlay ) && ! empty( $body->availableResolutions ) ) {
+		if ( ! empty( $body->hasMP4Fallback ) && ! empty( $body->availableResolutions ) ) {
 			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Bunny API response.
 			$best = $this->get_highest_mp4_resolution( $body->availableResolutions );
 			if ( $best ) {
