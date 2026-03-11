@@ -335,26 +335,22 @@ class Schema {
 
 		$upload_date = $this->parse_dutch_date( $video['datum'] );
 
-		$schema = [
+		$content_url = '';
+		if ( $video['library_id'] ) {
+			$content_url = $this->bunny->get_mp4_url( $video['library_id'], $video['videoid'] );
+		}
+
+		return [
 			'@type'            => 'VideoObject',
 			'@id'              => $canonical . '#/schema/VideoObject/' . $video['videoid'],
 			'name'             => $video['naam'],
 			'description'      => $video['naam'],
 			'thumbnailUrl'     => $thumbnail,
-			'embedUrl'         => 'https://iframe.mediadelivery.net/play/' . $video['library_id'] . '/' . $video['videoid'],
+			'contentUrl'       => $content_url,
 			'uploadDate'       => $upload_date,
 			'isFamilyFriendly' => true,
 			'inLanguage'       => 'nl-NL',
 		];
-
-		if ( $video['library_id'] ) {
-			$mp4_url = $this->bunny->get_mp4_url( $video['library_id'], $video['videoid'] );
-			if ( $mp4_url ) {
-				$schema['contentUrl'] = $mp4_url;
-			}
-		}
-
-		return $schema;
 	}
 
 	/**
