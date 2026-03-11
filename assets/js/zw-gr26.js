@@ -656,6 +656,7 @@
 
         triggerElement = tile;
         backdrop.classList.add('is-open');
+        history.pushState({ zwgr26Modal: true }, '');
         modalClose.focus();
     }
 
@@ -703,6 +704,7 @@
      * @access private
      */
     function closeModal() {
+        if (!backdrop.classList.contains('is-open')) return;
         backdrop.classList.remove('is-open');
         if (triggerElement) {
             triggerElement.focus();
@@ -710,17 +712,28 @@
         }
     }
 
-    modalClose.addEventListener('click', closeModal);
+    function closeModalWithHistory() {
+        if (!backdrop.classList.contains('is-open')) return;
+        history.back();
+    }
+
+    window.addEventListener('popstate', () => {
+        if (backdrop.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
+
+    modalClose.addEventListener('click', closeModalWithHistory);
 
     backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
-            closeModal();
+            closeModalWithHistory();
         }
     });
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && backdrop.classList.contains('is-open')) {
-            closeModal();
+            closeModalWithHistory();
         }
     });
 })();
