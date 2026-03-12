@@ -23,41 +23,70 @@
      *
      * @access private
      *
-     * @param {HTMLElement} panel The panel element to trap focus within.
-     * @return {Function} Callback to rebuild the cached focusable-element list.
+     * @param {HTMLElement}  panel        The panel element to trap focus within.
+     * @param {?HTMLElement} initialFocus Preferred first focus target when the
+     *                                    panel itself is focused.
+     * @return {Object} Focus trap controls.
      */
-    function createFocusTrap(panel) {
+    function createFocusTrap(panel, initialFocus = null) {
+        const focusableSelector =
+            'button, [href], input, select, textarea, video, [tabindex]:not([tabindex="-1"])';
         let cache = [];
         let focusinHandler = null;
 
+        function isTabbable(el) {
+            if (el.tabIndex < 0 || el.matches(':disabled')) {
+                return false;
+            }
+
+            if (el.closest('[hidden], [inert], [aria-hidden="true"]')) {
+                return false;
+            }
+
+            return el.getClientRects().length > 0;
+        }
+
         function refresh() {
-            cache = [
-                ...panel.querySelectorAll(
-                    'button, [href], input, select, textarea, video, [tabindex]:not([tabindex="-1"])',
-                ),
-            ].filter((el) => el.offsetWidth > 0);
+            cache = [...panel.querySelectorAll(focusableSelector)].filter(
+                isTabbable,
+            );
         }
 
         panel.addEventListener('keydown', (e) => {
-            if (e.key !== 'Tab' || cache.length === 0) return;
-            const first = cache[0];
-            const last = cache[cache.length - 1];
-            if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            } else if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
+            if (e.key !== 'Tab') return;
+
+            refresh();
+            if (cache.length === 0) return;
+
+            const currentIndex = cache.indexOf(document.activeElement);
+            const initialIndex = initialFocus
+                ? cache.indexOf(initialFocus)
+                : -1;
+            const nextIndex =
+                currentIndex === -1
+                    ? e.shiftKey
+                        ? initialIndex >= 0
+                            ? (initialIndex - 1 + cache.length) % cache.length
+                            : cache.length - 1
+                        : initialIndex >= 0
+                          ? initialIndex
+                          : 0
+                    : (currentIndex + (e.shiftKey ? -1 : 1) + cache.length) %
+                      cache.length;
+
+            e.preventDefault();
+            cache[nextIndex].focus();
         });
 
         function activate() {
             refresh();
             if (focusinHandler) return;
             focusinHandler = (e) => {
-                if (!panel.contains(e.target) && cache.length > 0) {
-                    e.preventDefault();
-                    cache[0].focus();
+                if (!panel.contains(e.target)) {
+                    refresh();
+                    if (cache.length > 0) {
+                        cache[0].focus();
+                    }
                 }
             };
             document.addEventListener('focusin', focusinHandler);
@@ -283,7 +312,7 @@
     if (videoBackdrop && typeof videojs !== 'undefined') {
         const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
         const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
-        const videoFocusTrap = createFocusTrap(videoPanel);
+        const videoFocusTrap = createFocusTrap(videoPanel, videoClose);
 
         /** @type {?Object} Video.js player instance, lazily initialized. */
         let player = null;
@@ -311,7 +340,7 @@
             open() {
                 videoBackdrop.classList.add('is-open');
                 videoFocusTrap.activate();
-                videoClose.focus();
+                videoPanel.focus();
             },
             close() {
                 videoFocusTrap.deactivate();
@@ -378,7 +407,7 @@
         return;
     }
 
-    const resultsFocusTrap = createFocusTrap(modal);
+    const resultsFocusTrap = createFocusTrap(modal, modalClose);
 
     /** @type {string} Default fallback color for parties without a specified color. */
     const DEFAULT_COLOR = '#90a4ae';
@@ -883,7 +912,7 @@
         open() {
             backdrop.classList.add('is-open');
             resultsFocusTrap.activate();
-            modalClose.focus();
+            modal.focus();
         },
         close() {
             resultsFocusTrap.deactivate();

@@ -96,7 +96,7 @@ class Shortcode_Pagina {
 				'wp_footer',
 				static function () {
 					echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
-					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video">';
+					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
 					echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
 					echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
 					echo '</div></div>';
