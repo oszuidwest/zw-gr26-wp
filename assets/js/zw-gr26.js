@@ -884,7 +884,7 @@
         },
         close() {
             resultsFocusTrap.deactivate();
-            backdrop.classList.remove('is-open');
+            backdrop.classList.remove('is-open', 'is-restored');
         },
     };
 
@@ -984,10 +984,12 @@
     });
 
     // Reopen modal after page reload if history state contains a municipality.
+    // Skip the slide-in animation so the modal appears instantly.
     const savedState = history.state?.[HISTORY_KEY];
     if (savedState?.type === 'resultaten' && savedState.gemeente) {
         const tile = findTileByGemeente(savedState.gemeente);
         if (tile) {
+            backdrop.classList.add('is-restored');
             renderTile(tile);
             restoreModal(resultsModal);
         }

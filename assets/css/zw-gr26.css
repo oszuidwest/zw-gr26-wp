@@ -756,6 +756,10 @@ body.zw-gr26-modal-open {
     animation: zw-gr26-drawer-in 0.3s ease;
 }
 
+.zw-gr26-modal-backdrop.is-restored .zw-gr26-modal {
+    animation: none;
+}
+
 @keyframes zw-gr26-drawer-in {
     from {
         transform: translateX(100%);
