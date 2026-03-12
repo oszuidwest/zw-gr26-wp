@@ -973,7 +973,7 @@ body.zw-gr26-modal-open {
     font-weight: 900;
     color: var(--zw-gr26-green);
     margin-top: 2px;
-    letter-spacing: 0.02em;
+    letter-spacing: -0.03em;
 }
 
 /* --- Opkomst --- */
@@ -1048,9 +1048,14 @@ body.zw-gr26-modal-open {
 .zw-gr26-tbl__diff {
     font-size: 10px;
     font-weight: 700;
+    min-width: 28px;
     padding: 1px 6px;
     border-radius: var(--zw-gr26-radius-sm);
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    vertical-align: middle;
 }
 
 .zw-gr26-tbl__diff--plus {
