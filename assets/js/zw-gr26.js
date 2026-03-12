@@ -15,7 +15,7 @@
     /** @type {?Object} Currently active modal instance. */
     let activeModal = null;
 
-    /** @type {Object<string, Function>} Restore callbacks for forward navigation, keyed by modal type. */
+    /** @type {Object<string, function(Object): boolean>} Restore callbacks keyed by modal type. Return true on success, false if restore failed. */
     const modalRestorers = {};
 
     /**
@@ -102,7 +102,7 @@
     }
 
     /**
-     * Restores a modal on forward navigation (no history push).
+     * Restores a modal without pushing a new history entry.
      *
      * The history entry already exists, so we skip the push but still
      * mark historyPushed so the back button closes the modal.
@@ -167,7 +167,9 @@
     window.addEventListener('popstate', (e) => {
         const data = e.state?.[HISTORY_KEY];
         if (data?.type && modalRestorers[data.type]) {
-            modalRestorers[data.type](data);
+            if (!modalRestorers[data.type](data)) {
+                closeActiveModal();
+            }
         } else {
             closeActiveModal();
         }
@@ -329,6 +331,7 @@
         modalRestorers.video = (data) => {
             loadVideo(data.src, data.poster);
             restoreModal(videoModal);
+            return true;
         };
 
         document
@@ -951,10 +954,11 @@
 
     modalRestorers.resultaten = (data) => {
         const tile = findTileByGemeente(data.gemeente);
-        if (tile) {
-            renderTile(tile);
-            restoreModal(resultsModal);
-        }
+        if (!tile) return false;
+
+        renderTile(tile);
+        restoreModal(resultsModal);
+        return true;
     };
 
     document
@@ -987,10 +991,9 @@
     // Skip the slide-in animation so the modal appears instantly.
     const savedState = history.state?.[HISTORY_KEY];
     if (savedState?.type === 'resultaten' && savedState.gemeente) {
-        const tile = findTileByGemeente(savedState.gemeente);
-        if (tile) {
-            backdrop.classList.add('is-restored');
-            modalRestorers.resultaten(savedState);
+        backdrop.classList.add('is-restored');
+        if (!modalRestorers.resultaten(savedState)) {
+            backdrop.classList.remove('is-restored');
         }
     }
 })();

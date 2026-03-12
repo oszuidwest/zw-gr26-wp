@@ -1610,7 +1610,8 @@ body.zw-gr26-modal-open {
 .zw-gr26-modal__refresh:focus-visible,
 .zw-gr26-coal-toggle:focus-visible,
 .zw-gr26-coal-status__reset:focus-visible {
-    outline: none;
+    outline: 2px solid var(--zw-gr26-blue);
+    outline-offset: 2px;
 }
 
 .zw-gr26-programma__select:focus-visible {

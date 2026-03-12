@@ -119,7 +119,7 @@ class Shortcode_Resultaten {
 
 				// Header.
 				echo '<div class="zw-gr26-modal__header">';
-					echo '<button class="zw-gr26-modal__refresh" id="zwvModalRefresh" type="button" aria-label="Ververs uitslagen">'
+				echo '<button class="zw-gr26-modal__refresh" id="zwvModalRefresh" type="button" aria-label="Ververs uitslagen">'
 					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG from Icons registry.
 					. Icons::get( 'refresh' ) . '</button>';
 				echo '<button class="zw-gr26-modal__close" id="zwvModalClose">&times;</button>';
