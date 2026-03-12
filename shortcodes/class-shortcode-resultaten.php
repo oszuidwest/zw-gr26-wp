@@ -114,14 +114,17 @@ class Shortcode_Resultaten {
 		add_action(
 			'wp_footer',
 			function () {
-				echo '<div class="zw-gr26-modal-backdrop" id="zwvModal" role="dialog" aria-modal="true" aria-labelledby="zwvModalTitle">';
+				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26Modal" role="dialog" aria-modal="true" aria-labelledby="zwgr26ModalTitle">';
 				echo '<div class="zw-gr26-modal">';
 
 				// Header.
 				echo '<div class="zw-gr26-modal__header">';
-				echo '<button class="zw-gr26-modal__close" id="zwvModalClose">&times;</button>';
-				echo '<div class="zw-gr26-modal__title" id="zwvModalTitle"></div>';
-				echo '<div class="zw-gr26-modal__subtitle" id="zwvModalSubtitle"></div>';
+				echo '<button class="zw-gr26-modal__refresh" id="zwgr26ModalRefresh" type="button" aria-label="Ververs uitslagen">'
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG from Icons registry.
+					. Icons::get( 'refresh' ) . '</button>';
+				echo '<button class="zw-gr26-modal__close" id="zwgr26ModalClose">&times;</button>';
+				echo '<div class="zw-gr26-modal__title" id="zwgr26ModalTitle"></div>';
+				echo '<div class="zw-gr26-modal__subtitle" id="zwgr26ModalSubtitle"></div>';
 				echo '</div>';
 
 				// Scrollable body.
@@ -132,35 +135,35 @@ class Shortcode_Resultaten {
 
 				// Donut section.
 				echo '<div class="zw-gr26-modal__section">';
-				echo '<div class="zw-gr26-modal__section-label" id="zwvDonutLabel">Zetelverdeling</div>';
+				echo '<div class="zw-gr26-modal__section-label" id="zwgr26DonutLabel">Zetelverdeling</div>';
 				echo '<div class="zw-gr26-modal__donut-area">';
-				echo '<div class="zw-gr26-modal__donut" id="zwvDonut">';
+				echo '<div class="zw-gr26-modal__donut" id="zwgr26Donut">';
 				echo '<div class="zw-gr26-modal__donut-center">';
-				echo '<div class="zw-gr26-modal__donut-total" id="zwvDonutTotal"></div>';
+				echo '<div class="zw-gr26-modal__donut-total" id="zwgr26DonutTotal"></div>';
 				echo '<div class="zw-gr26-modal__donut-label">zetels</div>';
-				echo '<div class="zw-gr26-modal__donut-coal-label" id="zwvDonutCoalLabel"></div>';
+				echo '<div class="zw-gr26-modal__donut-coal-label" id="zwgr26DonutCoalLabel"></div>';
 				echo '<div class="zw-gr26-modal__donut-majority-label">Meerderheid!</div>';
 				echo '</div></div>';
-				echo '<div class="zw-gr26-modal__opkomst" id="zwvOpkomst"></div>';
+				echo '<div class="zw-gr26-modal__opkomst" id="zwgr26Opkomst"></div>';
 				echo '</div></div>';
 
 				// Table section.
 				echo '<div class="zw-gr26-modal__section">';
-				echo '<div class="zw-gr26-modal__section-label" id="zwvTableLabel">Resultaten</div>';
+				echo '<div class="zw-gr26-modal__section-label" id="zwgr26TableLabel">Resultaten</div>';
 				echo '<table class="zw-gr26-tbl">';
 				echo '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/−</th></tr></thead>';
-				echo '<tbody id="zwvTbody"></tbody>';
+				echo '<tbody id="zwgr26Tbody"></tbody>';
 				echo '</table></div>';
 
 				echo '</div>'; // end body.
 
 				// Coalition toggle.
-				echo '<button class="zw-gr26-coal-toggle" id="zwvCoalToggle" type="button">Bouw coalitie</button>';
+				echo '<button class="zw-gr26-coal-toggle" id="zwgr26CoalToggle" type="button">Bouw coalitie</button>';
 
 				// Coalition status bar.
-				echo '<div class="zw-gr26-coal-status" id="zwvCoalStatus">';
-				echo '<span class="zw-gr26-coal-status__text" id="zwvCoalStatusText">Klik op partijen om een coalitie te vormen</span>';
-				echo '<button class="zw-gr26-coal-status__reset" id="zwvCoalReset" type="button">Wissen</button>';
+				echo '<div class="zw-gr26-coal-status" id="zwgr26CoalStatus">';
+				echo '<span class="zw-gr26-coal-status__text" id="zwgr26CoalStatusText">Klik op partijen om een coalitie te vormen</span>';
+				echo '<button class="zw-gr26-coal-status__reset" id="zwgr26CoalReset" type="button">Wissen</button>';
 				echo '</div>';
 
 				echo '</div></div>'; // end modal + backdrop.

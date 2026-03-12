@@ -15,7 +15,7 @@
     /** @type {?Object} Currently active modal instance. */
     let activeModal = null;
 
-    /** @type {Object<string, Function>} Restore callbacks for forward navigation, keyed by modal type. */
+    /** @type {Object<string, function(Object): boolean>} Restore callbacks keyed by modal type. Return true on success, false if restore failed. */
     const modalRestorers = {};
 
     /**
@@ -102,7 +102,7 @@
     }
 
     /**
-     * Restores a modal on forward navigation (no history push).
+     * Restores a modal without pushing a new history entry.
      *
      * The history entry already exists, so we skip the push but still
      * mark historyPushed so the back button closes the modal.
@@ -167,7 +167,9 @@
     window.addEventListener('popstate', (e) => {
         const data = e.state?.[HISTORY_KEY];
         if (data?.type && modalRestorers[data.type]) {
-            modalRestorers[data.type](data);
+            if (!modalRestorers[data.type](data)) {
+                closeActiveModal();
+            }
         } else {
             closeActiveModal();
         }
@@ -329,6 +331,7 @@
         modalRestorers.video = (data) => {
             loadVideo(data.src, data.poster);
             restoreModal(videoModal);
+            return true;
         };
 
         document
@@ -355,21 +358,21 @@
         return;
     }
 
-    const backdrop = document.getElementById('zwvModal');
+    const backdrop = document.getElementById('zwgr26Modal');
     const modal = backdrop ? backdrop.querySelector('.zw-gr26-modal') : null;
-    const modalTitle = document.getElementById('zwvModalTitle');
-    const modalSub = document.getElementById('zwvModalSubtitle');
-    const modalClose = document.getElementById('zwvModalClose');
-    const donutEl = document.getElementById('zwvDonut');
-    const donutTotal = document.getElementById('zwvDonutTotal');
-    const donutCoalLabel = document.getElementById('zwvDonutCoalLabel');
-    const donutLabel = document.getElementById('zwvDonutLabel');
-    const opkomstEl = document.getElementById('zwvOpkomst');
-    const tbody = document.getElementById('zwvTbody');
-    const coalToggle = document.getElementById('zwvCoalToggle');
-    const coalStatusText = document.getElementById('zwvCoalStatusText');
-    const coalReset = document.getElementById('zwvCoalReset');
-    const tableLabel = document.getElementById('zwvTableLabel');
+    const modalTitle = document.getElementById('zwgr26ModalTitle');
+    const modalSub = document.getElementById('zwgr26ModalSubtitle');
+    const modalClose = document.getElementById('zwgr26ModalClose');
+    const donutEl = document.getElementById('zwgr26Donut');
+    const donutTotal = document.getElementById('zwgr26DonutTotal');
+    const donutCoalLabel = document.getElementById('zwgr26DonutCoalLabel');
+    const donutLabel = document.getElementById('zwgr26DonutLabel');
+    const opkomstEl = document.getElementById('zwgr26Opkomst');
+    const tbody = document.getElementById('zwgr26Tbody');
+    const coalToggle = document.getElementById('zwgr26CoalToggle');
+    const coalStatusText = document.getElementById('zwgr26CoalStatusText');
+    const coalReset = document.getElementById('zwgr26CoalReset');
+    const tableLabel = document.getElementById('zwgr26TableLabel');
 
     if (!backdrop || !modalTitle) {
         return;
@@ -884,7 +887,7 @@
         },
         close() {
             resultsFocusTrap.deactivate();
-            backdrop.classList.remove('is-open');
+            backdrop.classList.remove('is-open', 'is-restored');
         },
     };
 
@@ -951,10 +954,11 @@
 
     modalRestorers.resultaten = (data) => {
         const tile = findTileByGemeente(data.gemeente);
-        if (tile) {
-            renderTile(tile);
-            restoreModal(resultsModal);
-        }
+        if (!tile) return false;
+
+        renderTile(tile);
+        restoreModal(resultsModal);
+        return true;
     };
 
     document
@@ -971,9 +975,25 @@
 
     modalClose.addEventListener('click', closeActiveModalWithHistory);
 
+    // Refresh button — reload page, modal reopens via history state.
+    const refreshBtn = document.getElementById('zwgr26ModalRefresh');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => location.reload());
+    }
+
     backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
             closeActiveModalWithHistory();
         }
     });
+
+    // Reopen modal after page reload if history state contains a municipality.
+    // Skip the slide-in animation so the modal appears instantly.
+    const savedState = history.state?.[HISTORY_KEY];
+    if (savedState?.type === 'resultaten' && savedState.gemeente) {
+        backdrop.classList.add('is-restored');
+        if (!modalRestorers.resultaten(savedState)) {
+            backdrop.classList.remove('is-restored');
+        }
+    }
 })();

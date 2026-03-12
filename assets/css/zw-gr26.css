@@ -756,6 +756,10 @@ body.zw-gr26-modal-open {
     animation: zw-gr26-drawer-in 0.3s ease;
 }
 
+.zw-gr26-modal-backdrop.is-restored .zw-gr26-modal {
+    animation: none;
+}
+
 @keyframes zw-gr26-drawer-in {
     from {
         transform: translateX(100%);
@@ -774,17 +778,16 @@ body.zw-gr26-modal-open {
     position: relative;
 }
 
-.zw-gr26-modal__close {
+.zw-gr26-modal__close,
+.zw-gr26-modal__refresh {
     position: absolute;
     top: 16px;
-    right: 16px;
     width: 32px;
     height: 32px;
     border-radius: var(--zw-gr26-radius-sm);
     border: none;
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
-    font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -792,8 +795,23 @@ body.zw-gr26-modal-open {
     transition: background var(--zw-gr26-ease-fast);
 }
 
-.zw-gr26-modal__close:hover {
+.zw-gr26-modal__close:hover,
+.zw-gr26-modal__refresh:hover {
     background: rgba(255, 255, 255, 0.25);
+}
+
+.zw-gr26-modal__close {
+    right: 16px;
+    font-size: 18px;
+}
+
+.zw-gr26-modal__refresh {
+    right: 56px;
+}
+
+.zw-gr26-modal__refresh svg {
+    width: 16px;
+    height: 16px;
 }
 
 .zw-gr26-modal__title {
@@ -1589,9 +1607,11 @@ body.zw-gr26-modal-open {
 }
 
 .zw-gr26-modal__close:focus-visible,
+.zw-gr26-modal__refresh:focus-visible,
 .zw-gr26-coal-toggle:focus-visible,
 .zw-gr26-coal-status__reset:focus-visible {
-    outline: none;
+    outline: 2px solid var(--zw-gr26-blue);
+    outline-offset: 2px;
 }
 
 .zw-gr26-programma__select:focus-visible {
