@@ -358,21 +358,21 @@
         return;
     }
 
-    const backdrop = document.getElementById('zwvModal');
+    const backdrop = document.getElementById('zwgr26Modal');
     const modal = backdrop ? backdrop.querySelector('.zw-gr26-modal') : null;
-    const modalTitle = document.getElementById('zwvModalTitle');
-    const modalSub = document.getElementById('zwvModalSubtitle');
-    const modalClose = document.getElementById('zwvModalClose');
-    const donutEl = document.getElementById('zwvDonut');
-    const donutTotal = document.getElementById('zwvDonutTotal');
-    const donutCoalLabel = document.getElementById('zwvDonutCoalLabel');
-    const donutLabel = document.getElementById('zwvDonutLabel');
-    const opkomstEl = document.getElementById('zwvOpkomst');
-    const tbody = document.getElementById('zwvTbody');
-    const coalToggle = document.getElementById('zwvCoalToggle');
-    const coalStatusText = document.getElementById('zwvCoalStatusText');
-    const coalReset = document.getElementById('zwvCoalReset');
-    const tableLabel = document.getElementById('zwvTableLabel');
+    const modalTitle = document.getElementById('zwgr26ModalTitle');
+    const modalSub = document.getElementById('zwgr26ModalSubtitle');
+    const modalClose = document.getElementById('zwgr26ModalClose');
+    const donutEl = document.getElementById('zwgr26Donut');
+    const donutTotal = document.getElementById('zwgr26DonutTotal');
+    const donutCoalLabel = document.getElementById('zwgr26DonutCoalLabel');
+    const donutLabel = document.getElementById('zwgr26DonutLabel');
+    const opkomstEl = document.getElementById('zwgr26Opkomst');
+    const tbody = document.getElementById('zwgr26Tbody');
+    const coalToggle = document.getElementById('zwgr26CoalToggle');
+    const coalStatusText = document.getElementById('zwgr26CoalStatusText');
+    const coalReset = document.getElementById('zwgr26CoalReset');
+    const tableLabel = document.getElementById('zwgr26TableLabel');
 
     if (!backdrop || !modalTitle) {
         return;
@@ -976,7 +976,7 @@
     modalClose.addEventListener('click', closeActiveModalWithHistory);
 
     // Refresh button — reload page, modal reopens via history state.
-    const refreshBtn = document.getElementById('zwvModalRefresh');
+    const refreshBtn = document.getElementById('zwgr26ModalRefresh');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => location.reload());
     }
