@@ -971,9 +971,25 @@
 
     modalClose.addEventListener('click', closeActiveModalWithHistory);
 
+    // Refresh button — reload page, modal reopens via history state.
+    const refreshBtn = document.getElementById('zwvModalRefresh');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => location.reload());
+    }
+
     backdrop.addEventListener('click', (e) => {
         if (e.target === backdrop) {
             closeActiveModalWithHistory();
         }
     });
+
+    // Reopen modal after page reload if history state contains a municipality.
+    const savedState = history.state?.[HISTORY_KEY];
+    if (savedState?.type === 'resultaten' && savedState.gemeente) {
+        const tile = findTileByGemeente(savedState.gemeente);
+        if (tile) {
+            renderTile(tile);
+            restoreModal(resultsModal);
+        }
+    }
 })();
