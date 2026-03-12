@@ -104,6 +104,7 @@ class Shortcode_Explainers {
 				$resolved = $this->bunny->resolve_video_card( $library_id, $explainer['videoid'], $video['thumbnail'] );
 
 				$video['thumbnail']  = $resolved['thumbnail'];
+				$video['poster']     = $resolved['poster'];
 				$video['url']        = $resolved['url'];
 				$video['stream_url'] = $resolved['stream_url'];
 				$coming_soon         = $resolved['binnenkort'];

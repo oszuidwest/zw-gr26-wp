@@ -105,6 +105,7 @@ class Shortcode_Debatten {
 				$resolved = $this->bunny->resolve_video_card( $library_id, $debat['videoid'], $video['thumbnail'] );
 
 				$video['thumbnail']  = $resolved['thumbnail'];
+				$video['poster']     = $resolved['poster'];
 				$video['url']        = $resolved['url'];
 				$video['stream_url'] = $resolved['stream_url'];
 				$coming_soon         = $resolved['binnenkort'];
