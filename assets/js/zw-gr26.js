@@ -59,20 +59,24 @@
             if (cache.length === 0) return;
 
             const currentIndex = cache.indexOf(document.activeElement);
-            const initialIndex = initialFocus
-                ? cache.indexOf(initialFocus)
-                : -1;
-            const nextIndex =
-                currentIndex === -1
-                    ? e.shiftKey
-                        ? initialIndex >= 0
-                            ? (initialIndex - 1 + cache.length) % cache.length
-                            : cache.length - 1
-                        : initialIndex >= 0
-                          ? initialIndex
-                          : 0
-                    : (currentIndex + (e.shiftKey ? -1 : 1) + cache.length) %
-                      cache.length;
+            let nextIndex;
+
+            if (currentIndex === -1) {
+                // Focus is on the panel itself — jump to initialFocus (or first/last).
+                const start = initialFocus ? cache.indexOf(initialFocus) : -1;
+                if (e.shiftKey) {
+                    nextIndex =
+                        start >= 0
+                            ? (start - 1 + cache.length) % cache.length
+                            : cache.length - 1;
+                } else {
+                    nextIndex = start >= 0 ? start : 0;
+                }
+            } else {
+                nextIndex =
+                    (currentIndex + (e.shiftKey ? -1 : 1) + cache.length) %
+                    cache.length;
+            }
 
             e.preventDefault();
             cache[nextIndex].focus();
