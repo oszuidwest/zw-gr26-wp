@@ -128,15 +128,15 @@
      */
     function closeActiveModal() {
         if (!activeModal) return;
+        const trigger = activeModal.trigger;
         activeModal.close();
         document.body.classList.remove('zw-gr26-modal-open');
-        if (activeModal.trigger) {
-            activeModal.trigger.focus();
-            activeModal.trigger = null;
-        }
         activeModal = null;
         historyPushed = false;
         closePending = false;
+        if (trigger) {
+            requestAnimationFrame(() => trigger.focus());
+        }
     }
 
     /**
