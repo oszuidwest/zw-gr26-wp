@@ -28,6 +28,7 @@
      */
     function createFocusTrap(panel) {
         let cache = [];
+        let focusinHandler = null;
 
         function refresh() {
             cache = [
@@ -50,7 +51,26 @@
             }
         });
 
-        return refresh;
+        function activate() {
+            refresh();
+            if (focusinHandler) return;
+            focusinHandler = (e) => {
+                if (!panel.contains(e.target) && cache.length > 0) {
+                    e.preventDefault();
+                    cache[0].focus();
+                }
+            };
+            document.addEventListener('focusin', focusinHandler);
+        }
+
+        function deactivate() {
+            if (focusinHandler) {
+                document.removeEventListener('focusin', focusinHandler);
+                focusinHandler = null;
+            }
+        }
+
+        return { refresh, activate, deactivate };
     }
 
     /** @type {boolean} Whether the active modal pushed a history entry. */
@@ -261,7 +281,7 @@
     if (videoBackdrop && typeof videojs !== 'undefined') {
         const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
         const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
-        const refreshVideoFocus = createFocusTrap(videoPanel);
+        const videoFocusTrap = createFocusTrap(videoPanel);
 
         /** @type {?Object} Video.js player instance, lazily initialized. */
         let player = null;
@@ -286,10 +306,11 @@
         const videoModal = {
             open() {
                 videoBackdrop.classList.add('is-open');
-                refreshVideoFocus();
+                videoFocusTrap.activate();
                 videoClose.focus();
             },
             close() {
+                videoFocusTrap.deactivate();
                 videoBackdrop.classList.remove('is-open');
                 if (player) {
                     player.reset();
@@ -347,7 +368,7 @@
         return;
     }
 
-    const refreshResultsFocus = createFocusTrap(modal);
+    const resultsFocusTrap = createFocusTrap(modal);
 
     /** @type {string} Default fallback color for parties without a specified color. */
     const DEFAULT_COLOR = '#90a4ae';
@@ -838,7 +859,7 @@
             hadMajority = false;
         }
 
-        refreshResultsFocus();
+        resultsFocusTrap.refresh();
     });
 
     coalReset.addEventListener('click', () => {
@@ -851,10 +872,11 @@
     const resultsModal = {
         open() {
             backdrop.classList.add('is-open');
-            refreshResultsFocus();
+            resultsFocusTrap.activate();
             modalClose.focus();
         },
         close() {
+            resultsFocusTrap.deactivate();
             backdrop.classList.remove('is-open');
         },
     };
