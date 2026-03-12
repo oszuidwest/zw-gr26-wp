@@ -429,11 +429,12 @@ class Bunny_API {
 	 * @param int    $library_id Bunny library ID.
 	 * @param string $video_id   Video GUID.
 	 * @param string $thumbnail  Existing thumbnail URL (preserved if non-empty).
-	 * @return array{thumbnail: string, binnenkort: bool, url: string, stream_url: string} Resolved video display data.
+	 * @return array{thumbnail: string, poster: string, binnenkort: bool, url: string, stream_url: string} Resolved video display data.
 	 */
 	public function resolve_video_card( int $library_id, string $video_id, string $thumbnail = '' ): array {
 		$result = [
 			'thumbnail'  => $thumbnail,
+			'poster'     => '',
 			'binnenkort' => true,
 			'url'        => '',
 			'stream_url' => '',
@@ -441,6 +442,7 @@ class Bunny_API {
 
 		$info = $this->get_video_info( $library_id, $video_id );
 		if ( $info ) {
+			$result['poster'] = $info['thumbnail'];
 			if ( ! $result['thumbnail'] ) {
 				$result['thumbnail'] = $info['thumbnail'];
 			}

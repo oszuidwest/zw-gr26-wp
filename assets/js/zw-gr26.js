@@ -291,15 +291,17 @@
          *
          * @access private
          *
-         * @param {string} src HLS stream URL to load.
+         * @param {string}  src    HLS stream URL to load.
+         * @param {?string} poster Optional poster image URL.
          */
-        function loadVideo(src) {
+        function loadVideo(src, poster) {
             if (!player) {
                 player = videojs('zwgr26VideoPlayer', {
                     autoplay: true,
                     language: 'nl',
                 });
             }
+            player.poster(poster || '');
             player.src({ src: src, type: 'application/x-mpegURL' });
         }
 
@@ -325,7 +327,7 @@
         videoClose.addEventListener('click', closeActiveModalWithHistory);
 
         modalRestorers.video = (data) => {
-            loadVideo(data.src);
+            loadVideo(data.src, data.poster);
             restoreModal(videoModal);
         };
 
@@ -337,8 +339,13 @@
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const src = link.dataset.stream;
-                    loadVideo(src);
-                    openModal(videoModal, { type: 'video', src: src }, link);
+                    const poster = link.dataset.poster || '';
+                    loadVideo(src, poster);
+                    openModal(
+                        videoModal,
+                        { type: 'video', src: src, poster: poster },
+                        link,
+                    );
                 });
             });
     }

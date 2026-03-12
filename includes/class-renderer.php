@@ -159,14 +159,16 @@ class Renderer {
 	 * @return string Video card HTML.
 	 */
 	public function video_card( array $video, bool $coming_soon = false ): string {
-		$tag    = $coming_soon ? 'div' : 'a';
-		$href   = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
-		$stream = ! empty( $video['stream_url'] ) ? ' data-stream="' . esc_url( $video['stream_url'] ) . '"' : '';
+		$tag        = $coming_soon ? 'div' : 'a';
+		$href       = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
+		$stream     = ! empty( $video['stream_url'] ) ? ' data-stream="' . esc_url( $video['stream_url'] ) . '"' : '';
+		$poster_url = ! empty( $video['poster'] ) ? $video['poster'] : ( $video['thumbnail'] ?? '' );
+		$poster     = $poster_url ? ' data-poster="' . esc_url( $poster_url ) . '"' : '';
 
 		$has_thumb = ! empty( $video['thumbnail'] );
 
 		$html  = '<article class="zw-gr26-vcard' . ( $coming_soon ? ' zw-gr26-binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . $stream . ' class="zw-gr26-vcard__link">';
+		$html .= '<' . $tag . $href . $stream . $poster . ' class="zw-gr26-vcard__link">';
 
 		if ( $has_thumb ) {
 			$html .= $this->img_tag(
@@ -219,9 +221,11 @@ class Renderer {
 		$tag         = $coming_soon ? 'div' : 'a';
 		$href        = $coming_soon ? '' : ' href="' . esc_url( $video['url'] ) . '"';
 		$stream      = ! empty( $video['stream_url'] ) ? ' data-stream="' . esc_url( $video['stream_url'] ) . '"' : '';
+		$poster_url  = ! empty( $video['poster'] ) ? $video['poster'] : ( $video['thumbnail'] ?? '' );
+		$poster      = $poster_url ? ' data-poster="' . esc_url( $poster_url ) . '"' : '';
 
 		$html  = '<article class="zw-gr26-ecard' . ( $coming_soon ? ' zw-gr26-ecard--binnenkort' : '' ) . '">';
-		$html .= '<' . $tag . $href . $stream . ' class="zw-gr26-ecard__link">';
+		$html .= '<' . $tag . $href . $stream . $poster . ' class="zw-gr26-ecard__link">';
 
 		if ( $has_thumb ) {
 			$html .= $this->img_tag(
