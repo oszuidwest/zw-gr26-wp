@@ -115,7 +115,7 @@ class Shortcode_Resultaten {
 			'wp_footer',
 			function () {
 				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26Modal" role="dialog" aria-modal="true" aria-labelledby="zwgr26ModalTitle">';
-				echo '<div class="zw-gr26-modal">';
+				echo '<div class="zw-gr26-modal" tabindex="-1">';
 
 				// Header.
 				echo '<div class="zw-gr26-modal__header">';

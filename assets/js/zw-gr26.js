@@ -23,10 +23,12 @@
      *
      * @access private
      *
-     * @param {HTMLElement} panel The panel element to trap focus within.
+     * @param {HTMLElement}  panel        The panel element to trap focus within.
+     * @param {?HTMLElement} initialFocus Preferred first focus target when the
+     *                                    panel itself is focused.
      * @return {Object} Focus trap controls.
      */
-    function createFocusTrap(panel) {
+    function createFocusTrap(panel, initialFocus = null) {
         const focusableSelector =
             'button, [href], input, select, textarea, video, [tabindex]:not([tabindex="-1"])';
         let cache = [];
@@ -57,11 +59,18 @@
             if (cache.length === 0) return;
 
             const currentIndex = cache.indexOf(document.activeElement);
+            const initialIndex = initialFocus
+                ? cache.indexOf(initialFocus)
+                : -1;
             const nextIndex =
                 currentIndex === -1
                     ? e.shiftKey
-                        ? cache.length - 1
-                        : 0
+                        ? initialIndex >= 0
+                            ? (initialIndex - 1 + cache.length) % cache.length
+                            : cache.length - 1
+                        : initialIndex >= 0
+                          ? initialIndex
+                          : 0
                     : (currentIndex + (e.shiftKey ? -1 : 1) + cache.length) %
                       cache.length;
 
@@ -303,7 +312,7 @@
     if (videoBackdrop && typeof videojs !== 'undefined') {
         const videoPanel = videoBackdrop.querySelector('.zw-gr26-video-modal');
         const videoClose = videoBackdrop.querySelector('.zw-gr26-modal__close');
-        const videoFocusTrap = createFocusTrap(videoPanel);
+        const videoFocusTrap = createFocusTrap(videoPanel, videoClose);
 
         /** @type {?Object} Video.js player instance, lazily initialized. */
         let player = null;
@@ -331,7 +340,7 @@
             open() {
                 videoBackdrop.classList.add('is-open');
                 videoFocusTrap.activate();
-                videoClose.focus();
+                videoPanel.focus();
             },
             close() {
                 videoFocusTrap.deactivate();
@@ -398,7 +407,7 @@
         return;
     }
 
-    const resultsFocusTrap = createFocusTrap(modal);
+    const resultsFocusTrap = createFocusTrap(modal, modalClose);
 
     /** @type {string} Default fallback color for parties without a specified color. */
     const DEFAULT_COLOR = '#90a4ae';
@@ -903,7 +912,7 @@
         open() {
             backdrop.classList.add('is-open');
             resultsFocusTrap.activate();
-            modalClose.focus();
+            modal.focus();
         },
         close() {
             resultsFocusTrap.deactivate();
