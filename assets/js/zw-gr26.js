@@ -990,8 +990,7 @@
         const tile = findTileByGemeente(savedState.gemeente);
         if (tile) {
             backdrop.classList.add('is-restored');
-            renderTile(tile);
-            restoreModal(resultsModal);
+            modalRestorers.resultaten(savedState);
         }
     }
 })();
