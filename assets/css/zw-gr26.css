@@ -1606,12 +1606,24 @@ body.zw-gr26-modal-open {
     outline-offset: 2px;
 }
 
+.zw-gr26-modal__close:focus,
 .zw-gr26-modal__close:focus-visible,
-.zw-gr26-modal__refresh:focus-visible,
-.zw-gr26-coal-toggle:focus-visible,
+.zw-gr26-modal__refresh:focus,
+.zw-gr26-modal__refresh:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.zw-gr26-coal-toggle:focus,
+.zw-gr26-coal-toggle:focus-visible {
+    outline: none;
+    background: #ecedf0;
+}
+
+.zw-gr26-coal-status__reset:focus,
 .zw-gr26-coal-status__reset:focus-visible {
-    outline: 2px solid var(--zw-gr26-blue);
-    outline-offset: 2px;
+    outline: none;
+    color: var(--zw-gr26-muted);
 }
 
 .zw-gr26-programma__select:focus-visible {
