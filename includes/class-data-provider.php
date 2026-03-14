@@ -33,36 +33,46 @@ class Data_Provider {
 	/**
 	 * Fetches the latest dossier posts.
 	 *
-	 * @param string $dossier_slug Taxonomy slug for the dossier.
+	 * When dossier_slug is empty, posts are queried without a dossier filter
+	 * (useful for regio-only queries on gemeente subpages).
+	 *
+	 * @param string $dossier_slug Taxonomy slug for the dossier. Empty for no dossier filter.
 	 * @param int    $count        Maximum number of posts to return.
 	 * @param string $regio_slug   Optional regio taxonomy slug to filter by.
 	 * @return array List of article data arrays.
 	 */
 	public function get_dossier_posts( string $dossier_slug, int $count = 6, string $regio_slug = '' ): array {
-		if ( ! taxonomy_exists( 'dossier' ) ) {
-			return [];
-		}
+		$tax_query = [];
 
-		$tax_query = [
-			[
+		if ( '' !== $dossier_slug ) {
+			if ( ! taxonomy_exists( 'dossier' ) ) {
+				return [];
+			}
+			$tax_query[] = [
 				'taxonomy' => 'dossier',
 				'field'    => 'slug',
 				'terms'    => $dossier_slug,
-			],
-		];
+			];
+		}
 
 		if ( '' !== $regio_slug && taxonomy_exists( 'regio' ) ) {
-			$tax_query['relation'] = 'AND';
-			$tax_query[]           = [
+			if ( ! empty( $tax_query ) ) {
+				$tax_query['relation'] = 'AND';
+			}
+			$tax_query[] = [
 				'taxonomy' => 'regio',
 				'field'    => 'slug',
 				'terms'    => $regio_slug,
 			];
 		}
 
+		if ( empty( $tax_query ) ) {
+			return [];
+		}
+
 		$query = new \WP_Query(
 			[
-				'post_type'      => [ 'post', 'fragment' ],
+				'post_type'      => 'post',
 				'posts_per_page' => $count,
 				'tax_query'      => $tax_query, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'orderby'        => 'date',
@@ -412,6 +422,46 @@ class Data_Provider {
 		}
 
 		return $gemeenten;
+	}
+
+	/**
+	 * Gets program URLs for a single municipality by slug.
+	 *
+	 * @param string $slug Municipality post slug.
+	 * @return array<int, array{naam: string, url: string}> Party program list.
+	 */
+	public function get_programmas_for( string $slug ): array {
+		if ( ! post_type_exists( 'gemeente_uitslag' ) ) {
+			return [];
+		}
+
+		$posts = get_posts(
+			[
+				'post_type'   => 'gemeente_uitslag',
+				'post_status' => [ 'publish', 'draft' ],
+				'name'        => $slug,
+				'numberposts' => 1,
+			]
+		);
+
+		if ( empty( $posts ) ) {
+			return [];
+		}
+
+		$repeater = get_field( 'partijen', $posts[0]->ID );
+		if ( ! is_array( $repeater ) ) {
+			return [];
+		}
+
+		$partijen = [];
+		foreach ( $repeater as $row ) {
+			$partijen[] = [
+				'naam' => $row['partij_naam'] ?? '',
+				'url'  => ! empty( $row['programma_url'] ) ? $row['programma_url'] : '',
+			];
+		}
+
+		return $partijen;
 	}
 
 	/**

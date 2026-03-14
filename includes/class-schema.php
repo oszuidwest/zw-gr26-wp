@@ -177,7 +177,8 @@ class Schema {
 			return false;
 		}
 
-		return has_shortcode( $post->post_content, 'zw_gr26_pagina' );
+		return has_shortcode( $post->post_content, 'zw_gr26_pagina' )
+			|| has_shortcode( $post->post_content, 'zw_gr26_gemeente_pagina' );
 	}
 
 	/**
@@ -211,7 +212,8 @@ class Schema {
 
 		$all_videos = array_merge(
 			$this->parse_video_shortcodes( $content, 'zw_gr26_debatten', 'zw_gr26_debat' ),
-			$this->parse_video_shortcodes( $content, 'zw_gr26_explainers', 'zw_gr26_explainer' )
+			$this->parse_video_shortcodes( $content, 'zw_gr26_explainers', 'zw_gr26_explainer' ),
+			$this->parse_standalone_shortcode( $content, 'zw_gr26_gemeente_explainer' )
 		);
 
 		// Exclude videos with a broadcast_date in the future.
@@ -305,6 +307,38 @@ class Schema {
 					'datum'      => $atts['datum'] ?? '',
 				];
 			}
+		}
+
+		return $videos;
+	}
+
+	/**
+	 * Parses standalone video shortcodes (not parent/child) from raw content.
+	 *
+	 * @param string $content Raw post content.
+	 * @param string $tag     Shortcode tag name.
+	 * @return array Videos found.
+	 */
+	private function parse_standalone_shortcode( string $content, string $tag ): array {
+		$videos  = [];
+		$pattern = '/\[' . $tag . '\s+([^\]]*)\]/';
+
+		if ( ! preg_match_all( $pattern, $content, $matches, PREG_SET_ORDER ) ) {
+			return $videos;
+		}
+
+		foreach ( $matches as $match ) {
+			$atts = shortcode_parse_atts( $match[1] );
+			if ( empty( $atts['videoid'] ) ) {
+				continue;
+			}
+
+			$videos[] = [
+				'naam'       => $atts['naam'] ?? '',
+				'videoid'    => $atts['videoid'],
+				'library_id' => ! empty( $atts['bibliotheek'] ) ? (int) $atts['bibliotheek'] : 0,
+				'datum'      => $atts['datum'] ?? '',
+			];
 		}
 
 		return $videos;

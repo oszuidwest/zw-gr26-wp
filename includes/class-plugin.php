@@ -110,7 +110,7 @@ class Plugin {
 	private function register_shortcodes(): void {
 		$pagina       = new Shortcode_Pagina( $this->assets, $this->renderer );
 		$livestream   = new Shortcode_Livestream( $this->assets, $this->renderer );
-		$debatten     = new Shortcode_Debatten( $this->assets, $this->renderer, $this->bunny );
+		$debatten     = new Shortcode_Debatten( $this->assets, $this->renderer, $this->bunny, $this->data );
 		$explainers   = new Shortcode_Explainers( $this->assets, $this->renderer, $this->bunny );
 		$nieuws       = new Shortcode_Nieuws( $this->assets, $this->renderer, $this->data );
 		$podcast      = new Shortcode_Podcast( $this->assets, $this->renderer, $this->data, $this->proxy );
@@ -119,9 +119,16 @@ class Plugin {
 		$stemlocaties = new Shortcode_Stemlocaties( $this->assets, $this->renderer, $this->data );
 		$tekst        = new Shortcode_Tekst( $this->assets, $this->renderer );
 
-		add_shortcode( 'zw_gr26_pagina', [ $pagina, 'render' ] );
+		// Gemeente subpage shortcodes.
+		$gem_pagina     = new Shortcode_Gemeente_Pagina( $this->assets, $this->renderer, $this->data );
+		$gem_explainer  = new Shortcode_Gemeente_Explainer( $this->assets, $this->renderer, $this->bunny, $this->proxy );
+		$gem_programmas = new Shortcode_Gemeente_Programmas( $this->assets, $this->renderer, $this->data );
+		$gem_resultaten = new Shortcode_Gemeente_Resultaten( $this->assets, $this->renderer, $this->data );
 
-		// All other shortcodes only render inside [zw_gr26_pagina].
+		add_shortcode( 'zw_gr26_pagina', [ $pagina, 'render' ] );
+		add_shortcode( 'zw_gr26_gemeente_pagina', [ $gem_pagina, 'render' ] );
+
+		// All other shortcodes only render inside [zw_gr26_pagina] or [zw_gr26_gemeente_pagina].
 		$this->add_nested_shortcode( 'zw_gr26_livestream', [ $livestream, 'render' ] );
 		$this->add_nested_shortcode( 'zw_gr26_debatten', [ $debatten, 'render' ] );
 		$this->add_nested_shortcode( 'zw_gr26_debat', [ $debatten, 'render_debat' ] );
@@ -133,6 +140,9 @@ class Plugin {
 		$this->add_nested_shortcode( 'zw_gr26_resultaten', [ $resultaten, 'render' ] );
 		$this->add_nested_shortcode( 'zw_gr26_stemlocaties', [ $stemlocaties, 'render' ] );
 		$this->add_nested_shortcode( 'zw_gr26_tekst', [ $tekst, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_gemeente_explainer', [ $gem_explainer, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_gemeente_programmas', [ $gem_programmas, 'render' ] );
+		$this->add_nested_shortcode( 'zw_gr26_gemeente_resultaten', [ $gem_resultaten, 'render' ] );
 	}
 
 	/**

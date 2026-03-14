@@ -179,6 +179,8 @@ class Renderer {
 				'zw-gr26-cover-img',
 				'(max-width: 480px) calc(100vw - 40px), (max-width: 768px) calc(50vw - 28px), 300px'
 			);
+		} else {
+			$html .= '<div class="zw-gr26-cover-img zw-gr26-vcard__placeholder"></div>';
 		}
 
 		if ( $coming_soon ) {

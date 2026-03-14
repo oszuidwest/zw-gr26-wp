@@ -73,6 +73,18 @@ class Shortcode_Stemlocaties {
 			return '';
 		}
 
+		$active_gemeente = Shortcode_Pagina::$active_gemeente;
+
+		// Single-gemeente mode: show only this municipality, no dropdown.
+		if ( $active_gemeente && isset( $alle_data[ $active_gemeente ] ) ) {
+			return $this->render_single( $atts['titel'], $active_gemeente, $alle_data[ $active_gemeente ] );
+		}
+
+		// No data for the active gemeente.
+		if ( $active_gemeente ) {
+			return '';
+		}
+
 		$municipalities = $this->data->get_all_municipalities();
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
@@ -106,6 +118,34 @@ class Shortcode_Stemlocaties {
 			$html .= '</div>';
 		}
 
+		$html .= '</div>';
+		$html .= $this->renderer->section_close();
+
+		return $html;
+	}
+
+	/**
+	 * Renders polling stations for a single municipality (no dropdown).
+	 *
+	 * @param string $titel         Section title.
+	 * @param string $slug          Municipality slug.
+	 * @param array  $gemeente_data Location data for the municipality.
+	 * @return string Section HTML.
+	 */
+	private function render_single( string $titel, string $slug, array $gemeente_data ): string {
+		$locaties = $gemeente_data['locaties'] ?? [];
+		$contact  = $gemeente_data['contact'] ?? '';
+		$website  = $gemeente_data['website'] ?? '';
+
+		$html  = $this->renderer->section_open( $titel );
+		$html .= '<div class="zw-gr26-programma" aria-label="' . esc_attr( $titel ) . '">';
+		$html .= '<div class="zw-gr26-programma__list zw-gr26-programma__list--open zw-gr26-stem__list"'
+			. ' id="zw-gr26-stem-' . esc_attr( sanitize_title( $slug ) ) . '">';
+
+		$html .= $this->render_location_rows( $locaties );
+		$html .= $this->render_contact_footer( $contact, $website );
+
+		$html .= '</div>';
 		$html .= '</div>';
 		$html .= $this->renderer->section_close();
 
