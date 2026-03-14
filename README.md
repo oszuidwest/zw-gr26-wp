@@ -17,7 +17,7 @@ Optional:
 
 ## Shortcodes
 
-All shortcodes are nested inside `[zw_gr26_pagina]` and only render within it.
+All shortcodes are nested inside `[zw_gr26_pagina]` or `[zw_gr26_gemeente_pagina]` and only render within one of these wrappers.
 
 ### `[zw_gr26_pagina]`
 
@@ -141,6 +141,55 @@ Free-form text/HTML block with optional title.
 | Attribute | Default |
 |-----------|---------|
 | `titel` | — |
+
+## Gemeente subpage shortcodes
+
+These shortcodes are used to build per-municipality subpages. They are nested inside `[zw_gr26_gemeente_pagina]` and share the same child shortcodes as the main page (debatten, nieuws, podcast, livestream, tekst, stemlocaties).
+
+### `[zw_gr26_gemeente_pagina]`
+
+Municipality subpage wrapper with hero and gemeente context. Validates the municipality against the `gemeente_uitslag` CPT.
+
+| Attribute | Default |
+|-----------|---------|
+| `gemeente` | — (required, municipality slug) |
+| `titel` | *(auto-detected from municipality name)* |
+| `ondertitel` | `Alles over de gemeente­raads­verkiezingen in {gemeente}.` |
+| `achtergrond` | *(default background image URL)* |
+
+When active, existing shortcodes adapt automatically:
+- `[zw_gr26_debatten]` renders a spotlight layout (main debate large, others as compact sidebar cards)
+- `[zw_gr26_nieuws]` auto-fills `regio` from the active municipality
+- `[zw_gr26_stemlocaties]` shows only locations for the active municipality
+
+### `[zw_gr26_gemeente_explainer]`
+
+Single explainer video with blue background, pencil pattern, and text panel.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Explainer` |
+| `videoid` | — (required) |
+| `naam` | — |
+| `bibliotheek` | — |
+| `thumbnail` | — |
+| `tekst` | *(default explanatory text)* |
+
+### `[zw_gr26_gemeente_programmas]`
+
+Simple party program list without dropdown (single municipality).
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Verkiezingsprogramma's` |
+
+### `[zw_gr26_gemeente_resultaten]`
+
+Inline election results with donut chart, results table, and coalition builder.
+
+| Attribute | Default |
+|-----------|---------|
+| `titel` | `Uitslag` |
 
 ## Installation
 
