@@ -62,10 +62,11 @@ class Shortcode_Gemeente_Explainer {
 	/**
 	 * Renders the shortcode.
 	 *
-	 * @param array|string $atts Shortcode attributes.
+	 * @param array|string $atts    Shortcode attributes.
+	 * @param string|null  $content Enclosed shortcode content (used as text panel).
 	 * @return string Shortcode HTML output.
 	 */
-	public function render( $atts ): string {
+	public function render( $atts, ?string $content = null ): string {
 		$this->assets->enqueue();
 
 		$atts = shortcode_atts(
@@ -105,8 +106,10 @@ class Shortcode_Gemeente_Explainer {
 			$coming_soon         = $resolved['binnenkort'];
 		}
 
+		$tekst = ! empty( $content ) ? trim( $content ) : $atts['tekst'];
+
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= $this->render_player( $video, $coming_soon, $atts['tekst'] );
+		$html .= $this->render_player( $video, $coming_soon, $tekst );
 		$html .= $this->renderer->section_close();
 
 		return $html;
@@ -152,7 +155,7 @@ class Shortcode_Gemeente_Explainer {
 		// Text column.
 		if ( $tekst ) {
 			$html .= '<div class="zw-gr26-gem-explainer__text">'
-				. '<p>' . esc_html( $tekst ) . '</p>'
+				. '<p>' . wp_kses_post( $tekst ) . '</p>'
 				. '</div>';
 		}
 
