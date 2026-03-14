@@ -65,6 +65,8 @@ class Shortcode_Gemeente_Pagina {
 		$atts = shortcode_atts(
 			[
 				'gemeente'    => '',
+				'titel'       => '',
+				'ondertitel'  => 'Gemeenteraadsverkiezingen 2026',
 				'achtergrond' => 'https://www.zuidwestupdate.nl/wp-content/uploads/2022/03/potlood.jpg',
 			],
 			$atts,
@@ -114,9 +116,11 @@ class Shortcode_Gemeente_Pagina {
 		}
 
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
+		$titel = $atts['titel'] ? $atts['titel'] : $naam;
+
 		$html .= $this->renderer->hero(
-			$naam,
-			'Gemeenteraadsverkiezingen 2026',
+			$titel,
+			$atts['ondertitel'],
 			$atts['achtergrond']
 		);
 		$html .= $this->renderer->stripe();
