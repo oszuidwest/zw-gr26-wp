@@ -1,6 +1,6 @@
 <?php
 /**
- * Wrapper shortcode for the election page.
+ * Gemeente page wrapper shortcode.
  *
  * @package ZWGR26
  */
@@ -12,36 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Renders [zw_gr26_pagina] — the full-page wrapper with hero, stripe, and inner shortcodes.
+ * Renders [zw_gr26_gemeente_pagina] — a full-page wrapper for a single municipality.
+ *
+ * Sets the active gemeente context so child shortcodes can scope their output.
  */
-class Shortcode_Pagina {
-
-	/**
-	 * Whether the pagina shortcode is currently rendering.
-	 *
-	 * Child shortcodes check this flag and return empty output
-	 * when used outside [zw_gr26_pagina].
-	 *
-	 * @var bool
-	 */
-	public static bool $active = false;
-
-	/**
-	 * The currently active municipality slug, set by [zw_gr26_gemeente_pagina].
-	 *
-	 * Child shortcodes read this to scope their output to a single municipality.
-	 * Null when rendering the main page (no municipality context).
-	 *
-	 * @var string|null
-	 */
-	public static ?string $active_gemeente = null;
-
-	/**
-	 * Whether the video modal has already been added to the footer.
-	 *
-	 * @var bool
-	 */
-	public static bool $video_modal_added = false;
+class Shortcode_Gemeente_Pagina {
 
 	/**
 	 * Asset manager.
@@ -58,14 +33,23 @@ class Shortcode_Pagina {
 	private Renderer $renderer;
 
 	/**
+	 * Data provider.
+	 *
+	 * @var Data_Provider
+	 */
+	private Data_Provider $data;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param Assets   $assets   Asset manager.
-	 * @param Renderer $renderer Shared renderer.
+	 * @param Assets        $assets   Asset manager.
+	 * @param Renderer      $renderer Shared renderer.
+	 * @param Data_Provider $data     Data provider.
 	 */
-	public function __construct( Assets $assets, Renderer $renderer ) {
+	public function __construct( Assets $assets, Renderer $renderer, Data_Provider $data ) {
 		$this->assets   = $assets;
 		$this->renderer = $renderer;
+		$this->data     = $data;
 	}
 
 	/**
@@ -80,19 +64,34 @@ class Shortcode_Pagina {
 
 		$atts = shortcode_atts(
 			[
-				'titel'       => 'ZuidWest Kiest',
-				'ondertitel'  => "Alles over de gemeente\xC2\xADraads\xC2\xADverkiezingen van 2026 in West-Brabant.",
+				'gemeente'    => '',
 				'achtergrond' => 'https://www.zuidwestupdate.nl/wp-content/uploads/2022/03/potlood.jpg',
 			],
 			$atts,
-			'zw_gr26_pagina'
+			'zw_gr26_gemeente_pagina'
 		);
 
-		self::$active = true;
+		$slug = sanitize_title( $atts['gemeente'] );
+		if ( ! $slug ) {
+			return '<!-- zw_gr26_gemeente_pagina: gemeente niet opgegeven -->';
+		}
+
+		// Validate against known municipalities.
+		$municipalities = $this->data->get_all_municipalities();
+		if ( ! isset( $municipalities[ $slug ] ) ) {
+			return '<!-- zw_gr26_gemeente_pagina: onbekende gemeente -->';
+		}
+
+		$naam = $municipalities[ $slug ];
+
+		Shortcode_Pagina::$active          = true;
+		Shortcode_Pagina::$active_gemeente = $slug;
+
 		try {
 			$inner = do_shortcode( $content );
 		} finally {
-			self::$active = false;
+			Shortcode_Pagina::$active          = false;
+			Shortcode_Pagina::$active_gemeente = null;
 		}
 
 		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
@@ -100,8 +99,8 @@ class Shortcode_Pagina {
 		$inner = preg_replace( '#<p>\s*</p>#', '', $inner );
 
 		// Render video modal in wp_footer so it sits outside .zw-gr26-wrapper.
-		if ( ! self::$video_modal_added ) {
-			self::$video_modal_added = true;
+		if ( ! Shortcode_Pagina::$video_modal_added ) {
+			Shortcode_Pagina::$video_modal_added = true;
 			add_action(
 				'wp_footer',
 				static function () {
@@ -116,13 +115,12 @@ class Shortcode_Pagina {
 
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$html .= $this->renderer->hero(
-			$atts['titel'],
-			$atts['ondertitel'],
+			$naam,
+			'Gemeenteraadsverkiezingen 2026',
 			$atts['achtergrond']
 		);
 		$html .= $this->renderer->stripe();
 		$html .= '<div class="zw-gr26-container">';
-
 		$html .= $inner;
 		$html .= '</div></main>';
 

@@ -71,8 +71,13 @@ class Shortcode_Nieuws {
 			'zw_gr26_nieuws'
 		);
 
-		if ( ! $atts['dossier'] ) {
-			return '<!-- zw_gr26_nieuws: dossier niet opgegeven -->';
+		// Auto-fill regio from gemeente context when not explicitly set.
+		if ( ! $atts['regio'] && Shortcode_Pagina::$active_gemeente ) {
+			$atts['regio'] = Shortcode_Pagina::$active_gemeente;
+		}
+
+		if ( ! $atts['dossier'] && ! $atts['regio'] ) {
+			return '<!-- zw_gr26_nieuws: dossier of regio niet opgegeven -->';
 		}
 
 		$items = $this->data->get_dossier_posts( $atts['dossier'], (int) $atts['aantal'], $atts['regio'] );
@@ -82,7 +87,7 @@ class Shortcode_Nieuws {
 		}
 
 		$link = $atts['link'];
-		if ( ! $link && taxonomy_exists( 'dossier' ) ) {
+		if ( ! $link && $atts['dossier'] && taxonomy_exists( 'dossier' ) ) {
 			$term_link = get_term_link( $atts['dossier'], 'dossier' );
 			if ( ! is_wp_error( $term_link ) ) {
 				$link = $term_link;
