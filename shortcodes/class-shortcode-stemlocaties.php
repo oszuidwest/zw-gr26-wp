@@ -270,7 +270,7 @@ class Shortcode_Stemlocaties {
 
 		$features = [];
 		foreach ( $map as $key => $label ) {
-			if ( ! empty( $loc[ $key ] ) ) {
+			if ( ! empty( $loc[ $key ] ) && 'nee' !== strtolower( $loc[ $key ] ) ) {
 				$features[] = $label;
 			}
 		}
