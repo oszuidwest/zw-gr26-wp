@@ -139,7 +139,7 @@
 .zw-gr26-hero {
     color: #fff;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     min-height: clamp(220px, 8vw + 180px, 280px);
     display: flex;
     align-items: center;
@@ -149,6 +149,7 @@
 .zw-gr26-hero__bg {
     position: absolute;
     inset: 0;
+    overflow: hidden;
     background-size: cover;
     background-position: center;
 }
@@ -187,6 +188,128 @@
     margin: 0;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
     opacity: 0.9;
+}
+
+/* Gemeente navigation dropdown in subtitle */
+.zw-gr26-hero__nav {
+    position: relative;
+    display: inline-block;
+}
+
+.zw-gr26-hero__nav-trigger {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 2px 10px;
+    text-shadow: inherit;
+    transition: all var(--zw-gr26-ease-fast);
+}
+
+.zw-gr26-hero__nav-trigger:hover {
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.zw-gr26-hero__nav-trigger[aria-expanded="true"] {
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.zw-gr26-hero__nav-arrow {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 4px;
+    vertical-align: -1px;
+    transition: transform 0.2s ease;
+}
+
+.zw-gr26-hero__nav-arrow svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.zw-gr26-hero__nav-trigger[aria-expanded="true"] .zw-gr26-hero__nav-arrow {
+    transform: rotate(180deg);
+}
+
+.zw-gr26-hero__nav-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    min-width: 210px;
+    padding: 8px 0;
+    z-index: 10;
+    text-shadow: none;
+    flex-direction: column;
+}
+
+/* CSS tooltip arrow */
+.zw-gr26-hero__nav-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #fff;
+}
+
+.zw-gr26-hero__nav-trigger[aria-expanded="true"] + .zw-gr26-hero__nav-dropdown {
+    display: flex;
+}
+
+.zw-gr26-hero__nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    color: var(--zw-gr26-text);
+    text-decoration: none;
+    font-size: 15px;
+    white-space: nowrap;
+    transition: all var(--zw-gr26-ease-fast);
+}
+
+.zw-gr26-hero__nav-item::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ddd;
+    flex-shrink: 0;
+}
+
+a.zw-gr26-hero__nav-item:hover {
+    background: var(--zw-gr26-bg);
+    color: var(--zw-gr26-blue);
+    text-decoration: none;
+}
+
+a.zw-gr26-hero__nav-item:hover::before {
+    background: var(--zw-gr26-blue);
+}
+
+.zw-gr26-hero__nav-item--current {
+    font-weight: 700;
+    color: var(--zw-gr26-blue);
+    cursor: default;
+}
+
+.zw-gr26-hero__nav-item--current::before {
+    background: var(--zw-gr26-blue);
 }
 
 /* === ACCENT STRIPE === */

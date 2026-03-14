@@ -66,7 +66,6 @@ class Shortcode_Gemeente_Pagina {
 			[
 				'gemeente'    => '',
 				'titel'       => '',
-				'ondertitel'  => 'Gemeenteraadsverkiezingen 2026',
 				'achtergrond' => 'https://www.zuidwestupdate.nl/wp-content/uploads/2022/03/potlood.jpg',
 			],
 			$atts,
@@ -115,12 +114,17 @@ class Shortcode_Gemeente_Pagina {
 			);
 		}
 
+		$gemeente_pages = $this->data->get_gemeente_pages();
+		$main_page_url  = $this->data->get_main_page_url();
+		$nav            = $this->renderer->gemeente_nav( $naam, $slug, $gemeente_pages, $main_page_url );
+		$subtitle       = "Alles over de gemeente\xC2\xADraads\xC2\xADverkiezingen van 2026 in " . $nav;
+
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$titel = $atts['titel'] ? $atts['titel'] : $naam;
 
 		$html .= $this->renderer->hero(
 			$titel,
-			$atts['ondertitel'],
+			$subtitle,
 			$atts['achtergrond']
 		);
 		$html .= $this->renderer->stripe();

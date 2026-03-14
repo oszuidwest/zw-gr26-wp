@@ -58,14 +58,23 @@ class Shortcode_Pagina {
 	private Renderer $renderer;
 
 	/**
+	 * Data provider.
+	 *
+	 * @var Data_Provider
+	 */
+	private Data_Provider $data;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param Assets   $assets   Asset manager.
-	 * @param Renderer $renderer Shared renderer.
+	 * @param Assets        $assets   Asset manager.
+	 * @param Renderer      $renderer Shared renderer.
+	 * @param Data_Provider $data     Data provider.
 	 */
-	public function __construct( Assets $assets, Renderer $renderer ) {
+	public function __construct( Assets $assets, Renderer $renderer, Data_Provider $data ) {
 		$this->assets   = $assets;
 		$this->renderer = $renderer;
+		$this->data     = $data;
 	}
 
 	/**
@@ -81,7 +90,6 @@ class Shortcode_Pagina {
 		$atts = shortcode_atts(
 			[
 				'titel'       => 'ZuidWest Kiest',
-				'ondertitel'  => "Alles over de gemeente\xC2\xADraads\xC2\xADverkiezingen van 2026 in West-Brabant.",
 				'achtergrond' => 'https://www.zuidwestupdate.nl/wp-content/uploads/2022/03/potlood.jpg',
 			],
 			$atts,
@@ -114,10 +122,15 @@ class Shortcode_Pagina {
 			);
 		}
 
+		$gemeente_pages = $this->data->get_gemeente_pages();
+		$main_page_url  = (string) get_permalink();
+		$nav            = $this->renderer->gemeente_nav( 'West-Brabant', null, $gemeente_pages, $main_page_url );
+		$subtitle       = "Alles over de gemeente\xC2\xADraads\xC2\xADverkiezingen van 2026 in " . $nav;
+
 		$html  = '<main class="zw-gr26-wrapper not-prose">';
 		$html .= $this->renderer->hero(
 			$atts['titel'],
-			$atts['ondertitel'],
+			$subtitle,
 			$atts['achtergrond']
 		);
 		$html .= $this->renderer->stripe();

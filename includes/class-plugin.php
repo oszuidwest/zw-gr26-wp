@@ -108,7 +108,7 @@ class Plugin {
 	 * @return void
 	 */
 	private function register_shortcodes(): void {
-		$pagina       = new Shortcode_Pagina( $this->assets, $this->renderer );
+		$pagina       = new Shortcode_Pagina( $this->assets, $this->renderer, $this->data );
 		$livestream   = new Shortcode_Livestream( $this->assets, $this->renderer );
 		$debatten     = new Shortcode_Debatten( $this->assets, $this->renderer, $this->bunny, $this->data );
 		$explainers   = new Shortcode_Explainers( $this->assets, $this->renderer, $this->bunny );

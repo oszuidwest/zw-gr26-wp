@@ -31,6 +31,20 @@ class Data_Provider {
 	private static ?array $all_municipalities = null;
 
 	/**
+	 * Cached gemeente subpage URLs.
+	 *
+	 * @var array|null
+	 */
+	private static ?array $gemeente_pages = null;
+
+	/**
+	 * Cached main page URL.
+	 *
+	 * @var string|false|null Null = not fetched, false = not found.
+	 */
+	private static string|false|null $main_page_url = null;
+
+	/**
 	 * Fetches the latest dossier posts.
 	 *
 	 * When dossier_slug is empty, posts are queried without a dossier filter
@@ -546,6 +560,98 @@ class Data_Provider {
 		}
 
 		return $covers;
+	}
+
+	/**
+	 * Finds WordPress pages that use [zw_gr26_gemeente_pagina] and returns
+	 * their gemeente slug, display name, and permalink.
+	 *
+	 * Results are cached for the duration of the request.
+	 *
+	 * @return array<int, array{slug: string, naam: string, url: string}>
+	 */
+	public function get_gemeente_pages(): array {
+		if ( null !== self::$gemeente_pages ) {
+			return self::$gemeente_pages;
+		}
+
+		$pages = get_posts(
+			[
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'numberposts' => 50,
+				's'           => 'zw_gr26_gemeente_pagina',
+			]
+		);
+
+		$municipalities = $this->get_all_municipalities();
+		$result         = [];
+
+		foreach ( $pages as $page ) {
+			if ( ! has_shortcode( $page->post_content, 'zw_gr26_gemeente_pagina' ) ) {
+				continue;
+			}
+
+			// Extract the gemeente attribute from the shortcode.
+			if ( ! preg_match( '/\[zw_gr26_gemeente_pagina\s[^\]]*gemeente=["\']?([^"\'\]\s]+)/', $page->post_content, $matches ) ) {
+				continue;
+			}
+
+			$slug = sanitize_title( $matches[1] );
+			$naam = $municipalities[ $slug ] ?? '';
+			if ( ! $naam ) {
+				continue;
+			}
+
+			$result[] = [
+				'slug' => $slug,
+				'naam' => $naam,
+				'url'  => get_permalink( $page->ID ),
+			];
+		}
+
+		// Sort alphabetically by name.
+		usort(
+			$result,
+			static function ( array $a, array $b ): int {
+				return strcasecmp( $a['naam'], $b['naam'] );
+			}
+		);
+
+		self::$gemeente_pages = $result;
+
+		return self::$gemeente_pages;
+	}
+
+	/**
+	 * Finds the permalink of the page that uses [zw_gr26_pagina].
+	 *
+	 * @return string Main page URL, or empty string if not found.
+	 */
+	public function get_main_page_url(): string {
+		if ( null !== self::$main_page_url ) {
+			return false !== self::$main_page_url ? self::$main_page_url : '';
+		}
+
+		$pages = get_posts(
+			[
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'numberposts' => 10,
+				's'           => 'zw_gr26_pagina',
+			]
+		);
+
+		foreach ( $pages as $page ) {
+			if ( has_shortcode( $page->post_content, 'zw_gr26_pagina' ) ) {
+				self::$main_page_url = (string) get_permalink( $page->ID );
+				return self::$main_page_url;
+			}
+		}
+
+		self::$main_page_url = false;
+
+		return '';
 	}
 
 	/**

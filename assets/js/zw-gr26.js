@@ -452,6 +452,36 @@
         }
     });
 
+    /* === GEMEENTE NAV DROPDOWN === */
+    document.querySelectorAll('.zw-gr26-hero__nav-trigger').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            // Close any other open dropdowns first.
+            document
+                .querySelectorAll(
+                    '.zw-gr26-hero__nav-trigger[aria-expanded="true"]',
+                )
+                .forEach((other) => {
+                    if (other !== btn)
+                        other.setAttribute('aria-expanded', 'false');
+                });
+            btn.setAttribute('aria-expanded', String(!expanded));
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.zw-gr26-hero__nav')) {
+            document
+                .querySelectorAll(
+                    '.zw-gr26-hero__nav-trigger[aria-expanded="true"]',
+                )
+                .forEach((btn) => {
+                    btn.setAttribute('aria-expanded', 'false');
+                });
+        }
+    });
+
     /* === STEMLOCATIES ACCORDION === */
     document.querySelectorAll('.zw-gr26-stem__row').forEach((row) => {
         row.addEventListener('click', () => {

@@ -110,22 +110,70 @@ class Renderer {
 	/**
 	 * Renders the hero header with background image.
 	 *
-	 * @param string $title    Main heading.
-	 * @param string $subtitle Subtitle text.
-	 * @param string $bg_image Background image URL.
+	 * The subtitle may contain pre-escaped HTML (e.g. the gemeente navigation dropdown).
+	 *
+	 * @param string $title         Main heading.
+	 * @param string $subtitle_html Pre-escaped subtitle HTML.
+	 * @param string $bg_image      Background image URL.
 	 * @return string Hero header HTML.
 	 */
-	public function hero( string $title, string $subtitle, string $bg_image ): string {
+	public function hero( string $title, string $subtitle_html, string $bg_image ): string {
 		$html  = '<header class="zw-gr26-hero">';
 		$html .= '<div class="zw-gr26-hero__bg" style="background-image:url(' . esc_url( $this->proxy->url( $bg_image, 1920, 1080 ) ) . ')"></div>';
 		$html .= '<div class="zw-gr26-hero__content">';
 		$html .= '<h1 class="zw-gr26-hero__title">' . esc_html( $title ) . '</h1>';
 
-		if ( $subtitle ) {
-			$html .= '<p class="zw-gr26-hero__subtitle">' . esc_html( $subtitle ) . '</p>';
+		if ( $subtitle_html ) {
+			$html .= '<p class="zw-gr26-hero__subtitle">' . $subtitle_html . '</p>';
 		}
 
 		$html .= '</div></header>';
+
+		return $html;
+	}
+
+	/**
+	 * Renders a gemeente navigation dropdown for use in the hero subtitle.
+	 *
+	 * @param string      $label          Visible label (e.g. "West-Brabant" or municipality name).
+	 * @param string|null $current_slug   Current municipality slug, or null for main page.
+	 * @param array       $gemeente_pages List of gemeente pages from Data_Provider::get_gemeente_pages().
+	 * @param string      $main_page_url  URL of the main overview page.
+	 * @return string Dropdown HTML.
+	 */
+	public function gemeente_nav( string $label, ?string $current_slug, array $gemeente_pages, string $main_page_url = '' ): string {
+		if ( empty( $gemeente_pages ) ) {
+			return esc_html( $label );
+		}
+
+		$html = '<span class="zw-gr26-hero__nav">';
+
+		$html .= '<button class="zw-gr26-hero__nav-trigger" type="button" aria-expanded="false">';
+		$html .= esc_html( $label ) . ' <span class="zw-gr26-hero__nav-arrow">' . Icons::get( 'chevron-down' ) . '</span>';
+		$html .= '</button>';
+
+		$html .= '<span class="zw-gr26-hero__nav-dropdown" role="list">';
+
+		// Main page link (West-Brabant overview).
+		if ( null === $current_slug && $main_page_url ) {
+			$html .= '<span class="zw-gr26-hero__nav-item zw-gr26-hero__nav-item--current" role="listitem">'
+				. 'West-Brabant</span>';
+		} elseif ( $main_page_url ) {
+			$html .= '<a href="' . esc_url( $main_page_url ) . '" class="zw-gr26-hero__nav-item" role="listitem">'
+				. 'West-Brabant</a>';
+		}
+
+		foreach ( $gemeente_pages as $page ) {
+			if ( $page['slug'] === $current_slug ) {
+				$html .= '<span class="zw-gr26-hero__nav-item zw-gr26-hero__nav-item--current" role="listitem">'
+					. esc_html( $page['naam'] ) . '</span>';
+			} else {
+				$html .= '<a href="' . esc_url( $page['url'] ) . '" class="zw-gr26-hero__nav-item" role="listitem">'
+					. esc_html( $page['naam'] ) . '</a>';
+			}
+		}
+		$html .= '</span>';
+		$html .= '</span>';
 
 		return $html;
 	}
