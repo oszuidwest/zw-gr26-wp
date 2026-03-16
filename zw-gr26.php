@@ -41,6 +41,7 @@ require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-pagina.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-explainer.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-programmas.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-resultaten.php';
+require_once ZWGR26_PATH . 'shortcodes/class-shortcode-uitslag-tabel.php';
 require_once ZWGR26_PATH . 'includes/class-plugin.php';
 
 register_activation_hook( __FILE__, [ 'ZWGR26\Post_Type_Uitslag', 'activate' ] );
