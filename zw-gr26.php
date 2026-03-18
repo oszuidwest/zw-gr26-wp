@@ -2,7 +2,7 @@
 /**
  * Plugin Name: ZuidWest GR 2026
  * Description: Gemeenteraadsverkiezingen 2026 — shortcodes voor de verkiezingspagina op ZuidWest Update.
- * Version: 0.3.2
+ * Version: 0.4.0
  * Author: Streekomroep ZuidWest
  * Text Domain: zw-gr26
  * License: GPL-2.0-or-later
@@ -43,6 +43,7 @@ require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-programmas.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-gemeente-resultaten.php';
 require_once ZWGR26_PATH . 'shortcodes/class-shortcode-uitslag-tabel.php';
 require_once ZWGR26_PATH . 'includes/class-admin-api-results.php';
+require_once ZWGR26_PATH . 'includes/class-rest-api.php';
 require_once ZWGR26_PATH . 'includes/class-plugin.php';
 
 register_activation_hook( __FILE__, [ 'ZWGR26\Post_Type_Uitslag', 'activate' ] );

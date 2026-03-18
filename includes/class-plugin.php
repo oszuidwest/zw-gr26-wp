@@ -100,6 +100,9 @@ class Plugin {
 		$this->schema->register();
 		$this->uitslag->register();
 		$this->register_shortcodes();
+
+		$rest = new Rest_API( $this->data );
+		$rest->register();
 	}
 
 	/**
