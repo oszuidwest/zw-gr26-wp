@@ -1135,7 +1135,7 @@ body.zw-gr26-modal-open {
 
 .zw-gr26-tbl thead th:nth-child(3),
 .zw-gr26-tbl thead th:nth-child(4) {
-    text-align: right;
+    text-align: center;
 }
 
 .zw-gr26-tbl td {
@@ -1150,7 +1150,7 @@ body.zw-gr26-modal-open {
 
 .zw-gr26-tbl td:nth-child(3),
 .zw-gr26-tbl td:nth-child(4) {
-    text-align: right;
+    text-align: center;
 }
 
 .zw-gr26-tbl__dot {
@@ -1207,8 +1207,8 @@ body.zw-gr26-modal-open {
     font-size: 14px;
     font-weight: 700;
     font-family: var(--zw-gr26-font-heading);
-    color: var(--zw-gr26-blue);
-    background: var(--zw-gr26-bg);
+    color: #fff;
+    background: var(--zw-gr26-blue);
     border: none;
     border-top: 1px solid var(--zw-gr26-border);
     cursor: pointer;
@@ -1223,7 +1223,7 @@ body.zw-gr26-modal-open {
 }
 
 .zw-gr26-coal-toggle:hover {
-    background: #ecedf0;
+    background: #15326e;
 }
 
 .zw-gr26-coal-status {
@@ -1286,7 +1286,7 @@ body.zw-gr26-modal-open {
 }
 
 .is-coal-mode .zw-gr26-coal-toggle {
-    color: var(--zw-gr26-red);
+    background: var(--zw-gr26-red);
 }
 
 .is-coal-mode .zw-gr26-coal-status {
@@ -1300,6 +1300,25 @@ body.zw-gr26-modal-open {
     cursor: pointer;
     border-radius: var(--zw-gr26-radius-md);
     transition: background var(--zw-gr26-ease-fast);
+}
+
+@keyframes coal-hint {
+    0% {
+        background: transparent;
+        transform: scale(1);
+    }
+    40% {
+        background: rgba(0, 0, 0, 0.08);
+        transform: scale(1.02);
+    }
+    100% {
+        background: transparent;
+        transform: scale(1);
+    }
+}
+
+.is-coal-mode .zw-gr26-tbl tbody tr.coal-hint {
+    animation: coal-hint 0.8s ease;
 }
 
 .is-coal-mode .zw-gr26-tbl tbody tr:hover {
@@ -2116,7 +2135,7 @@ body.zw-gr26-modal-open {
 }
 
 .zw-gr26-gem-resultaten.is-coal-mode .zw-gr26-coal-toggle {
-    color: var(--zw-gr26-red);
+    background: var(--zw-gr26-red);
 }
 
 .zw-gr26-gem-resultaten.is-coal-mode .zw-gr26-coal-status {
@@ -2213,7 +2232,7 @@ body.zw-gr26-modal-open {
 .zw-gr26-coal-toggle:focus,
 .zw-gr26-coal-toggle:focus-visible {
     outline: none;
-    background: #ecedf0;
+    background: #15326e;
 }
 
 .zw-gr26-coal-status__reset:focus,

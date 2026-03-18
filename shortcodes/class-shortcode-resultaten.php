@@ -68,7 +68,7 @@ class Shortcode_Resultaten {
 
 		$atts = shortcode_atts(
 			[
-				'titel' => 'Uitslagen per gemeente',
+				'titel' => 'Uitslagen',
 			],
 			$atts,
 			'zw_gr26_resultaten'
@@ -131,7 +131,7 @@ class Shortcode_Resultaten {
 				echo '<div class="zw-gr26-modal__body">';
 
 				// Wacht-state banner (hidden by default, shown via JS .is-wacht class).
-				echo '<div class="zw-gr26-modal__wacht-banner">Hier verschijnen de uitslagen op 18 maart</div>';
+				echo '<div class="zw-gr26-modal__wacht-banner">Hier verschijnen de uitslagen binnenkort</div>';
 
 				// Donut section.
 				echo '<div class="zw-gr26-modal__section">';

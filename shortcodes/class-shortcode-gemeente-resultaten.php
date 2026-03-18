@@ -55,19 +55,11 @@ class Shortcode_Gemeente_Resultaten {
 	/**
 	 * Renders the shortcode.
 	 *
-	 * @param array|string $atts Shortcode attributes.
+	 * @param array|string $atts Shortcode attributes (unused, kept for WordPress compatibility).
 	 * @return string Shortcode HTML output.
 	 */
-	public function render( $atts ): string {
+	public function render( $atts ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		$this->assets->enqueue();
-
-		$atts = shortcode_atts(
-			[
-				'titel' => 'Uitslag',
-			],
-			$atts,
-			'zw_gr26_gemeente_resultaten'
-		);
 
 		$slug = Shortcode_Pagina::$active_gemeente;
 		if ( ! $slug ) {
@@ -87,21 +79,15 @@ class Shortcode_Gemeente_Resultaten {
 
 		$is_2026       = ! empty( $entry['has_2026'] );
 		$totaal_zetels = $entry['totaal_zetels'];
+		$titel         = 'Uitslag ' . $entry['naam'];
 
-		$html  = $this->renderer->section_open( $atts['titel'] );
+		$html  = $this->renderer->section_open( $titel );
 		$html .= '<div class="zw-gr26-gem-resultaten' . ( $is_2026 ? '' : ' is-wacht' )
 			. '" id="zwgr26GemResultaten">';
 
 		// Wacht-state banner (visible only when no 2026 results yet).
 		$html .= '<div class="zw-gr26-gem-resultaten__wacht-banner">'
-			. 'Hier verschijnen de uitslagen op 18 maart</div>';
-
-		// Subtitle.
-		$html .= '<div class="zw-gr26-gem-resultaten__subtitle">';
-		$html .= $is_2026
-			? 'Uitslag gemeenteraadsverkiezingen 2026'
-			: 'Huidige samenstelling gemeenteraad';
-		$html .= '</div>';
+			. 'Hier verschijnen de uitslagen binnenkort</div>';
 
 		// Grid: donut left, table right.
 		$html .= '<div class="zw-gr26-gem-resultaten__grid">';
@@ -109,7 +95,7 @@ class Shortcode_Gemeente_Resultaten {
 		// Donut column.
 		$html .= '<div class="zw-gr26-gem-resultaten__donut-col">';
 		$html .= '<div class="zw-gr26-gem-resultaten__section-label" id="zwgr26GemDonutLabel">';
-		$html .= $is_2026 ? 'Zetelverdeling' : 'Huidige zetelverdeling';
+		$html .= 'Zetelverdeling';
 		$html .= '</div>';
 		$html .= '<div class="zw-gr26-gem-resultaten__donut-area">';
 		$html .= '<div class="zw-gr26-gem-resultaten__donut" id="zwgr26GemDonut">';
@@ -141,7 +127,7 @@ class Shortcode_Gemeente_Resultaten {
 		// Table column.
 		$html .= '<div class="zw-gr26-gem-resultaten__table-col">';
 		$html .= '<div class="zw-gr26-gem-resultaten__section-label" id="zwgr26GemTableLabel">';
-		$html .= $is_2026 ? 'Resultaten' : 'Huidige raad';
+		$html .= 'Resultaten';
 		$html .= '</div>';
 		$html .= '<table class="zw-gr26-tbl">';
 		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';

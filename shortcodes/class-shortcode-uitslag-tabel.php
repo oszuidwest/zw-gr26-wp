@@ -69,7 +69,7 @@ class Shortcode_Uitslag_Tabel {
 		$entry = $results[ $slug ];
 
 		if ( empty( $entry['has_2026'] ) ) {
-			return '<p><em>De uitslag voor ' . esc_html( $entry['naam'] ) . ' is nog niet bekend. Kijk later op deze pagina voor de resultaten.</em></p>';
+			return '<p><em>Hier verschijnen de uitslagen binnenkort.</em></p>';
 		}
 
 		if ( empty( $entry['partijen'] ) ) {
@@ -81,8 +81,8 @@ class Shortcode_Uitslag_Tabel {
 
 		if ( ! self::$style_rendered ) {
 			$html                .= '<style>'
-				. '.zw-gr26-uitslag-tabel thead th{background:#e8f5e9;color:#1b5e20}'
-				. '.dark .zw-gr26-uitslag-tabel thead th{background:#1b5e20;color:#e8f5e9}'
+				. '.zw-gr26-uitslag-tabel thead th{background:#1b3f94;color:#fff}'
+				. '.dark .zw-gr26-uitslag-tabel thead th{background:#243f7a;color:#fff}'
 				. '.zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(0,0,0,.04)}'
 				. '.dark .zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(255,255,255,.05)}'
 				. '</style>';
@@ -115,7 +115,10 @@ class Shortcode_Uitslag_Tabel {
 		$html .= '</tbody></table>';
 
 		$cta_url = $this->get_gemeente_page_url( $slug );
-		if ( '' === $cta_url ) {
+		if ( '' !== $cta_url ) {
+			$anchor  = sanitize_title( 'Uitslag ' . $entry['naam'] );
+			$cta_url = $cta_url . '#' . $anchor;
+		} else {
 			$cta_url = $this->data->get_main_page_url();
 		}
 

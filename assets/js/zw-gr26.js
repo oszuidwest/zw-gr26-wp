@@ -782,10 +782,8 @@
                 modal.classList.toggle('is-wacht', !is2026);
                 coalToggle.textContent = 'Bouw coalitie';
                 coalToggle.style.display = is2026 ? '' : 'none';
-                donutLabel.textContent = is2026
-                    ? 'Zetelverdeling'
-                    : 'Huidige zetelverdeling';
-                tableLabel.textContent = is2026 ? 'Resultaten' : 'Huidige raad';
+                donutLabel.textContent = 'Zetelverdeling';
+                tableLabel.textContent = 'Resultaten';
                 coalStatusText.textContent =
                     'Klik op partijen om een coalitie te vormen';
             }
@@ -870,9 +868,18 @@
 
                 if (coalMode) {
                     drawCoalDonut(getSelectedRows());
+                    rows.forEach((row, i) => {
+                        row.classList.remove('coal-hint');
+                        void row.offsetWidth;
+                        setTimeout(
+                            () => row.classList.add('coal-hint'),
+                            i * 50,
+                        );
+                    });
                 } else {
                     donutTotal.textContent = currentTotalZetels;
-                    for (const row of rows) row.classList.remove('is-selected');
+                    for (const row of rows)
+                        row.classList.remove('is-selected', 'coal-hint');
                     donutEl.classList.remove('has-majority');
                     modal.classList.remove('has-majority');
                     hadMajority = false;
@@ -1121,10 +1128,18 @@
 
                     if (gemCoalMode) {
                         gemDrawCoalDonut(gemGetSelectedRows());
+                        gemRows.forEach((row, i) => {
+                            row.classList.remove('coal-hint');
+                            void row.offsetWidth;
+                            setTimeout(
+                                () => row.classList.add('coal-hint'),
+                                i * 50,
+                            );
+                        });
                     } else {
                         gemDonutTotal.textContent = totalZetels;
                         for (const row of gemRows)
-                            row.classList.remove('is-selected');
+                            row.classList.remove('is-selected', 'coal-hint');
                         gemDonut.classList.remove('has-majority');
                         container.classList.remove('has-majority');
                         gemHadMajority = false;
