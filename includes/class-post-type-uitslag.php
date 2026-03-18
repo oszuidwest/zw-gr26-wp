@@ -56,6 +56,9 @@ class Post_Type_Uitslag {
 		add_action( 'admin_head', [ $this, 'hide_add_new_button' ] );
 		add_filter( 'user_has_cap', [ $this, 'block_delete' ], 10, 3 );
 
+		// Sort repeater rows alphabetically on save.
+		add_action( 'acf/save_post', [ $this, 'sort_partijen' ], 20 );
+
 		// Menu highlighting.
 		add_filter( 'parent_file', [ $this, 'fix_parent_file' ] );
 		add_filter( 'submenu_file', [ $this, 'fix_submenu_file' ] );
@@ -312,6 +315,35 @@ class Post_Type_Uitslag {
 		$instance = new self();
 		$instance->register_post_type();
 		$instance->seed_municipalities();
+	}
+
+	/**
+	 * Sorts the partijen repeater rows alphabetically by party name.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	public function sort_partijen( int $post_id ): void {
+		if ( self::POST_TYPE !== get_post_type( $post_id ) ) {
+			return;
+		}
+
+		$partijen = get_field( 'partijen', $post_id );
+		if ( ! is_array( $partijen ) || empty( $partijen ) ) {
+			return;
+		}
+
+		usort(
+			$partijen,
+			static function ( array $a, array $b ): int {
+				return strcasecmp( $a['partij_naam'] ?? '', $b['partij_naam'] ?? '' );
+			}
+		);
+
+		// Unhook to prevent infinite loop.
+		remove_action( 'acf/save_post', [ $this, 'sort_partijen' ], 20 );
+		update_field( 'partijen', $partijen, $post_id );
+		add_action( 'acf/save_post', [ $this, 'sort_partijen' ], 20 );
 	}
 
 	/**
