@@ -19,6 +19,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Shortcode_Uitslag_Tabel {
 
 	/**
+	 * Whether the inline <style> block has already been rendered.
+	 *
+	 * @var bool
+	 */
+	private static bool $style_rendered = false;
+
+	/**
 	 * Data provider.
 	 *
 	 * @var Data_Provider
@@ -59,48 +66,71 @@ class Shortcode_Uitslag_Tabel {
 			return '<!-- zw_gr26_uitslag_tabel: gemeente "' . esc_html( $slug ) . '" niet gevonden -->';
 		}
 
-		$entry   = $results[ $slug ];
-		$is_2026 = ! empty( $entry['has_2026'] );
+		$entry = $results[ $slug ];
+
+		if ( empty( $entry['has_2026'] ) ) {
+			return '<p><em>De uitslag voor ' . esc_html( $entry['naam'] ) . ' is nog niet bekend. Kijk later op deze pagina voor de resultaten.</em></p>';
+		}
 
 		if ( empty( $entry['partijen'] ) ) {
 			return '<!-- zw_gr26_uitslag_tabel: geen partijdata voor "' . esc_html( $slug ) . '" -->';
 		}
 
-		$cell      = 'padding:8px 12px';
-		$col_count = $is_2026 ? 3 : 2;
-		$html      = '<style>.zwgr26-uitslag-tabel tr.zwgr26-stripe{background:rgba(0,0,0,.04)}'
-			. '.dark .zwgr26-uitslag-tabel tr.zwgr26-stripe{background:rgba(255,255,255,.05)}</style>';
-		$html     .= '<table class="zwgr26-uitslag-tabel" style="border-collapse:collapse">';
-		$html     .= '<thead><tr>';
-		$html     .= '<th style="' . $cell . ';text-align:left">Partij</th>';
-		$html     .= $is_2026
-			? '<th style="' . $cell . '">Zetels</th><th style="' . $cell . '">+/−</th>'
-			: '<th style="' . $cell . '">Zetels 2022</th>';
-		$html     .= '</tr></thead>';
-		$html     .= '<tbody>';
+		$cell = 'padding:8px 12px';
+		$html = '';
+
+		if ( ! self::$style_rendered ) {
+			$html                .= '<style>'
+				. '.zw-gr26-uitslag-tabel thead th{background:#e8f5e9;color:#1b5e20}'
+				. '.dark .zw-gr26-uitslag-tabel thead th{background:#1b5e20;color:#e8f5e9}'
+				. '.zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(0,0,0,.04)}'
+				. '.dark .zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(255,255,255,.05)}'
+				. '</style>';
+			self::$style_rendered = true;
+		}
+
+		$html .= '<table class="zw-gr26-uitslag-tabel" style="border-collapse:collapse">';
+		$html .= '<thead><tr>';
+		$html .= '<th style="' . $cell . ';text-align:left">Partij</th>';
+		$html .= '<th style="' . $cell . '">Zetels</th>';
+		$html .= '<th style="' . $cell . '">+/−</th>';
+		$html .= '</tr></thead>';
+		$html .= '<tbody>';
 
 		$row_index = 0;
 		foreach ( $entry['partijen'] as $partij ) {
-			$stripe = 0 === $row_index % 2 ? ' class="zwgr26-stripe"' : '';
+			$stripe = 0 === $row_index % 2 ? ' class="zw-gr26-stripe"' : '';
 			$html  .= '<tr' . $stripe . '>';
 			++$row_index;
 			$html .= '<td style="' . $cell . '"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'
 				. esc_attr( $partij['kleur'] ) . ';margin-right:8px;vertical-align:middle"></span>'
 				. esc_html( $partij['naam'] ) . '</td>';
-
-			if ( $is_2026 ) {
-				$html .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels'] . '</td>';
-				$diff  = $this->format_difference( $partij['zetels'], $partij['zetels_2022'] );
-				$html .= '<td style="' . $cell . ';text-align:center">' . esc_html( $diff ) . '</td>';
-			} else {
-				$html .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels_2022'] . '</td>';
-			}
-
+			$html .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels'] . '</td>';
+			$diff  = $this->format_difference( $partij['zetels'], $partij['zetels_2022'] );
+			$html .= '<td style="' . $cell . ';text-align:center">' . esc_html( $diff ) . '</td>';
 			$html .= '</tr>';
 		}
 
-		$html .= $this->render_opkomst( $entry, $is_2026, $cell, $col_count );
+		$html .= $this->render_opkomst( $entry, $cell );
 		$html .= '</tbody></table>';
+
+		$cta_url = $this->get_gemeente_page_url( $slug );
+		if ( '' === $cta_url ) {
+			$cta_url = $this->data->get_main_page_url();
+		}
+
+		if ( '' !== $cta_url ) {
+			$html .= '<style>.zw-gr26-uitslag-cta{border:2px solid #1b3f94;border-radius:8px}'
+				. '.zw-gr26-uitslag-cta a{color:#1b3f94}'
+				. '.dark .zw-gr26-uitslag-cta{border-color:#5c7cca}'
+				. '.dark .zw-gr26-uitslag-cta a{color:#8ea8e8}</style>'
+				. '<div class="zw-gr26-uitslag-cta" style="margin-top:12px;padding:10px 16px;font-weight:700;font-size:.9em">'
+				. '<a href="' . esc_url( $cta_url )
+				. '" style="text-decoration:none;display:flex;align-items:center;gap:10px">'
+				. '<span style="width:8px;height:8px;border-radius:50%;background:#cc2229;flex-shrink:0"></span>'
+				. 'Bouw zelf een coalitie met onze coalitiebouwer'
+				. '<span style="font-size:1.2em;margin-left:auto">&rarr;</span></a></div>';
+		}
 
 		return $html;
 	}
@@ -130,32 +160,42 @@ class Shortcode_Uitslag_Tabel {
 	}
 
 	/**
+	 * Looks up the gemeente page URL for a given slug.
+	 *
+	 * @param string $slug Municipality slug.
+	 * @return string Page URL, or empty string if not found.
+	 */
+	private function get_gemeente_page_url( string $slug ): string {
+		foreach ( $this->data->get_gemeente_pages() as $page ) {
+			if ( $page['slug'] === $slug ) {
+				return (string) $page['url'];
+			}
+		}
+
+		return '';
+	}
+
+	/**
 	 * Renders turnout percentages as a table footer row.
 	 *
-	 * @param array<string, mixed> $entry     Municipality election data.
-	 * @param bool                 $is_2026   Whether 2026 results are available.
-	 * @param string               $cell      Shared inline padding style.
-	 * @param int                  $col_count Number of columns to span.
+	 * @param array<string, mixed> $entry Municipality election data.
+	 * @param string               $cell  Shared inline padding style.
 	 * @return string HTML table row with turnout data, or empty string.
 	 */
-	private function render_opkomst( array $entry, bool $is_2026, string $cell, int $col_count ): string {
+	private function render_opkomst( array $entry, string $cell ): string {
 		$parts = [];
 
-		if ( $is_2026 && null !== $entry['opkomst_2026'] ) {
-			$parts[] = 'Opkomst 2026: ' . number_format( $entry['opkomst_2026'], 1, ',', '.' ) . '%';
-		}
+		$parts[] = null !== $entry['opkomst_2026']
+			? 'Opkomst 2026: ' . number_format( $entry['opkomst_2026'], 1, ',', '.' ) . '%'
+			: 'Opkomst 2026: nog niet bekend';
 
 		if ( null !== $entry['opkomst_2022'] ) {
 			$parts[] = 'Opkomst 2022: ' . number_format( $entry['opkomst_2022'], 1, ',', '.' ) . '%';
 		}
 
-		if ( empty( $parts ) ) {
-			return '';
-		}
-
 		$border = 'border-top:1px solid rgba(128,128,128,.25)';
 
-		return '<tr><td colspan="' . $col_count . '" style="' . $cell . ';' . $border
-			. ';font-size:.9em;opacity:.7">' . esc_html( implode( ' · ', $parts ) ) . '</td></tr>';
+		return '<tr><td colspan="3" style="' . $cell . ';' . $border
+			. ';font-size:.9em;opacity:.7;text-align:center">' . esc_html( implode( ' · ', $parts ) ) . '</td></tr>';
 	}
 }
