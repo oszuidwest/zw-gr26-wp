@@ -783,7 +783,9 @@
                 coalToggle.textContent = 'Bouw coalitie';
                 coalToggle.style.display = is2026 ? '' : 'none';
                 donutLabel.textContent = 'Zetelverdeling';
-                tableLabel.textContent = 'Resultaten';
+                tableLabel.textContent = is2026
+                    ? 'Resultaten'
+                    : 'Huidig college';
                 coalStatusText.textContent =
                     'Klik op partijen om een coalitie te vormen';
             }

@@ -69,7 +69,7 @@ class Shortcode_Livestream {
 		$html .= '<div class="zw-gr26-uitslagen">';
 
 		if ( $atts['url'] ) {
-			$html .= '<a href="' . esc_url( $atts['url'] ) . '" class="zw-gr26-uitslagen__player">';
+			$html .= '<a href="' . esc_url( $atts['url'] ) . '" class="zw-gr26-uitslagen__player" target="_blank" rel="noopener">';
 		} else {
 			$html .= '<div class="zw-gr26-uitslagen__player">';
 		}

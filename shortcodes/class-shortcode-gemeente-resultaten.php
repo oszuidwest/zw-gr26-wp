@@ -127,7 +127,7 @@ class Shortcode_Gemeente_Resultaten {
 		// Table column.
 		$html .= '<div class="zw-gr26-gem-resultaten__table-col">';
 		$html .= '<div class="zw-gr26-gem-resultaten__section-label" id="zwgr26GemTableLabel">';
-		$html .= 'Resultaten';
+		$html .= $is_2026 ? 'Resultaten' : 'Huidig college';
 		$html .= '</div>';
 		$html .= '<table class="zw-gr26-tbl">';
 		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';
