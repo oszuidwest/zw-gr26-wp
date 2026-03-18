@@ -84,7 +84,8 @@ class Renderer {
 	 * @return string Opening section HTML.
 	 */
 	public function section_open( string $title, string $link = '', string $link_text = '' ): string {
-		$html  = '<section class="zw-gr26-section">';
+		$id    = sanitize_title( $title );
+		$html  = '<section class="zw-gr26-section" id="' . esc_attr( $id ) . '">';
 		$html .= '<div class="zw-gr26-section__header">';
 		$html .= '<h2 class="zw-gr26-section__title">' . esc_html( $title ) . '</h2>';
 

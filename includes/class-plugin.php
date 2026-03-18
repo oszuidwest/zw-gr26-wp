@@ -125,8 +125,11 @@ class Plugin {
 		$gem_programmas = new Shortcode_Gemeente_Programmas( $this->assets, $this->renderer, $this->data );
 		$gem_resultaten = new Shortcode_Gemeente_Resultaten( $this->assets, $this->renderer, $this->data );
 
+		$uitslag_tabel = new Shortcode_Uitslag_Tabel( $this->data );
+
 		add_shortcode( 'zw_gr26_pagina', [ $pagina, 'render' ] );
 		add_shortcode( 'zw_gr26_gemeente_pagina', [ $gem_pagina, 'render' ] );
+		add_shortcode( 'zw_gr26_uitslag_tabel', [ $uitslag_tabel, 'render' ] );
 
 		// All other shortcodes only render inside [zw_gr26_pagina] or [zw_gr26_gemeente_pagina].
 		$this->add_nested_shortcode( 'zw_gr26_livestream', [ $livestream, 'render' ] );
