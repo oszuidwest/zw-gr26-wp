@@ -154,7 +154,6 @@ class Shortcode_Resultaten {
 				echo '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/−</th></tr></thead>';
 				echo '<tbody id="zwgr26Tbody"></tbody>';
 				echo '</table>';
-				echo '<p class="zw-gr26-tbl__verdwenen" id="zwgr26Verdwenen"></p>';
 				echo '</div>';
 
 				echo '</div>'; // end body.

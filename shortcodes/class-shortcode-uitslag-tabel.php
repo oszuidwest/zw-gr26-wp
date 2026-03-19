@@ -85,6 +85,7 @@ class Shortcode_Uitslag_Tabel {
 				. '.dark .zw-gr26-uitslag-tabel thead th{background:#243f7a;color:#fff}'
 				. '.zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(0,0,0,.04)}'
 				. '.dark .zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(255,255,255,.05)}'
+				. '.zw-gr26-uitslag-tabel tr.zw-gr26-ghost{opacity:.4}'
 				. '.zw-gr26-uitslag-diff{font-size:.8em;font-weight:600;padding:2px 6px;border-radius:4px}'
 				. '.zw-gr26-uitslag-diff--plus{color:#2e7d32;background:#e8f5e9}'
 				. '.zw-gr26-uitslag-diff--min{color:#c62828;background:#ffebee}'
@@ -106,33 +107,33 @@ class Shortcode_Uitslag_Tabel {
 		$html .= '<tbody>';
 
 		$row_index = 0;
-		$verdwenen = [];
 		foreach ( $entry['partijen'] as $partij ) {
-			// Collect disappeared parties for the text line below the table.
-			if ( 0 === (int) $partij['zetels'] && null !== $partij['zetels_2022'] && $partij['zetels_2022'] > 0 ) {
-				$verdwenen[] = $partij['naam'] . ' (' . $partij['zetels_2022'] . "\u{2009}\u{2192}\u{2009}0)";
-				continue;
-			}
+			$is_ghost = 0 === (int) $partij['zetels'] && null !== $partij['zetels_2022'] && $partij['zetels_2022'] > 0;
 
-			$stripe = 0 === $row_index % 2 ? ' class="zw-gr26-stripe"' : '';
-			$html  .= '<tr' . $stripe . '>';
+			$classes = [];
+			if ( 0 === $row_index % 2 ) {
+				$classes[] = 'zw-gr26-stripe';
+			}
+			if ( $is_ghost ) {
+				$classes[] = 'zw-gr26-ghost';
+			}
+			$class_attr = ! empty( $classes ) ? ' class="' . implode( ' ', $classes ) . '"' : '';
+
+			$html .= '<tr' . $class_attr . '>';
 			++$row_index;
-			$html .= '<td style="' . $cell . '"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'
+			$name_style = $is_ghost ? 'text-decoration:line-through' : '';
+			$html      .= '<td style="' . $cell . '"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'
 				. esc_attr( $partij['kleur'] ) . ';margin-right:8px;vertical-align:middle"></span>'
-				. esc_html( $partij['naam'] ) . '</td>';
-			$html .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels'] . '</td>';
-			$diff  = $this->format_difference( $partij['zetels'], $partij['zetels_2022'] );
+				. '<span' . ( '' !== $name_style ? ' style="' . $name_style . '"' : '' ) . '>'
+				. esc_html( $partij['naam'] ) . '</span></td>';
+			$html      .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels'] . '</td>';
+			$diff       = $this->format_difference( $partij['zetels'], $partij['zetels_2022'] );
 			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML from format_difference() with safe values.
 			$html .= '<td style="' . $cell . ';text-align:center">' . $diff . '</td>';
 			$html .= '</tr>';
 		}
 
 		$html .= '</tbody></table>';
-
-		if ( ! empty( $verdwenen ) ) {
-			$html .= '<p style="font-size:.8em;color:#888;margin-top:10px">Niet teruggekeerd: '
-				. esc_html( implode( ', ', $verdwenen ) ) . '</p>';
-		}
 
 		$cta_url = $this->get_gemeente_page_url( $slug );
 		if ( '' !== $cta_url ) {
