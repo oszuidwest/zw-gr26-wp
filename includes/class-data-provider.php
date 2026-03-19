@@ -185,21 +185,34 @@ class Data_Provider {
 				}
 
 				if ( $has_2026 ) {
-					// Remove parties with 0 seats in 2026 and sort descending.
-					$partijen = array_values(
-						array_filter(
-							$partijen,
-							static function ( array $p ): bool {
-								return $p['zetels'] > 0;
-							}
-						)
-					);
+					// Split into parties with seats and parties that lost all seats.
+					$with_seats    = [];
+					$without_seats = [];
+					foreach ( $partijen as $p ) {
+						if ( $p['zetels'] > 0 ) {
+							$with_seats[] = $p;
+						} elseif ( null !== $p['zetels_2022'] && $p['zetels_2022'] > 0 ) {
+							$without_seats[] = $p;
+						}
+					}
+
+					// Sort parties with seats descending by 2026 seats.
 					usort(
-						$partijen,
+						$with_seats,
 						static function ( array $a, array $b ): int {
 							return $b['zetels'] <=> $a['zetels'];
 						}
 					);
+
+					// Sort disappeared parties descending by 2022 seats.
+					usort(
+						$without_seats,
+						static function ( array $a, array $b ): int {
+							return $b['zetels_2022'] <=> $a['zetels_2022'];
+						}
+					);
+
+					$partijen = array_merge( $with_seats, $without_seats );
 				} else {
 					// Keep parties with 2022 seats, sorted descending.
 					$partijen = array_values(

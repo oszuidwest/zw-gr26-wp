@@ -198,7 +198,9 @@
     }
 
     /**
-     * Builds table rows from party data.
+     * Builds table rows from party data. Disappeared parties (0 seats in 2026
+     * while having had seats in 2022) are rendered as ghost rows with reduced
+     * opacity and a strikethrough on the party name.
      *
      * Each row displays the party color dot, name, seat count, and optional
      * seat difference. Returns the created rows for coalition mode usage.
@@ -216,11 +218,21 @@
         const rows = [];
 
         partijen.forEach((p) => {
+            const isGhost =
+                is2026 &&
+                p.zetels === 0 &&
+                p.zetels_2022 != null &&
+                p.zetels_2022 > 0;
+
             const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
             const color = p.kleur || DEFAULT_COLOR;
             const tr = document.createElement('tr');
             tr.dataset.zetels = seats;
             tr.dataset.kleur = color;
+
+            if (isGhost) {
+                tr.classList.add('zw-gr26-tbl__ghost');
+            }
 
             // Dot + name cell (matches first half of header colspan="2").
             const tdParty = document.createElement('td');
@@ -242,14 +254,19 @@
 
             const tdDiff = createDiffCell(p, is2026);
 
-            tr.addEventListener('click', () => onClick(tr));
+            if (!isGhost) {
+                tr.addEventListener('click', () => onClick(tr));
+            }
 
             tr.appendChild(tdParty);
             tr.appendChild(tdSpacer);
             tr.appendChild(tdSeats);
             tr.appendChild(tdDiff);
             tbody.appendChild(tr);
-            rows.push(tr);
+
+            if (!isGhost) {
+                rows.push(tr);
+            }
         });
 
         return rows;
@@ -831,6 +848,7 @@
                 let offset = 0;
                 partijen.forEach((p) => {
                     const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                    if (seats === 0) return;
                     const pct = seats / currentTotalZetels;
                     addCircle(
                         svgResults,
@@ -1026,6 +1044,7 @@
             let offset = 0;
             partijen.forEach((p) => {
                 const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                if (seats === 0) return;
                 const pct = seats / totalZetels;
                 addCircle(svgResults, p.kleur || DEFAULT_COLOR, pct, offset);
                 offset += pct * circumference;

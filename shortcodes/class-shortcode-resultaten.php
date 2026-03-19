@@ -153,7 +153,8 @@ class Shortcode_Resultaten {
 				echo '<table class="zw-gr26-tbl">';
 				echo '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/−</th></tr></thead>';
 				echo '<tbody id="zwgr26Tbody"></tbody>';
-				echo '</table></div>';
+				echo '</table>';
+				echo '</div>';
 
 				echo '</div>'; // end body.
 

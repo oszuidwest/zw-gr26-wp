@@ -1200,6 +1200,19 @@ body.zw-gr26-modal-open {
     background: #e3f2fd;
 }
 
+.zw-gr26-tbl__ghost {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.zw-gr26-tbl__ghost .zw-gr26-tbl__name {
+    text-decoration: line-through;
+}
+
+.is-coal-mode .zw-gr26-tbl__ghost {
+    display: none;
+}
+
 /* --- Coalition controls --- */
 .zw-gr26-coal-toggle {
     width: 100%;
