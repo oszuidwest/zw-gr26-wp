@@ -213,7 +213,7 @@ class Shortcode_Uitslag_Tabel {
 			? '2022: ' . number_format( $val_2022, 1, ',', '.' ) . '%'
 			: '';
 
-		$html  = '<div style="margin-bottom:14px">';
+		$html  = '<div style="margin-bottom:6px">';
 		$html .= '<div style="display:flex;justify-content:space-between;font-size:.8em;color:#666;margin-bottom:4px">';
 		$html .= '<span>' . $label_2026 . '</span>';
 
