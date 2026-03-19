@@ -192,22 +192,55 @@ class Shortcode_Uitslag_Tabel {
 	}
 
 	/**
-	 * Renders turnout percentages as a paragraph above the table.
+	 * Renders turnout as a progress bar with 2022 reference marker.
 	 *
 	 * @param array<string, mixed> $entry Municipality election data.
-	 * @return string HTML paragraph with turnout data.
+	 * @return string HTML turnout bar, or empty string if no data.
 	 */
 	private function render_opkomst( array $entry ): string {
-		$parts = [];
+		$val_2026 = $entry['opkomst_2026'];
+		$val_2022 = $entry['opkomst_2022'];
 
-		$parts[] = null !== $entry['opkomst_2026']
-			? 'Opkomst 2026: ' . number_format( $entry['opkomst_2026'], 1, ',', '.' ) . '%'
-			: 'Opkomst 2026: nog niet bekend';
-
-		if ( null !== $entry['opkomst_2022'] ) {
-			$parts[] = 'Opkomst 2022: ' . number_format( $entry['opkomst_2022'], 1, ',', '.' ) . '%';
+		if ( null === $val_2026 && null === $val_2022 ) {
+			return '';
 		}
 
-		return '<p style="font-size:.9em;opacity:.7;margin-bottom:8px">' . esc_html( implode( ' · ', $parts ) ) . '</p>';
+		$label_2026 = null !== $val_2026
+			? '<strong style="color:#1a1a1a">Opkomst 2026:</strong> ' . number_format( $val_2026, 1, ',', '.' ) . '%'
+			: '<strong style="color:#1a1a1a">Opkomst 2026:</strong> nog niet bekend';
+
+		$label_2022 = null !== $val_2022
+			? '2022: ' . number_format( $val_2022, 1, ',', '.' ) . '%'
+			: '';
+
+		$html  = '<div style="margin-bottom:14px">';
+		$html .= '<div style="display:flex;justify-content:space-between;font-size:.8em;color:#666;margin-bottom:4px">';
+		$html .= '<span>' . $label_2026 . '</span>';
+
+		if ( '' !== $label_2022 ) {
+			$html .= '<span>' . esc_html( $label_2022 ) . '</span>';
+		}
+
+		$html .= '</div>';
+
+		// Progress bar track.
+		$html .= '<div style="background:#e8e8e8;border-radius:6px;height:10px;position:relative;overflow:hidden">';
+
+		// 2026 fill.
+		$width_2026 = null !== $val_2026 ? min( (float) $val_2026, 100.0 ) : 0.0;
+		$html      .= '<div style="background:linear-gradient(90deg,#1b3f94,#3a6fd8);width:'
+			. esc_attr( number_format( $width_2026, 1 ) ) . '%;height:100%;border-radius:6px"></div>';
+
+		// 2022 reference marker.
+		if ( null !== $val_2022 ) {
+			$left  = min( (float) $val_2022, 100.0 );
+			$html .= '<div style="position:absolute;left:' . esc_attr( number_format( $left, 1 ) )
+				. '%;top:0;width:2px;height:100%;background:#cc2229" title="'
+				. esc_attr( '2022: ' . number_format( $val_2022, 1, ',', '.' ) . '%' ) . '"></div>';
+		}
+
+		$html .= '</div></div>';
+
+		return $html;
 	}
 }
