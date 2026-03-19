@@ -133,6 +133,7 @@ class Shortcode_Gemeente_Resultaten {
 		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';
 		$html .= '<tbody id="zwgr26GemTbody"></tbody>';
 		$html .= '</table>';
+		$html .= '<p class="zw-gr26-tbl__verdwenen" id="zwgr26GemVerdwenen"></p>';
 		$html .= '</div>'; // End table-col.
 
 		$html .= '</div>'; // End grid.

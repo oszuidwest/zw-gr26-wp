@@ -98,7 +98,14 @@ class Shortcode_Uitslag_Tabel {
 		$html .= '<tbody>';
 
 		$row_index = 0;
+		$verdwenen = [];
 		foreach ( $entry['partijen'] as $partij ) {
+			// Collect disappeared parties for the text line below the table.
+			if ( 0 === (int) $partij['zetels'] && null !== $partij['zetels_2022'] && $partij['zetels_2022'] > 0 ) {
+				$verdwenen[] = $partij['naam'] . ' (' . $partij['zetels_2022'] . "\u{2009}\u{2192}\u{2009}0)";
+				continue;
+			}
+
 			$stripe = 0 === $row_index % 2 ? ' class="zw-gr26-stripe"' : '';
 			$html  .= '<tr' . $stripe . '>';
 			++$row_index;
@@ -113,6 +120,11 @@ class Shortcode_Uitslag_Tabel {
 
 		$html .= $this->render_opkomst( $entry, $cell );
 		$html .= '</tbody></table>';
+
+		if ( ! empty( $verdwenen ) ) {
+			$html .= '<p style="font-size:.8em;color:#888;margin-top:10px">Niet teruggekeerd: '
+				. esc_html( implode( ', ', $verdwenen ) ) . '</p>';
+		}
 
 		$cta_url = $this->get_gemeente_page_url( $slug );
 		if ( '' !== $cta_url ) {

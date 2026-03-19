@@ -198,7 +198,7 @@
     }
 
     /**
-     * Builds table rows from party data.
+     * Builds table rows from party data, skipping disappeared parties.
      *
      * Each row displays the party color dot, name, seat count, and optional
      * seat difference. Returns the created rows for coalition mode usage.
@@ -216,6 +216,9 @@
         const rows = [];
 
         partijen.forEach((p) => {
+            // Skip disappeared parties (0 seats in 2026 while results are in).
+            if (is2026 && p.zetels === 0) return;
+
             const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
             const color = p.kleur || DEFAULT_COLOR;
             const tr = document.createElement('tr');
@@ -253,6 +256,31 @@
         });
 
         return rows;
+    }
+
+    /**
+     * Renders a text line listing disappeared parties below the results table.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} el       Target paragraph element.
+     * @param {Object[]}   partijen Array of party objects.
+     * @param {boolean}    is2026   Whether 2026 results are available.
+     */
+    function renderVerdwenen(el, partijen, is2026) {
+        if (!el) return;
+        el.textContent = '';
+        if (!is2026) return;
+
+        const verdwenen = partijen.filter(
+            (p) => p.zetels === 0 && p.zetels_2022 != null && p.zetels_2022 > 0,
+        );
+        if (verdwenen.length === 0) return;
+
+        const items = verdwenen.map(
+            (p) => `${p.naam} (${p.zetels_2022}\u2009\u2192\u20090)`,
+        );
+        el.textContent = `Niet teruggekeerd: ${items.join(', ')}`;
     }
 
     /* === MODAL HELPER === */
@@ -831,6 +859,7 @@
                 let offset = 0;
                 partijen.forEach((p) => {
                     const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                    if (seats === 0) return;
                     const pct = seats / currentTotalZetels;
                     addCircle(
                         svgResults,
@@ -855,6 +884,11 @@
                     tr.classList.toggle('is-selected');
                     updateCoalition();
                 });
+                renderVerdwenen(
+                    document.getElementById('zwgr26Verdwenen'),
+                    partijen,
+                    is2026,
+                );
             }
 
             /* --- Event handlers --- */
@@ -1026,6 +1060,7 @@
             let offset = 0;
             partijen.forEach((p) => {
                 const seats = is2026 ? p.zetels : p.zetels_2022 || 0;
+                if (seats === 0) return;
                 const pct = seats / totalZetels;
                 addCircle(svgResults, p.kleur || DEFAULT_COLOR, pct, offset);
                 offset += pct * circumference;
@@ -1115,6 +1150,11 @@
                 tr.classList.toggle('is-selected');
                 gemUpdateCoalition();
             });
+            renderVerdwenen(
+                document.getElementById('zwgr26GemVerdwenen'),
+                partijen,
+                is2026,
+            );
 
             // Coalition toggle (only present for 2026 results).
             if (gemCoalToggle) {
