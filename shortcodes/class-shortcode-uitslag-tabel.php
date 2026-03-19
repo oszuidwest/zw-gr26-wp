@@ -89,6 +89,8 @@ class Shortcode_Uitslag_Tabel {
 			self::$style_rendered = true;
 		}
 
+		$html .= $this->render_opkomst( $entry );
+
 		$html .= '<table class="zw-gr26-uitslag-tabel" style="border-collapse:collapse">';
 		$html .= '<thead><tr>';
 		$html .= '<th style="' . $cell . ';text-align:left">Partij</th>';
@@ -118,7 +120,6 @@ class Shortcode_Uitslag_Tabel {
 			$html .= '</tr>';
 		}
 
-		$html .= $this->render_opkomst( $entry, $cell );
 		$html .= '</tbody></table>';
 
 		if ( ! empty( $verdwenen ) ) {
@@ -191,13 +192,12 @@ class Shortcode_Uitslag_Tabel {
 	}
 
 	/**
-	 * Renders turnout percentages as a table footer row.
+	 * Renders turnout percentages as a paragraph above the table.
 	 *
 	 * @param array<string, mixed> $entry Municipality election data.
-	 * @param string               $cell  Shared inline padding style.
-	 * @return string HTML table row with turnout data, or empty string.
+	 * @return string HTML paragraph with turnout data.
 	 */
-	private function render_opkomst( array $entry, string $cell ): string {
+	private function render_opkomst( array $entry ): string {
 		$parts = [];
 
 		$parts[] = null !== $entry['opkomst_2026']
@@ -208,9 +208,6 @@ class Shortcode_Uitslag_Tabel {
 			$parts[] = 'Opkomst 2022: ' . number_format( $entry['opkomst_2022'], 1, ',', '.' ) . '%';
 		}
 
-		$border = 'border-top:1px solid rgba(128,128,128,.25)';
-
-		return '<tr><td colspan="3" style="' . $cell . ';' . $border
-			. ';font-size:.9em;opacity:.7;text-align:center">' . esc_html( implode( ' · ', $parts ) ) . '</td></tr>';
+		return '<p style="font-size:.9em;opacity:.7;margin-bottom:8px">' . esc_html( implode( ' · ', $parts ) ) . '</p>';
 	}
 }
