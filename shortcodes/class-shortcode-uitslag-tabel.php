@@ -85,6 +85,12 @@ class Shortcode_Uitslag_Tabel {
 				. '.dark .zw-gr26-uitslag-tabel thead th{background:#243f7a;color:#fff}'
 				. '.zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(0,0,0,.04)}'
 				. '.dark .zw-gr26-uitslag-tabel tr.zw-gr26-stripe{background:rgba(255,255,255,.05)}'
+				. '.zw-gr26-uitslag-diff{font-size:.8em;font-weight:600;padding:2px 6px;border-radius:4px}'
+				. '.zw-gr26-uitslag-diff--plus{color:#2e7d32;background:#e8f5e9}'
+				. '.zw-gr26-uitslag-diff--min{color:#c62828;background:#ffebee}'
+				. '.zw-gr26-uitslag-diff--nw{color:#1565c0;background:#e3f2fd}'
+				. '.zw-gr26-uitslag-opkomst{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}'
+				. '@media(max-width:480px){.zw-gr26-uitslag-opkomst span{font-size:.72em!important;padding:4px 9px!important}}'
 				. '</style>';
 			self::$style_rendered = true;
 		}
@@ -116,7 +122,8 @@ class Shortcode_Uitslag_Tabel {
 				. esc_html( $partij['naam'] ) . '</td>';
 			$html .= '<td style="' . $cell . ';text-align:center">' . (int) $partij['zetels'] . '</td>';
 			$diff  = $this->format_difference( $partij['zetels'], $partij['zetels_2022'] );
-			$html .= '<td style="' . $cell . ';text-align:center">' . esc_html( $diff ) . '</td>';
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML from format_difference() with safe values.
+			$html .= '<td style="' . $cell . ';text-align:center">' . $diff . '</td>';
 			$html .= '</tr>';
 		}
 
@@ -152,27 +159,27 @@ class Shortcode_Uitslag_Tabel {
 	}
 
 	/**
-	 * Formats the seat difference between 2026 and 2022.
+	 * Returns an HTML badge showing the seat difference between 2026 and 2022.
 	 *
 	 * @param int      $zetels_2026 Seats in 2026.
 	 * @param int|null $zetels_2022 Seats in 2022, or null if the party is new.
-	 * @return string Formatted difference string.
+	 * @return string HTML span element, or empty string if no change.
 	 */
 	private function format_difference( int $zetels_2026, ?int $zetels_2022 ): string {
 		if ( null === $zetels_2022 ) {
-			return 'NW';
+			return '<span class="zw-gr26-uitslag-diff zw-gr26-uitslag-diff--nw">NW</span>';
 		}
 
 		$diff = $zetels_2026 - $zetels_2022;
 
 		if ( $diff > 0 ) {
-			return '+' . $diff;
+			return '<span class="zw-gr26-uitslag-diff zw-gr26-uitslag-diff--plus">+' . $diff . '</span>';
 		}
 		if ( $diff < 0 ) {
 			// U+2212 MINUS SIGN.
-			return "\u{2212}" . abs( $diff );
+			return '<span class="zw-gr26-uitslag-diff zw-gr26-uitslag-diff--min">' . "\u{2212}" . abs( $diff ) . '</span>';
 		}
-		return '0';
+		return '';
 	}
 
 	/**
@@ -192,10 +199,10 @@ class Shortcode_Uitslag_Tabel {
 	}
 
 	/**
-	 * Renders turnout as a progress bar with 2022 reference marker.
+	 * Renders turnout as pill badges above the table.
 	 *
 	 * @param array<string, mixed> $entry Municipality election data.
-	 * @return string HTML turnout bar, or empty string if no data.
+	 * @return string HTML pill badges, or empty string if no data.
 	 */
 	private function render_opkomst( array $entry ): string {
 		$val_2026 = $entry['opkomst_2026'];
@@ -205,41 +212,22 @@ class Shortcode_Uitslag_Tabel {
 			return '';
 		}
 
-		$label_2026 = null !== $val_2026
-			? '<strong style="color:#1a1a1a">Opkomst 2026:</strong> ' . number_format( $val_2026, 1, ',', '.' ) . '%'
-			: '<strong style="color:#1a1a1a">Opkomst 2026:</strong> nog niet bekend';
+		$html = '<div class="zw-gr26-uitslag-opkomst">';
 
-		$label_2022 = null !== $val_2022
-			? '2022: ' . number_format( $val_2022, 1, ',', '.' ) . '%'
-			: '';
+		if ( null !== $val_2026 ) {
+			$html .= '<span style="background:#1b3f94;color:#fff;padding:5px 12px;border-radius:20px;font-size:.82em;font-weight:700">'
+				. 'Opkomst 2026: ' . esc_html( number_format( $val_2026, 1, ',', '.' ) ) . '%</span>';
+		} else {
+			$html .= '<span style="background:#1b3f94;color:#fff;padding:5px 12px;border-radius:20px;font-size:.82em;font-weight:700">'
+				. 'Opkomst 2026: nog niet bekend</span>';
+		}
 
-		$html  = '<div style="margin-bottom:6px">';
-		$html .= '<div style="display:flex;justify-content:space-between;font-size:.8em;color:#666;margin-bottom:4px">';
-		$html .= '<span>' . $label_2026 . '</span>';
-
-		if ( '' !== $label_2022 ) {
-			$html .= '<span>' . esc_html( $label_2022 ) . '</span>';
+		if ( null !== $val_2022 ) {
+			$html .= '<span style="background:#e8e8e8;color:#555;padding:5px 12px;border-radius:20px;font-size:.82em;font-weight:600">'
+				. 'Opkomst 2022: ' . esc_html( number_format( $val_2022, 1, ',', '.' ) ) . '%</span>';
 		}
 
 		$html .= '</div>';
-
-		// Progress bar track.
-		$html .= '<div style="background:#e8e8e8;border-radius:6px;height:10px;position:relative;overflow:hidden">';
-
-		// 2026 fill.
-		$width_2026 = null !== $val_2026 ? min( (float) $val_2026, 100.0 ) : 0.0;
-		$html      .= '<div style="background:linear-gradient(90deg,#1b3f94,#3a6fd8);width:'
-			. esc_attr( number_format( $width_2026, 1 ) ) . '%;height:100%;border-radius:6px"></div>';
-
-		// 2022 reference marker.
-		if ( null !== $val_2022 ) {
-			$left  = min( (float) $val_2022, 100.0 );
-			$html .= '<div style="position:absolute;left:' . esc_attr( number_format( $left, 1 ) )
-				. '%;top:0;width:2px;height:100%;background:#cc2229" title="'
-				. esc_attr( '2022: ' . number_format( $val_2022, 1, ',', '.' ) . '%' ) . '"></div>';
-		}
-
-		$html .= '</div></div>';
 
 		return $html;
 	}
