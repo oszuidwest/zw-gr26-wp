@@ -90,6 +90,7 @@ class Shortcode_Uitslag_Tabel {
 				. '.zw-gr26-uitslag-diff--plus{color:#2e7d32;background:#e8f5e9}'
 				. '.zw-gr26-uitslag-diff--min{color:#c62828;background:#ffebee}'
 				. '.zw-gr26-uitslag-diff--nw{color:#1565c0;background:#e3f2fd}'
+				. '.dark .zw-gr26-uitslag-opkomst--2022{background:rgba(255,255,255,.05)!important;color:rgba(255,255,255,.5)!important}'
 				. '.zw-gr26-uitslag-opkomst{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}'
 				. '@media(max-width:480px){.zw-gr26-uitslag-opkomst span{font-size:.72em!important;padding:4px 9px!important}}'
 				. '</style>';
@@ -224,7 +225,8 @@ class Shortcode_Uitslag_Tabel {
 		}
 
 		if ( null !== $val_2022 ) {
-			$html .= '<span style="background:#e8e8e8;color:#555;padding:5px 12px;border-radius:20px;font-size:.82em;font-weight:600">'
+			$html .= '<span class="zw-gr26-uitslag-opkomst--2022"'
+				. ' style="background:#e8e8e8;color:#555;padding:5px 12px;border-radius:20px;font-size:.82em;font-weight:600">'
 				. 'Opkomst 2022: ' . esc_html( number_format( $val_2022, 1, ',', '.' ) ) . '%</span>';
 		}
 
