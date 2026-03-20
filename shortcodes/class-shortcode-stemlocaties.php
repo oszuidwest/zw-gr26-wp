@@ -92,7 +92,7 @@ class Shortcode_Stemlocaties {
 
 		// Municipality dropdown.
 		$html .= '<div class="zw-gr26-programma__select-wrap">';
-		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select>';
+		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select aria-label="Kies je gemeente">';
 		$html .= '<option value="">Kies je gemeente...</option>';
 
 		foreach ( $alle_data as $gem_slug => $gemeente_data ) {
@@ -181,7 +181,7 @@ class Shortcode_Stemlocaties {
 	 * @return string Row header HTML.
 	 */
 	private function render_row_header( array $loc ): string {
-		$html = '<div class="zw-gr26-stem__header">';
+		$html = '<div class="zw-gr26-stem__header" tabindex="0" role="button" aria-expanded="false">';
 
 		// Name + time + address.
 		$html .= '<div class="zw-gr26-stem__info">';

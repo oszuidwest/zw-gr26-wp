@@ -78,7 +78,7 @@ class Shortcode_Programmas {
 
 		// Municipality dropdown.
 		$html .= '<div class="zw-gr26-programma__select-wrap">';
-		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select>';
+		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select aria-label="Kies je gemeente">';
 		$html .= '<option value="">Kies je gemeente...</option>';
 
 		foreach ( $gemeenten as $gemeente ) {

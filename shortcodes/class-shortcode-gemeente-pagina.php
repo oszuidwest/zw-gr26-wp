@@ -85,14 +85,17 @@ class Shortcode_Gemeente_Pagina {
 
 		$naam = $municipalities[ $slug ];
 
+		$was_active   = Shortcode_Pagina::$active;
+		$was_gemeente = Shortcode_Pagina::$active_gemeente;
+
 		Shortcode_Pagina::$active          = true;
 		Shortcode_Pagina::$active_gemeente = $slug;
 
 		try {
 			$inner = do_shortcode( $content );
 		} finally {
-			Shortcode_Pagina::$active          = false;
-			Shortcode_Pagina::$active_gemeente = null;
+			Shortcode_Pagina::$active          = $was_active;
+			Shortcode_Pagina::$active_gemeente = $was_gemeente;
 		}
 
 		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
@@ -107,7 +110,7 @@ class Shortcode_Gemeente_Pagina {
 				static function () {
 					echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
 					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
-					echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
+					echo '<button class="zw-gr26-modal__close" type="button" aria-label="Sluiten">&times;</button>';
 					echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
 					echo '</div></div>';
 				}

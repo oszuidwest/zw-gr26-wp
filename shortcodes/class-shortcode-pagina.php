@@ -96,11 +96,12 @@ class Shortcode_Pagina {
 			'zw_gr26_pagina'
 		);
 
+		$was_active   = self::$active;
 		self::$active = true;
 		try {
 			$inner = do_shortcode( $content );
 		} finally {
-			self::$active = false;
+			self::$active = $was_active;
 		}
 
 		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
@@ -115,7 +116,7 @@ class Shortcode_Pagina {
 				static function () {
 					echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
 					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
-					echo '<button class="zw-gr26-modal__close" type="button">&times;</button>';
+					echo '<button class="zw-gr26-modal__close" type="button" aria-label="Sluiten">&times;</button>';
 					echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
 					echo '</div></div>';
 				}

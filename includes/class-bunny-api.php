@@ -52,6 +52,13 @@ class Bunny_API {
 	private const API_TIMEOUT = 30;
 
 	/**
+	 * Maximum number of pages to fetch from the Bunny API.
+	 *
+	 * @var int
+	 */
+	private const MAX_PAGES = 50;
+
+	/**
 	 * Prefix for WordPress transient keys.
 	 *
 	 * @var string
@@ -235,7 +242,7 @@ class Bunny_API {
 		$page    = 1;
 		$all     = [];
 
-		while ( true ) {
+		while ( $page <= self::MAX_PAGES ) {
 			$response = wp_remote_get(
 				add_query_arg(
 					[

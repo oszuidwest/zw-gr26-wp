@@ -74,7 +74,7 @@ class Shortcode_Gemeente_Resultaten {
 		}
 
 		// Pass single-gemeente data to JS.
-		$json = wp_json_encode( $entry, JSON_UNESCAPED_UNICODE );
+		$json = wp_json_encode( $entry, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG );
 		wp_add_inline_script( 'zw-gr26', 'var zwGr26GemeenteResultaten=' . $json . ';', 'before' );
 
 		$is_2026       = ! empty( $entry['has_2026'] );

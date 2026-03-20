@@ -49,7 +49,6 @@ class Post_Type_Uitslag {
 	public function register(): void {
 		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action( 'admin_menu', [ $this, 'register_admin_menu' ] );
-		add_action( 'admin_init', [ $this, 'seed_municipalities' ] );
 		add_action( 'acf/include_fields', [ $this, 'register_acf_fields' ] );
 
 		// Protections.

@@ -138,7 +138,7 @@ class Shortcode_Debatten {
 				'titel'     => $debat['naam'],
 				'thumbnail' => $debat['thumbnail'],
 				'url'       => '',
-				'meta'      => $debat['datum'] . ' &bull; ' . $debat['kanaal'],
+				'meta'      => $debat['datum'] . ' • ' . $debat['kanaal'],
 			];
 
 			if ( ! $coming_soon && $library_id ) {
