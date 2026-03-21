@@ -272,6 +272,188 @@
         return rows;
     }
 
+    /* === COALITION BUILDER FACTORY === */
+
+    /**
+     * Creates a coalition builder that manages coal-mode state, donut
+     * visualization, and row selection for a single results context.
+     *
+     * @access private
+     *
+     * @param {Object}       opts
+     * @param {HTMLElement}   opts.container      Element receiving .is-coal-mode / .has-majority.
+     * @param {HTMLElement}   opts.donutEl        .zw-gr26-donut element.
+     * @param {HTMLElement}   opts.donutTotal     .zw-gr26-donut-total element.
+     * @param {HTMLElement}   opts.donutCoalLabel .zw-gr26-donut-coal-label element.
+     * @param {HTMLElement}   opts.donutLabel     Section label element.
+     * @param {?HTMLElement}  opts.coalToggle     Coal toggle button (nullable).
+     * @param {HTMLElement}   opts.coalStatusText Coal status text span.
+     * @param {?HTMLElement}  opts.coalReset      Coal reset button (nullable).
+     * @param {function():number} opts.getTotalZetels Returns total seats (function, not value).
+     * @param {?function()}   opts.onToggle       Optional callback after coal toggle.
+     * @return {Object} Coalition builder controls.
+     */
+    function createCoalitionBuilder({
+        container,
+        donutEl,
+        donutTotal,
+        donutCoalLabel,
+        donutLabel,
+        coalToggle,
+        coalStatusText,
+        coalReset,
+        getTotalZetels,
+        onToggle,
+    }) {
+        let rows = [];
+        let svgCoal = null;
+        let coalMode = false;
+        let hadMajority = false;
+
+        function getSelectedRows() {
+            return rows.filter((row) => row.classList.contains('is-selected'));
+        }
+
+        function getSelectedSeats(selected) {
+            return selected.reduce(
+                (sum, row) => sum + Number(row.dataset.zetels),
+                0,
+            );
+        }
+
+        function drawCoalDonut(selected) {
+            svgCoal.replaceChildren();
+            const total = getTotalZetels();
+            let coalOffset = 0;
+
+            selected.forEach((row) => {
+                const z = Number(row.dataset.zetels);
+                const pct = z / total;
+                addCircle(svgCoal, row.dataset.kleur, pct, coalOffset);
+                coalOffset += pct * circumference;
+            });
+
+            const sum = getSelectedSeats(selected);
+            const remaining = total - sum;
+            if (remaining > 0) {
+                addCircle(svgCoal, '#e8e8e8', remaining / total, coalOffset);
+            }
+
+            donutTotal.textContent = sum;
+            donutCoalLabel.textContent = `van ${total}`;
+        }
+
+        function updateCoalition() {
+            const total = getTotalZetels();
+            const majorityThreshold = Math.floor(total / 2) + 1;
+            const selected = getSelectedRows();
+            const sum = getSelectedSeats(selected);
+
+            drawCoalDonut(selected);
+
+            const isMajority = sum >= majorityThreshold;
+
+            if (isMajority && !hadMajority) {
+                donutEl.classList.add('majority-celebrate');
+                donutEl.addEventListener(
+                    'animationend',
+                    () => donutEl.classList.remove('majority-celebrate'),
+                    { once: true },
+                );
+                launchConfetti();
+            }
+            hadMajority = isMajority;
+
+            donutEl.classList.toggle('has-majority', isMajority);
+            container.classList.toggle('has-majority', isMajority);
+
+            coalStatusText.textContent =
+                sum === 0
+                    ? 'Klik op partijen om een coalitie te vormen'
+                    : `${sum} van ${total} zetels`;
+        }
+
+        if (coalToggle) {
+            coalToggle.addEventListener('click', () => {
+                coalMode = !coalMode;
+                container.classList.toggle('is-coal-mode', coalMode);
+                coalToggle.textContent = coalMode
+                    ? 'Terug naar resultaten'
+                    : 'Bouw coalitie';
+                donutLabel.textContent = coalMode
+                    ? 'Coalitie'
+                    : 'Zetelverdeling';
+
+                if (coalMode) {
+                    drawCoalDonut(getSelectedRows());
+                    rows.forEach((row, i) => {
+                        row.classList.remove('coal-hint');
+                        void row.offsetWidth;
+                        setTimeout(
+                            () => row.classList.add('coal-hint'),
+                            i * 50,
+                        );
+                    });
+                } else {
+                    donutTotal.textContent = getTotalZetels();
+                    for (const row of rows)
+                        row.classList.remove('is-selected', 'coal-hint');
+                    donutEl.classList.remove('has-majority');
+                    container.classList.remove('has-majority');
+                    hadMajority = false;
+                }
+
+                if (onToggle) onToggle();
+            });
+        }
+
+        if (coalReset) {
+            coalReset.addEventListener('click', () => {
+                for (const row of rows) row.classList.remove('is-selected');
+                updateCoalition();
+            });
+        }
+
+        return {
+            /**
+             * Sets the table rows and coalition SVG for this context.
+             *
+             * @param {HTMLTableRowElement[]} tableRows Party rows.
+             * @param {SVGSVGElement}         coalSvg   Coalition SVG element.
+             */
+            setRows(tableRows, coalSvg) {
+                rows = tableRows;
+                svgCoal = coalSvg;
+            },
+
+            /** Recalculates coalition state after a row selection change. */
+            update: updateCoalition,
+
+            /**
+             * Resets coal state (used by drawer on municipality switch).
+             *
+             * @param {boolean} is2026 Whether 2026 results are available.
+             */
+            reset(is2026) {
+                coalMode = false;
+                hadMajority = false;
+                container.classList.remove('is-coal-mode', 'has-majority');
+                if (coalToggle) {
+                    coalToggle.textContent = 'Bouw coalitie';
+                    coalToggle.style.display = is2026 ? '' : 'none';
+                }
+                donutLabel.textContent = 'Zetelverdeling';
+                coalStatusText.textContent =
+                    'Klik op partijen om een coalitie te vormen';
+            },
+
+            /** @return {boolean} Whether coal mode is active. */
+            get isCoalMode() {
+                return coalMode;
+            },
+        };
+    }
+
     /* === MODAL HELPER === */
 
     /** @type {string} History state key used by all modals. */
@@ -703,108 +885,30 @@
             /** @type {?SVGSVGElement} SVG element for the results donut. */
             let svgResults = null;
 
-            /** @type {?SVGSVGElement} SVG element for the coalition donut overlay. */
-            let svgCoal = null;
-
-            /** @type {HTMLTableRowElement[]} All party table rows in the current modal. */
-            let rows = [];
-
-            /** @type {boolean} Whether the coalition builder mode is active. */
-            let coalMode = false;
-
-            /** @type {boolean} Whether a majority was already reached in the current session. */
-            let hadMajority = false;
-
             /** @type {number} Total number of seats for the current municipality. */
             let currentTotalZetels = 0;
 
-            /** @type {number} Number of seats needed for a majority. */
-            let currentMajority = 0;
-
-            /* --- Coalition helpers --- */
-
-            function getSelectedRows() {
-                return rows.filter((row) =>
-                    row.classList.contains('is-selected'),
-                );
-            }
-
-            function getSelectedSeats(selected) {
-                return selected.reduce(
-                    (sum, row) => sum + Number(row.dataset.zetels),
-                    0,
-                );
-            }
-
-            function drawCoalDonut(selected) {
-                svgCoal.replaceChildren();
-                let coalOffset = 0;
-
-                selected.forEach((row) => {
-                    const z = Number(row.dataset.zetels);
-                    const pct = z / currentTotalZetels;
-                    addCircle(svgCoal, row.dataset.kleur, pct, coalOffset);
-                    coalOffset += pct * circumference;
-                });
-
-                const sum = getSelectedSeats(selected);
-                const remaining = currentTotalZetels - sum;
-                if (remaining > 0) {
-                    addCircle(
-                        svgCoal,
-                        '#e8e8e8',
-                        remaining / currentTotalZetels,
-                        coalOffset,
-                    );
-                }
-
-                donutTotal.textContent = sum;
-                donutCoalLabel.textContent = `van ${currentTotalZetels}`;
-            }
-
-            function updateCoalition() {
-                const selected = getSelectedRows();
-                const sum = getSelectedSeats(selected);
-
-                drawCoalDonut(selected);
-
-                const isMajority = sum >= currentMajority;
-
-                if (isMajority && !hadMajority) {
-                    donutEl.classList.add('majority-celebrate');
-                    donutEl.addEventListener(
-                        'animationend',
-                        () => donutEl.classList.remove('majority-celebrate'),
-                        { once: true },
-                    );
-                    launchConfetti();
-                }
-                hadMajority = isMajority;
-
-                donutEl.classList.toggle('has-majority', isMajority);
-                modal.classList.toggle('has-majority', isMajority);
-
-                coalStatusText.textContent =
-                    sum === 0
-                        ? 'Klik op partijen om een coalitie te vormen'
-                        : `${sum} van ${currentTotalZetels} zetels`;
-            }
+            const coal = createCoalitionBuilder({
+                container: modal,
+                donutEl,
+                donutTotal,
+                donutCoalLabel,
+                donutLabel,
+                coalToggle,
+                coalStatusText,
+                coalReset,
+                getTotalZetels: () => currentTotalZetels,
+                onToggle: () => resultsFocusTrap.refresh(),
+            });
 
             /* --- Modal content builders --- */
 
             function resetState(is2026) {
-                coalMode = false;
-                hadMajority = false;
-                modal.classList.remove('is-coal-mode', 'has-majority');
+                coal.reset(is2026);
                 modal.classList.toggle('is-wacht', !is2026);
-                coalToggle.textContent = 'Bouw coalitie';
-                coalToggle.style.display = is2026 ? '' : 'none';
-                donutLabel.textContent = 'Zetelverdeling';
                 tableLabel.textContent = is2026
                     ? 'Resultaten'
                     : 'Huidig college';
-                coalStatusText.textContent =
-                    'Klik op partijen om een coalitie te vormen';
             }
 
             function renderHeader(data, key, tileName) {
@@ -825,13 +929,13 @@
                     opkomstEl.textContent = `Opkomst: ${data.opkomst_2026}%`;
                     if (data.opkomst_2022 != null) {
                         const ref = document.createElement('span');
-                        ref.className = 'zw-gr26-modal__opkomst-ref';
+                        ref.className = 'zw-gr26-opkomst-ref';
                         ref.textContent = ` (2022: ${data.opkomst_2022}%)`;
                         opkomstEl.appendChild(ref);
                     }
                 } else if (data && data.opkomst_2022 != null) {
                     const ref = document.createElement('span');
-                    ref.className = 'zw-gr26-modal__opkomst-ref';
+                    ref.className = 'zw-gr26-opkomst-ref';
                     ref.textContent = `Opkomst 2022: ${data.opkomst_2022}%`;
                     opkomstEl.appendChild(ref);
                 }
@@ -839,11 +943,12 @@
 
             function renderDonut(partijen, is2026) {
                 donutEl.classList.remove('has-majority');
-                if (svgResults) svgResults.remove();
-                if (svgCoal) svgCoal.remove();
+                for (const svg of donutEl.querySelectorAll('svg')) {
+                    svg.remove();
+                }
 
-                svgResults = createSvg('zw-gr26-modal__donut-svg-results');
-                svgCoal = createSvg('zw-gr26-modal__donut-svg-coal');
+                svgResults = createSvg('zw-gr26-donut-svg-results');
+                const svgCoal = createSvg('zw-gr26-donut-svg-coal');
 
                 let offset = 0;
                 partijen.forEach((p) => {
@@ -859,59 +964,21 @@
                     offset += pct * circumference;
                 });
 
-                const center = donutEl.querySelector(
-                    '.zw-gr26-modal__donut-center',
-                );
+                const center = donutEl.querySelector('.zw-gr26-donut-center');
                 donutEl.insertBefore(svgCoal, center);
                 donutEl.insertBefore(svgResults, center);
                 donutTotal.textContent = currentTotalZetels;
+
+                return svgCoal;
             }
 
             function renderTable(partijen, is2026) {
-                rows = buildTableRows(tbody, partijen, is2026, (tr) => {
-                    if (!coalMode) return;
+                return buildTableRows(tbody, partijen, is2026, (tr) => {
+                    if (!coal.isCoalMode) return;
                     tr.classList.toggle('is-selected');
-                    updateCoalition();
+                    coal.update();
                 });
             }
-
-            /* --- Event handlers --- */
-            coalToggle.addEventListener('click', () => {
-                coalMode = !coalMode;
-                modal.classList.toggle('is-coal-mode', coalMode);
-                coalToggle.textContent = coalMode
-                    ? 'Terug naar resultaten'
-                    : 'Bouw coalitie';
-                donutLabel.textContent = coalMode
-                    ? 'Coalitie'
-                    : 'Zetelverdeling';
-
-                if (coalMode) {
-                    drawCoalDonut(getSelectedRows());
-                    rows.forEach((row, i) => {
-                        row.classList.remove('coal-hint');
-                        void row.offsetWidth;
-                        setTimeout(
-                            () => row.classList.add('coal-hint'),
-                            i * 50,
-                        );
-                    });
-                } else {
-                    donutTotal.textContent = currentTotalZetels;
-                    for (const row of rows)
-                        row.classList.remove('is-selected', 'coal-hint');
-                    donutEl.classList.remove('has-majority');
-                    modal.classList.remove('has-majority');
-                    hadMajority = false;
-                }
-
-                resultsFocusTrap.refresh();
-            });
-
-            coalReset.addEventListener('click', () => {
-                for (const row of rows) row.classList.remove('is-selected');
-                updateCoalition();
-            });
 
             /* --- Results modal --- */
 
@@ -935,13 +1002,13 @@
                 const tileName = tile.querySelector('.zw-gr26-tile__name');
 
                 currentTotalZetels = data ? data.totaal_zetels : 0;
-                currentMajority = Math.floor(currentTotalZetels / 2) + 1;
 
                 resetState(is2026);
                 renderHeader(data, key, tileName);
                 renderOpkomst(data, is2026);
-                renderDonut(partijen, is2026);
-                renderTable(partijen, is2026);
+                const svgCoal = renderDonut(partijen, is2026);
+                const rows = renderTable(partijen, is2026);
+                coal.setRows(rows, svgCoal);
             }
 
             function openTile(tile) {
@@ -1018,7 +1085,6 @@
         const is2026 = data.has_2026;
         const partijen = data.partijen;
         const totalZetels = data.totaal_zetels;
-        const majority = Math.floor(totalZetels / 2) + 1;
 
         const container = document.getElementById('zwgr26GemResultaten');
         const gemDonut = document.getElementById('zwgr26GemDonut');
@@ -1035,11 +1101,21 @@
         const gemCoalReset = document.getElementById('zwgr26GemCoalReset');
 
         if (container && gemDonut && gemTbody) {
+            const coal = createCoalitionBuilder({
+                container,
+                donutEl: gemDonut,
+                donutTotal: gemDonutTotal,
+                donutCoalLabel: gemDonutCoalLabel,
+                donutLabel: gemDonutLabel,
+                coalToggle: gemCoalToggle,
+                coalStatusText: gemCoalStatusText,
+                coalReset: gemCoalReset,
+                getTotalZetels: () => totalZetels,
+            });
+
             // Render donut SVG.
-            const svgResults = createSvg(
-                'zw-gr26-gem-resultaten__donut-svg-results',
-            );
-            const svgCoal = createSvg('zw-gr26-gem-resultaten__donut-svg-coal');
+            const svgResults = createSvg('zw-gr26-donut-svg-results');
+            const svgCoal = createSvg('zw-gr26-donut-svg-coal');
 
             let offset = 0;
             partijen.forEach((p) => {
@@ -1050,131 +1126,18 @@
                 offset += pct * circumference;
             });
 
-            const center = gemDonut.querySelector(
-                '.zw-gr26-gem-resultaten__donut-center',
-            );
+            const center = gemDonut.querySelector('.zw-gr26-donut-center');
             gemDonut.insertBefore(svgCoal, center);
             gemDonut.insertBefore(svgResults, center);
 
-            // Coalition state.
-            let gemCoalMode = false;
-            let gemHadMajority = false;
-            let gemRows = [];
-
-            function gemGetSelectedRows() {
-                return gemRows.filter((row) =>
-                    row.classList.contains('is-selected'),
-                );
-            }
-
-            function gemGetSelectedSeats(selected) {
-                return selected.reduce(
-                    (sum, row) => sum + Number(row.dataset.zetels),
-                    0,
-                );
-            }
-
-            function gemDrawCoalDonut(selected) {
-                svgCoal.replaceChildren();
-                let coalOffset = 0;
-
-                selected.forEach((row) => {
-                    const z = Number(row.dataset.zetels);
-                    const pct = z / totalZetels;
-                    addCircle(svgCoal, row.dataset.kleur, pct, coalOffset);
-                    coalOffset += pct * circumference;
-                });
-
-                const sum = gemGetSelectedSeats(selected);
-                const remaining = totalZetels - sum;
-                if (remaining > 0) {
-                    addCircle(
-                        svgCoal,
-                        '#e8e8e8',
-                        remaining / totalZetels,
-                        coalOffset,
-                    );
-                }
-
-                gemDonutTotal.textContent = sum;
-                gemDonutCoalLabel.textContent = `van ${totalZetels}`;
-            }
-
-            function gemUpdateCoalition() {
-                const selected = gemGetSelectedRows();
-                const sum = gemGetSelectedSeats(selected);
-
-                gemDrawCoalDonut(selected);
-
-                const isMajority = sum >= majority;
-
-                if (isMajority && !gemHadMajority) {
-                    gemDonut.classList.add('majority-celebrate');
-                    gemDonut.addEventListener(
-                        'animationend',
-                        () => gemDonut.classList.remove('majority-celebrate'),
-                        { once: true },
-                    );
-                    launchConfetti();
-                }
-                gemHadMajority = isMajority;
-
-                gemDonut.classList.toggle('has-majority', isMajority);
-                container.classList.toggle('has-majority', isMajority);
-
-                gemCoalStatusText.textContent =
-                    sum === 0
-                        ? 'Klik op partijen om een coalitie te vormen'
-                        : `${sum} van ${totalZetels} zetels`;
-            }
-
             // Render table rows.
-            gemRows = buildTableRows(gemTbody, partijen, is2026, (tr) => {
-                if (!gemCoalMode) return;
+            const gemRows = buildTableRows(gemTbody, partijen, is2026, (tr) => {
+                if (!coal.isCoalMode) return;
                 tr.classList.toggle('is-selected');
-                gemUpdateCoalition();
+                coal.update();
             });
 
-            // Coalition toggle (only present for 2026 results).
-            if (gemCoalToggle) {
-                gemCoalToggle.addEventListener('click', () => {
-                    gemCoalMode = !gemCoalMode;
-                    container.classList.toggle('is-coal-mode', gemCoalMode);
-                    gemCoalToggle.textContent = gemCoalMode
-                        ? 'Terug naar resultaten'
-                        : 'Bouw coalitie';
-                    gemDonutLabel.textContent = gemCoalMode
-                        ? 'Coalitie'
-                        : 'Zetelverdeling';
-
-                    if (gemCoalMode) {
-                        gemDrawCoalDonut(gemGetSelectedRows());
-                        gemRows.forEach((row, i) => {
-                            row.classList.remove('coal-hint');
-                            void row.offsetWidth;
-                            setTimeout(
-                                () => row.classList.add('coal-hint'),
-                                i * 50,
-                            );
-                        });
-                    } else {
-                        gemDonutTotal.textContent = totalZetels;
-                        for (const row of gemRows)
-                            row.classList.remove('is-selected', 'coal-hint');
-                        gemDonut.classList.remove('has-majority');
-                        container.classList.remove('has-majority');
-                        gemHadMajority = false;
-                    }
-                });
-            }
-
-            if (gemCoalReset) {
-                gemCoalReset.addEventListener('click', () => {
-                    for (const row of gemRows)
-                        row.classList.remove('is-selected');
-                    gemUpdateCoalition();
-                });
-            }
+            coal.setRows(gemRows, svgCoal);
         }
     }
 })();
