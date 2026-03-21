@@ -77,16 +77,11 @@ class Shortcode_Programmas {
 		$html .= '<nav class="zw-gr26-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
 
 		// Municipality dropdown.
-		$html .= '<div class="zw-gr26-programma__select-wrap">';
-		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select aria-label="Kies je gemeente">';
-		$html .= '<option value="">Kies je gemeente...</option>';
-
+		$dropdown_items = [];
 		foreach ( $gemeenten as $gemeente ) {
-			$id    = 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] );
-			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $gemeente['naam'] ) . '</option>';
+			$dropdown_items[ 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] ) ] = $gemeente['naam'];
 		}
-
-		$html .= '</select></div>';
+		$html .= Renderer::municipality_dropdown( $dropdown_items );
 
 		// Party lists per municipality.
 		foreach ( $gemeenten as $gemeente ) {

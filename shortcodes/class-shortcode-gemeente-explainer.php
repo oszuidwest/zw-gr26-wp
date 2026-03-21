@@ -38,25 +38,16 @@ class Shortcode_Gemeente_Explainer {
 	private Bunny_API $bunny;
 
 	/**
-	 * Image proxy.
-	 *
-	 * @var Image_Proxy
-	 */
-	private Image_Proxy $proxy;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param Assets      $assets   Asset manager.
-	 * @param Renderer    $renderer Shared renderer.
-	 * @param Bunny_API   $bunny    Bunny CDN API client.
-	 * @param Image_Proxy $proxy    Image proxy.
+	 * @param Assets    $assets   Asset manager.
+	 * @param Renderer  $renderer Shared renderer.
+	 * @param Bunny_API $bunny    Bunny CDN API client.
 	 */
-	public function __construct( Assets $assets, Renderer $renderer, Bunny_API $bunny, Image_Proxy $proxy ) {
+	public function __construct( Assets $assets, Renderer $renderer, Bunny_API $bunny ) {
 		$this->assets   = $assets;
 		$this->renderer = $renderer;
 		$this->bunny    = $bunny;
-		$this->proxy    = $proxy;
 	}
 
 	/**
@@ -89,27 +80,20 @@ class Shortcode_Gemeente_Explainer {
 
 		$library_id = (int) $atts['bibliotheek'];
 
-		$video = [
-			'titel'     => $atts['naam'],
-			'thumbnail' => $atts['thumbnail'],
-			'url'       => '',
-		];
-
-		$coming_soon = false;
-		if ( $library_id ) {
-			$resolved = $this->bunny->resolve_video_card( $library_id, $atts['videoid'], $video['thumbnail'] );
-
-			$video['thumbnail']  = $resolved['thumbnail'];
-			$video['poster']     = $resolved['poster'];
-			$video['url']        = $resolved['url'];
-			$video['stream_url'] = $resolved['stream_url'];
-			$coming_soon         = $resolved['binnenkort'];
-		}
+		$video = $this->bunny->resolve_video(
+			$library_id,
+			$atts['videoid'],
+			[
+				'titel'     => $atts['naam'],
+				'thumbnail' => $atts['thumbnail'],
+				'url'       => '',
+			]
+		);
 
 		$tekst = ! empty( $content ) ? trim( $content ) : $atts['tekst'];
 
 		$html  = $this->renderer->section_open( $atts['titel'] );
-		$html .= $this->render_player( $video, $coming_soon, $tekst );
+		$html .= $this->render_player( $video, $video['binnenkort'], $tekst );
 		$html .= $this->renderer->section_close();
 
 		return $html;
@@ -141,7 +125,14 @@ class Shortcode_Gemeente_Explainer {
 		$html .= '<' . $tag . $href . $stream . $poster . ' class="' . $class . '">';
 
 		if ( $has_thumb ) {
-			$html .= $this->img_tag( $video['thumbnail'], $video['titel'] ?? '' );
+			$html .= $this->renderer->img_tag(
+				$video['thumbnail'],
+				$video['titel'] ?? '',
+				800,
+				450,
+				'zw-gr26-gem-explainer__thumb',
+				'(max-width: 768px) 100vw, 800px'
+			);
 		}
 
 		if ( $coming_soon ) {
@@ -161,33 +152,6 @@ class Shortcode_Gemeente_Explainer {
 
 		$html .= '</div>';
 		$html .= '</div>';
-
-		return $html;
-	}
-
-	/**
-	 * Renders a responsive image tag with srcset via the image proxy.
-	 *
-	 * @param string $src Source URL.
-	 * @param string $alt Alt text.
-	 * @return string Image HTML.
-	 */
-	private function img_tag( string $src, string $alt ): string {
-		$width  = 800;
-		$height = 450;
-		$src_1x = $this->proxy->url( $src, $width, $height );
-		$src_2x = $this->proxy->url( $src, $width * 2, $height * 2 );
-
-		$html = '<img class="zw-gr26-gem-explainer__thumb" src="' . esc_url( $src_1x ) . '"';
-
-		if ( $src_2x !== $src_1x ) {
-			$html .= ' srcset="' . esc_url( $src_1x ) . " {$width}w, "
-				. esc_url( $src_2x ) . ' ' . ( $width * 2 ) . 'w"'
-				. ' sizes="(max-width: 768px) 100vw, 800px"';
-		}
-
-		$html .= ' width="' . $width . '" height="' . $height . '"';
-		$html .= ' alt="' . esc_attr( $alt ) . '" loading="lazy" />';
 
 		return $html;
 	}

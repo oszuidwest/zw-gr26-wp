@@ -124,7 +124,7 @@ class Plugin {
 
 		// Gemeente subpage shortcodes.
 		$gem_pagina     = new Shortcode_Gemeente_Pagina( $this->assets, $this->renderer, $this->data );
-		$gem_explainer  = new Shortcode_Gemeente_Explainer( $this->assets, $this->renderer, $this->bunny, $this->proxy );
+		$gem_explainer  = new Shortcode_Gemeente_Explainer( $this->assets, $this->renderer, $this->bunny );
 		$gem_programmas = new Shortcode_Gemeente_Programmas( $this->assets, $this->renderer, $this->data );
 		$gem_resultaten = new Shortcode_Gemeente_Resultaten( $this->assets, $this->renderer, $this->data );
 

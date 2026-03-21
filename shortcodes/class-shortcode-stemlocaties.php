@@ -91,17 +91,11 @@ class Shortcode_Stemlocaties {
 		$html .= '<div class="zw-gr26-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
 
 		// Municipality dropdown.
-		$html .= '<div class="zw-gr26-programma__select-wrap">';
-		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select aria-label="Kies je gemeente">';
-		$html .= '<option value="">Kies je gemeente...</option>';
-
+		$dropdown_items = [];
 		foreach ( $alle_data as $gem_slug => $gemeente_data ) {
-			$naam  = $municipalities[ $gem_slug ] ?? ucfirst( $gem_slug );
-			$id    = 'zw-gr26-stem-' . sanitize_title( $gem_slug );
-			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $naam ) . '</option>';
+			$dropdown_items[ 'zw-gr26-stem-' . sanitize_title( $gem_slug ) ] = $municipalities[ $gem_slug ] ?? ucfirst( $gem_slug );
 		}
-
-		$html .= '</select></div>';
+		$html .= Renderer::municipality_dropdown( $dropdown_items );
 
 		// Location lists per municipality.
 		foreach ( $alle_data as $gem_slug => $gemeente_data ) {

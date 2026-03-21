@@ -137,35 +137,22 @@ class Shortcode_Resultaten {
 				echo '<div class="zw-gr26-modal__section">';
 				echo '<div class="zw-gr26-modal__section-label" id="zwgr26DonutLabel">Zetelverdeling</div>';
 				echo '<div class="zw-gr26-donut-area">';
-				echo '<div class="zw-gr26-donut zw-gr26-donut--lg" id="zwgr26Donut">';
-				echo '<div class="zw-gr26-donut-center">';
-				echo '<div class="zw-gr26-donut-total" id="zwgr26DonutTotal"></div>';
-				echo '<div class="zw-gr26-donut-label">zetels</div>';
-				echo '<div class="zw-gr26-donut-coal-label" id="zwgr26DonutCoalLabel"></div>';
-				echo '<div class="zw-gr26-donut-majority-label">Meerderheid!</div>';
-				echo '</div></div>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped Renderer output.
+				echo Renderer::donut_chart( 'zwgr26', '', 'zw-gr26-donut--lg' );
 				echo '<div class="zw-gr26-opkomst" id="zwgr26Opkomst"></div>';
 				echo '</div></div>';
 
 				// Table section.
 				echo '<div class="zw-gr26-modal__section">';
 				echo '<div class="zw-gr26-modal__section-label" id="zwgr26TableLabel">Resultaten</div>';
-				echo '<table class="zw-gr26-tbl">';
-				echo '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/−</th></tr></thead>';
-				echo '<tbody id="zwgr26Tbody"></tbody>';
-				echo '</table>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped Renderer output.
+				echo Renderer::results_table( 'zwgr26Tbody' );
 				echo '</div>';
 
 				echo '</div>'; // end body.
 
-				// Coalition toggle.
-				echo '<button class="zw-gr26-coal-toggle" id="zwgr26CoalToggle" type="button">Bouw coalitie</button>';
-
-				// Coalition status bar.
-				echo '<div class="zw-gr26-coal-status" id="zwgr26CoalStatus">';
-				echo '<span class="zw-gr26-coal-status__text" id="zwgr26CoalStatusText">Klik op partijen om een coalitie te vormen</span>';
-				echo '<button class="zw-gr26-coal-status__reset" id="zwgr26CoalReset" type="button">Wissen</button>';
-				echo '</div>';
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped Renderer output.
+				echo Renderer::coalition_builder( 'zwgr26' );
 
 				echo '</div></div>'; // end modal + backdrop.
 			}
