@@ -303,6 +303,66 @@ class Renderer {
 	}
 
 	/**
+	 * Cleans shortcode content by removing stray `<br>` and empty `<p>` tags injected by wpautop.
+	 *
+	 * @param string $html Raw shortcode output.
+	 * @return string Cleaned HTML.
+	 */
+	public static function clean_shortcode_html( string $html ): string {
+		$html = preg_replace( '/<br\s*\/?>\s*/', '', $html );
+		$html = preg_replace( '#<p>\s*</p>#', '', $html );
+		return $html;
+	}
+
+	/**
+	 * Registers the shared video modal in wp_footer (once).
+	 *
+	 * @return void
+	 */
+	public static function video_modal(): void {
+		if ( Shortcode_Pagina::$video_modal_added ) {
+			return;
+		}
+		Shortcode_Pagina::$video_modal_added = true;
+		add_action(
+			'wp_footer',
+			static function () {
+				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
+				echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
+				echo '<button class="zw-gr26-modal__close" type="button" aria-label="Sluiten">&times;</button>';
+				echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
+				echo '</div></div>';
+			}
+		);
+	}
+
+	/**
+	 * Renders a single program row (link or disabled placeholder).
+	 *
+	 * @param array $partij {
+	 *     Party data.
+	 *
+	 *     @type string $naam Party name.
+	 *     @type string $url  Program URL (empty string if unavailable).
+	 * }
+	 * @return string Program row HTML.
+	 */
+	public static function programma_row( array $partij ): string {
+		if ( $partij['url'] ) {
+			$html  = '<a href="' . esc_url( $partij['url'] ) . '" class="zw-gr26-prow" target="_blank" rel="noopener noreferrer">';
+			$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+			$html .= '<span class="zw-gr26-prow__link-text">Lees programma</span>';
+			$html .= '</a>';
+			return $html;
+		}
+		$html  = '<div class="zw-gr26-prow zw-gr26-prow--disabled">';
+		$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+		$html .= '<span class="zw-gr26-prow__link-text">Geen programma</span>';
+		$html .= '</div>';
+		return $html;
+	}
+
+	/**
 	 * Renders a news article card.
 	 *
 	 * @param array $item {

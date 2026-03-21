@@ -104,24 +104,8 @@ class Shortcode_Pagina {
 			self::$active = $was_active;
 		}
 
-		// Remove <br> and empty <p> tags injected by wpautop between shortcodes.
-		$inner = preg_replace( '/<br\s*\/?>\s*/', '', $inner );
-		$inner = preg_replace( '#<p>\s*</p>#', '', $inner );
-
-		// Render video modal in wp_footer so it sits outside .zw-gr26-wrapper.
-		if ( ! self::$video_modal_added ) {
-			self::$video_modal_added = true;
-			add_action(
-				'wp_footer',
-				static function () {
-					echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
-					echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
-					echo '<button class="zw-gr26-modal__close" type="button" aria-label="Sluiten">&times;</button>';
-					echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
-					echo '</div></div>';
-				}
-			);
-		}
+		$inner = Renderer::clean_shortcode_html( $inner );
+		Renderer::video_modal();
 
 		$gemeente_pages = $this->data->get_gemeente_pages();
 		$main_page_url  = (string) get_permalink();

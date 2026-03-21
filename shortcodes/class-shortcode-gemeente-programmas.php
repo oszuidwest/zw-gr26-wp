@@ -84,17 +84,7 @@ class Shortcode_Gemeente_Programmas {
 		$html .= '<div class="zw-gr26-programma__list zw-gr26-programma__list--open">';
 
 		foreach ( $partijen as $partij ) {
-			if ( $partij['url'] ) {
-				$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zw-gr26-prow" target="_blank" rel="noopener noreferrer">';
-				$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-				$html .= '<span class="zw-gr26-prow__link-text">Lees programma</span>';
-				$html .= '</a>';
-			} else {
-				$html .= '<div class="zw-gr26-prow zw-gr26-prow--disabled">';
-				$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-				$html .= '<span class="zw-gr26-prow__link-text">Geen programma</span>';
-				$html .= '</div>';
-			}
+			$html .= Renderer::programma_row( $partij );
 		}
 
 		$html .= '</div>';
