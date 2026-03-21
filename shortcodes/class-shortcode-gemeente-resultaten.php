@@ -86,7 +86,7 @@ class Shortcode_Gemeente_Resultaten {
 			. '" id="zwgr26GemResultaten">';
 
 		// Wacht-state banner (visible only when no 2026 results yet).
-		$html .= '<div class="zw-gr26-gem-resultaten__wacht-banner">'
+		$html .= '<div class="zw-gr26-wacht-banner">'
 			. 'Hier verschijnen de uitslagen binnenkort</div>';
 
 		// Grid: donut left, table right.
@@ -97,26 +97,26 @@ class Shortcode_Gemeente_Resultaten {
 		$html .= '<div class="zw-gr26-gem-resultaten__section-label" id="zwgr26GemDonutLabel">';
 		$html .= 'Zetelverdeling';
 		$html .= '</div>';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-area">';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut" id="zwgr26GemDonut">';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-center">';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-total" id="zwgr26GemDonutTotal">'
+		$html .= '<div class="zw-gr26-donut-area">';
+		$html .= '<div class="zw-gr26-donut" id="zwgr26GemDonut">';
+		$html .= '<div class="zw-gr26-donut-center">';
+		$html .= '<div class="zw-gr26-donut-total" id="zwgr26GemDonutTotal">'
 			. esc_html( (string) $totaal_zetels ) . '</div>';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-label">zetels</div>';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-coal-label" id="zwgr26GemDonutCoalLabel"></div>';
-		$html .= '<div class="zw-gr26-gem-resultaten__donut-majority-label">Meerderheid!</div>';
+		$html .= '<div class="zw-gr26-donut-label">zetels</div>';
+		$html .= '<div class="zw-gr26-donut-coal-label" id="zwgr26GemDonutCoalLabel"></div>';
+		$html .= '<div class="zw-gr26-donut-majority-label">Meerderheid!</div>';
 		$html .= '</div></div>';
 
 		// Opkomst.
-		$html .= '<div class="zw-gr26-gem-resultaten__opkomst" id="zwgr26GemOpkomst">';
+		$html .= '<div class="zw-gr26-opkomst" id="zwgr26GemOpkomst">';
 		if ( $is_2026 && null !== $entry['opkomst_2026'] ) {
 			$html .= 'Opkomst: ' . esc_html( (string) $entry['opkomst_2026'] ) . '%';
 			if ( null !== $entry['opkomst_2022'] ) {
-				$html .= '<span class="zw-gr26-gem-resultaten__opkomst-ref"> (2022: '
+				$html .= '<span class="zw-gr26-opkomst-ref"> (2022: '
 					. esc_html( (string) $entry['opkomst_2022'] ) . '%)</span>';
 			}
 		} elseif ( null !== $entry['opkomst_2022'] ) {
-			$html .= '<span class="zw-gr26-gem-resultaten__opkomst-ref">Opkomst 2022: '
+			$html .= '<span class="zw-gr26-opkomst-ref">Opkomst 2022: '
 				. esc_html( (string) $entry['opkomst_2022'] ) . '%</span>';
 		}
 		$html .= '</div>';

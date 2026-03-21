@@ -131,20 +131,20 @@ class Shortcode_Resultaten {
 				echo '<div class="zw-gr26-modal__body">';
 
 				// Wacht-state banner (hidden by default, shown via JS .is-wacht class).
-				echo '<div class="zw-gr26-modal__wacht-banner">Hier verschijnen de uitslagen binnenkort</div>';
+				echo '<div class="zw-gr26-wacht-banner">Hier verschijnen de uitslagen binnenkort</div>';
 
 				// Donut section.
 				echo '<div class="zw-gr26-modal__section">';
 				echo '<div class="zw-gr26-modal__section-label" id="zwgr26DonutLabel">Zetelverdeling</div>';
-				echo '<div class="zw-gr26-modal__donut-area">';
-				echo '<div class="zw-gr26-modal__donut" id="zwgr26Donut">';
-				echo '<div class="zw-gr26-modal__donut-center">';
-				echo '<div class="zw-gr26-modal__donut-total" id="zwgr26DonutTotal"></div>';
-				echo '<div class="zw-gr26-modal__donut-label">zetels</div>';
-				echo '<div class="zw-gr26-modal__donut-coal-label" id="zwgr26DonutCoalLabel"></div>';
-				echo '<div class="zw-gr26-modal__donut-majority-label">Meerderheid!</div>';
+				echo '<div class="zw-gr26-donut-area">';
+				echo '<div class="zw-gr26-donut zw-gr26-donut--lg" id="zwgr26Donut">';
+				echo '<div class="zw-gr26-donut-center">';
+				echo '<div class="zw-gr26-donut-total" id="zwgr26DonutTotal"></div>';
+				echo '<div class="zw-gr26-donut-label">zetels</div>';
+				echo '<div class="zw-gr26-donut-coal-label" id="zwgr26DonutCoalLabel"></div>';
+				echo '<div class="zw-gr26-donut-majority-label">Meerderheid!</div>';
 				echo '</div></div>';
-				echo '<div class="zw-gr26-modal__opkomst" id="zwgr26Opkomst"></div>';
+				echo '<div class="zw-gr26-opkomst" id="zwgr26Opkomst"></div>';
 				echo '</div></div>';
 
 				// Table section.
