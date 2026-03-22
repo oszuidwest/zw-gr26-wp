@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Admin meta box showing election results from the ZuidWest Kiest API.
  *

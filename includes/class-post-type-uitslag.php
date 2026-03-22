@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Custom Post Type for election results per municipality.
  *
@@ -315,6 +316,17 @@ class Post_Type_Uitslag {
 		$instance = new self();
 		$instance->register_post_type();
 		$instance->seed_municipalities();
+		flush_rewrite_rules();
+	}
+
+	/**
+	 * Cleans up transients on plugin deactivation.
+	 *
+	 * @return void
+	 */
+	public static function deactivate(): void {
+		delete_transient( 'zwgr26_stemlocaties_v3' );
+		flush_rewrite_rules();
 	}
 
 	/**

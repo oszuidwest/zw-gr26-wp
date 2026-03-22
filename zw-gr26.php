@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Plugin Name: ZuidWest GR 2026
  * Description: Gemeenteraadsverkiezingen 2026 — shortcodes voor de verkiezingspagina op ZuidWest Update.
@@ -6,6 +7,8 @@
  * Author: Streekomroep ZuidWest
  * Text Domain: zw-gr26
  * License: GPL-2.0-or-later
+ * Requires PHP: 8.3
+ * Requires at least: 6.8
  *
  * @package ZWGR26
  */
@@ -47,6 +50,6 @@ require_once ZWGR26_PATH . 'includes/class-rest-api.php';
 require_once ZWGR26_PATH . 'includes/class-plugin.php';
 
 register_activation_hook( __FILE__, [ 'ZWGR26\Post_Type_Uitslag', 'activate' ] );
+register_deactivation_hook( __FILE__, [ 'ZWGR26\Post_Type_Uitslag', 'deactivate' ] );
 
 ZWGR26\Plugin::instance();
-ZWGR26\Admin_API_Results::register();

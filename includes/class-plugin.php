@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Plugin orchestrator.
  *
@@ -103,6 +104,8 @@ class Plugin {
 
 		$rest = new Rest_API( $this->data );
 		$rest->register();
+
+		Admin_API_Results::register();
 	}
 
 	/**

@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * REST API endpoint for election results.
  *
@@ -55,8 +56,46 @@ class Rest_API {
 				'methods'             => 'GET',
 				'callback'            => [ $this, 'get_uitslagen' ],
 				'permission_callback' => '__return_true',
+				'schema'              => [ $this, 'get_schema' ],
 			]
 		);
+	}
+
+	/**
+	 * Returns the JSON Schema for the uitslagen endpoint.
+	 *
+	 * @return array Schema definition.
+	 */
+	public function get_schema(): array {
+		$partij_schema = [
+			'type'       => 'object',
+			'properties' => [
+				'naam'        => [ 'type' => 'string' ],
+				'kleur'       => [ 'type' => 'string' ],
+				'zetels_2022' => [ 'type' => [ 'integer', 'null' ] ],
+				'zetels_2026' => [ 'type' => 'integer' ],
+			],
+		];
+
+		return [
+			'$schema'              => 'http://json-schema.org/draft-04/schema#',
+			'title'                => 'uitslagen',
+			'type'                 => 'object',
+			'additionalProperties' => [
+				'type'       => 'object',
+				'properties' => [
+					'naam'          => [ 'type' => 'string' ],
+					'totaal_zetels' => [ 'type' => 'integer' ],
+					'has_2026'      => [ 'type' => 'boolean' ],
+					'opkomst_2022'  => [ 'type' => [ 'number', 'null' ] ],
+					'opkomst_2026'  => [ 'type' => [ 'number', 'null' ] ],
+					'partijen'      => [
+						'type'  => 'array',
+						'items' => $partij_schema,
+					],
+				],
+			],
+		];
 	}
 
 	/**

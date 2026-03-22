@@ -41,6 +41,8 @@
             'svg',
         );
         svg.setAttribute('viewBox', '0 0 100 100');
+        svg.setAttribute('role', 'img');
+        svg.setAttribute('aria-label', 'Zetelverdeling donut');
         svg.classList.add(className);
         return svg;
     }
@@ -501,7 +503,12 @@
                 return false;
             }
 
-            return el.getClientRects().length > 0;
+            if (el.getClientRects().length === 0) return false;
+
+            const style = getComputedStyle(el);
+            return (
+                style.visibility !== 'hidden' && style.visibility !== 'collapse'
+            );
         }
 
         function refresh() {
@@ -806,10 +813,11 @@
                 preloadCovers(covers).then(() => {
                     shuffleCovers();
                     const intervalId = setInterval(() => {
-                        if (!card.isConnected) {
+                        if (!document.body.contains(card)) {
                             clearInterval(intervalId);
                             return;
                         }
+                        if (document.hidden) return;
                         shuffleCovers();
                     }, 3000);
                 });
