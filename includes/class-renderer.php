@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Shared HTML rendering helpers.
  *
@@ -312,7 +313,7 @@ class Renderer {
 	 */
 	public static function donut_chart( string $id_prefix, string $total_content = '', string $extra_class = '' ): string {
 		$class = 'zw-gr26-donut' . ( $extra_class ? ' ' . $extra_class : '' );
-		$html  = '<div class="' . esc_attr( $class ) . '" id="' . esc_attr( $id_prefix . 'Donut' ) . '">';
+		$html  = '<div class="' . esc_attr( $class ) . '" id="' . esc_attr( $id_prefix . 'Donut' ) . '" role="figure" aria-label="Zetelverdeling">';
 		$html .= '<div class="zw-gr26-donut-center">';
 		$html .= '<div class="zw-gr26-donut-total" id="' . esc_attr( $id_prefix . 'DonutTotal' ) . '">' . $total_content . '</div>';
 		$html .= '<div class="zw-gr26-donut-label">zetels</div>';
@@ -331,7 +332,7 @@ class Renderer {
 	 */
 	public static function coalition_builder( string $id_prefix ): string {
 		$html  = '<button class="zw-gr26-coal-toggle" id="' . esc_attr( $id_prefix . 'CoalToggle' ) . '" type="button">Bouw coalitie</button>';
-		$html .= '<div class="zw-gr26-coal-status" id="' . esc_attr( $id_prefix . 'CoalStatus' ) . '">';
+		$html .= '<div class="zw-gr26-coal-status" id="' . esc_attr( $id_prefix . 'CoalStatus' ) . '" aria-live="polite">';
 		$html .= '<span class="zw-gr26-coal-status__text" id="' . esc_attr( $id_prefix . 'CoalStatusText' ) . '">'
 			. 'Klik op partijen om een coalitie te vormen</span>';
 		$html .= '<button class="zw-gr26-coal-status__reset" id="' . esc_attr( $id_prefix . 'CoalReset' ) . '" type="button">Wissen</button>';
@@ -347,7 +348,7 @@ class Renderer {
 	 * @return string Table HTML.
 	 */
 	public static function results_table( string $tbody_id ): string {
-		$html  = '<table class="zw-gr26-tbl">';
+		$html  = '<table class="zw-gr26-tbl" aria-label="Verkiezingsresultaten">';
 		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';
 		$html .= '<tbody id="' . esc_attr( $tbody_id ) . '"></tbody>';
 		$html .= '</table>';

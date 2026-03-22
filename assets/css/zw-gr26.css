@@ -177,7 +177,7 @@
 .zw-gr26-hero__title {
     font-size: clamp(28px, 2vw + 16px, 42px);
     font-weight: 900;
-    color: #fff !important;
+    color: #fff;
     text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
     margin: 0 0 8px;
     line-height: 1.15;
@@ -1719,11 +1719,11 @@ body.zw-gr26-modal-open {
 }
 
 .zw-gr26-podcast__btn--spotify {
-    background: #1db954 !important;
+    background: #1db954;
 }
 
 .zw-gr26-podcast__btn--apple {
-    background: #93c !important;
+    background: #93c;
 }
 
 .zw-gr26-podcast__btn svg {

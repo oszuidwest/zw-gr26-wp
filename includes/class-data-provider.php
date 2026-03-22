@@ -1,4 +1,5 @@
 <?php
+declare( strict_types = 1 );
 /**
  * Data layer for WordPress posts and election results from CPT.
  *
@@ -96,6 +97,11 @@ class Data_Provider {
 
 		$items = [];
 		if ( $query->have_posts() ) {
+			// Pre-cache regio terms for all posts in a single query to avoid N+1.
+			if ( taxonomy_exists( 'regio' ) ) {
+				update_object_term_cache( wp_list_pluck( $query->posts, 'ID' ), 'post' );
+			}
+
 			while ( $query->have_posts() ) {
 				$query->the_post();
 				$post_id = get_the_ID();
