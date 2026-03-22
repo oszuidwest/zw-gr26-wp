@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Custom Post Type for election results per municipality.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

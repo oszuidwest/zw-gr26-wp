@@ -1,5 +1,4 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Plugin Name: ZuidWest GR 2026
  * Description: Gemeenteraadsverkiezingen 2026 — shortcodes voor de verkiezingspagina op ZuidWest Update.
@@ -12,6 +11,8 @@ declare( strict_types = 1 );
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Gemeente page wrapper shortcode.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Asset registration and conditional enqueue.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

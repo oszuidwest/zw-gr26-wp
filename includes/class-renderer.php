@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Shared HTML rendering helpers.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

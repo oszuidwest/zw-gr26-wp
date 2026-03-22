@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Centralized SVG icon registry.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

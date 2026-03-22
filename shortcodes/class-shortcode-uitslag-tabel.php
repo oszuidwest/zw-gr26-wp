@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Standalone uitslag tabel shortcode.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

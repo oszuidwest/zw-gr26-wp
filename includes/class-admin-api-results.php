@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Admin meta box showing election results from the ZuidWest Kiest API.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

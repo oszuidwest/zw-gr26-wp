@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Data layer for WordPress posts and election results from CPT.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

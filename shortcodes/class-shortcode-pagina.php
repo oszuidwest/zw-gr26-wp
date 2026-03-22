@@ -1,10 +1,11 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Wrapper shortcode for the election page.
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

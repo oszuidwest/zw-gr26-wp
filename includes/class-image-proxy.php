@@ -1,5 +1,4 @@
 <?php
-declare( strict_types = 1 );
 /**
  * Image proxy (imgproxy) integration.
  *
@@ -9,6 +8,8 @@ declare( strict_types = 1 );
  *
  * @package ZWGR26
  */
+
+declare( strict_types = 1 );
 
 namespace ZWGR26;
 

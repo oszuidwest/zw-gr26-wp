@@ -55,14 +55,6 @@
         </properties>
     </rule>
 
-    <!-- Allow declare(strict_types=1) before the file docblock -->
-    <rule ref="PSR12.Files.FileHeader.IncorrectOrder">
-        <severity>0</severity>
-    </rule>
-    <rule ref="Squiz.Commenting.FileComment.Missing">
-        <severity>0</severity>
-    </rule>
-
     <!-- WordPress documentation standards -->
     <rule ref="WordPress-Docs">
         <!-- PHPStan type aliases aren't real PHP types -->
