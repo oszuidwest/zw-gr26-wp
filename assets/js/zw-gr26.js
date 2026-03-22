@@ -83,9 +83,6 @@
      * @access private
      */
     function launchConfetti() {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            return;
-        }
         const canvas = document.createElement('canvas');
         canvas.className = 'zw-gr26-confetti-canvas';
         document.body.appendChild(canvas);
