@@ -26,7 +26,6 @@ Full-page wrapper with hero and inner shortcodes.
 | Attribute | Default |
 |-----------|---------|
 | `titel` | `ZuidWest Kiest` |
-| `ondertitel` | `Alles over de gemeente­raads­verkiezingen van 2026 in West-Brabant.` |
 | `achtergrond` | *(default background image URL)* |
 
 ### `[zw_gr26_livestream]`
@@ -38,7 +37,7 @@ Election night livestream player card.
 | `titel` | `De uitslagenavond` |
 | `badge` | `Live op 18 maart` |
 | `naam` | `ZuidWest Kiest: De Uitslag` |
-| `datum_tekst` | `Woensdag 18 maart · Vanaf 21:00 · Live` |
+| `datum_tekst` | `Woensdag 18 maart • Vanaf 21:00 • Live` |
 | `url` | — |
 | `thumbnail` | — |
 | `tijd` | — |
@@ -124,7 +123,7 @@ Election results with interactive modal, donut chart, and coalition builder.
 
 | Attribute | Default |
 |-----------|---------|
-| `titel` | `Uitslagen per gemeente` |
+| `titel` | `Uitslagen` |
 
 ### `[zw_gr26_stemlocaties]`
 
@@ -142,6 +141,14 @@ Free-form text/HTML block with optional title.
 |-----------|---------|
 | `titel` | — |
 
+### `[zw_gr26_uitslag_tabel]`
+
+Standalone election results table. Does not require a page wrapper shortcode.
+
+| Attribute | Default |
+|-----------|---------|
+| `gemeente` | — (required, municipality slug) |
+
 ## Gemeente subpage shortcodes
 
 These shortcodes are used to build per-municipality subpages. They are nested inside `[zw_gr26_gemeente_pagina]` and share the same child shortcodes as the main page (debatten, nieuws, podcast, livestream, tekst, stemlocaties).
@@ -154,7 +161,6 @@ Municipality subpage wrapper with hero and gemeente context. Validates the munic
 |-----------|---------|
 | `gemeente` | — (required, municipality slug) |
 | `titel` | *(auto-detected from municipality name)* |
-| `ondertitel` | `Alles over de gemeente­raads­verkiezingen in {gemeente}.` |
 | `achtergrond` | *(default background image URL)* |
 
 When active, existing shortcodes adapt automatically:
@@ -185,11 +191,19 @@ Simple party program list without dropdown (single municipality).
 
 ### `[zw_gr26_gemeente_resultaten]`
 
-Inline election results with donut chart, results table, and coalition builder.
+Inline election results with donut chart, results table, and coalition builder. Title is generated dynamically as "Uitslag {gemeente naam}". No configurable attributes.
 
-| Attribute | Default |
-|-----------|---------|
-| `titel` | `Uitslag` |
+## REST API
+
+### `GET /wp-json/zwgr26/v1/uitslagen`
+
+Public endpoint (no authentication required) that returns election results for all municipalities as JSON. Used for external integrations.
+
+## Admin
+
+### Election results meta box
+
+The `gemeente_uitslag` edit screens include a read-only meta box that fetches live election results from `platform.zuidwestkiest.nl`. This allows editors to compare the external data source with the locally stored results.
 
 ## Installation
 
