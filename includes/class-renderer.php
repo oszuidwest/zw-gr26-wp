@@ -303,6 +303,139 @@ class Renderer {
 	}
 
 	/**
+	 * Renders the donut chart center with total and coalition labels.
+	 *
+	 * @param string $id_prefix    Element ID prefix (e.g. 'zwgr26' or 'zwgr26Gem').
+	 * @param string $total_content Optional. Initial content for the total display. Default empty.
+	 * @param string $extra_class   Optional. Extra CSS class for the donut wrapper. Default empty.
+	 * @return string Donut chart HTML.
+	 */
+	public static function donut_chart( string $id_prefix, string $total_content = '', string $extra_class = '' ): string {
+		$class = 'zw-gr26-donut' . ( $extra_class ? ' ' . $extra_class : '' );
+		$html  = '<div class="' . esc_attr( $class ) . '" id="' . esc_attr( $id_prefix . 'Donut' ) . '">';
+		$html .= '<div class="zw-gr26-donut-center">';
+		$html .= '<div class="zw-gr26-donut-total" id="' . esc_attr( $id_prefix . 'DonutTotal' ) . '">' . $total_content . '</div>';
+		$html .= '<div class="zw-gr26-donut-label">zetels</div>';
+		$html .= '<div class="zw-gr26-donut-coal-label" id="' . esc_attr( $id_prefix . 'DonutCoalLabel' ) . '"></div>';
+		$html .= '<div class="zw-gr26-donut-majority-label">Meerderheid!</div>';
+		$html .= '</div></div>';
+
+		return $html;
+	}
+
+	/**
+	 * Renders the coalition builder toggle button and status bar.
+	 *
+	 * @param string $id_prefix Element ID prefix (e.g. 'zwgr26' or 'zwgr26Gem').
+	 * @return string Coalition builder HTML.
+	 */
+	public static function coalition_builder( string $id_prefix ): string {
+		$html  = '<button class="zw-gr26-coal-toggle" id="' . esc_attr( $id_prefix . 'CoalToggle' ) . '" type="button">Bouw coalitie</button>';
+		$html .= '<div class="zw-gr26-coal-status" id="' . esc_attr( $id_prefix . 'CoalStatus' ) . '">';
+		$html .= '<span class="zw-gr26-coal-status__text" id="' . esc_attr( $id_prefix . 'CoalStatusText' ) . '">'
+			. 'Klik op partijen om een coalitie te vormen</span>';
+		$html .= '<button class="zw-gr26-coal-status__reset" id="' . esc_attr( $id_prefix . 'CoalReset' ) . '" type="button">Wissen</button>';
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	/**
+	 * Renders the results table with standard header row.
+	 *
+	 * @param string $tbody_id ID for the tbody element.
+	 * @return string Table HTML.
+	 */
+	public static function results_table( string $tbody_id ): string {
+		$html  = '<table class="zw-gr26-tbl">';
+		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';
+		$html .= '<tbody id="' . esc_attr( $tbody_id ) . '"></tbody>';
+		$html .= '</table>';
+
+		return $html;
+	}
+
+	/**
+	 * Renders a municipality dropdown select element.
+	 *
+	 * @param array<string, string> $items Map of element-id => display name.
+	 * @return string Select HTML with wrapping div.
+	 */
+	public static function municipality_dropdown( array $items ): string {
+		$html  = '<div class="zw-gr26-programma__select-wrap">';
+		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select aria-label="Kies je gemeente">';
+		$html .= '<option value="">Kies je gemeente...</option>';
+
+		foreach ( $items as $id => $naam ) {
+			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $naam ) . '</option>';
+		}
+
+		$html .= '</select></div>';
+
+		return $html;
+	}
+
+	/**
+	 * Cleans shortcode content by removing stray `<br>` and empty `<p>` tags injected by wpautop.
+	 *
+	 * @param string $html Raw shortcode output.
+	 * @return string Cleaned HTML.
+	 */
+	public static function clean_shortcode_html( string $html ): string {
+		$html = preg_replace( '/<br\s*\/?>\s*/', '', $html );
+		$html = preg_replace( '#<p>\s*</p>#', '', $html );
+		return $html;
+	}
+
+	/**
+	 * Registers the shared video modal in wp_footer (once).
+	 *
+	 * @return void
+	 */
+	public static function video_modal(): void {
+		if ( Shortcode_Pagina::$video_modal_added ) {
+			return;
+		}
+		Shortcode_Pagina::$video_modal_added = true;
+		add_action(
+			'wp_footer',
+			static function () {
+				echo '<div class="zw-gr26-modal-backdrop" id="zwgr26VideoModal">';
+				echo '<div class="zw-gr26-video-modal" role="dialog" aria-modal="true" aria-label="Video" tabindex="-1">';
+				echo '<button class="zw-gr26-modal__close" type="button" aria-label="Sluiten">&times;</button>';
+				echo '<video class="video-js vjs-fill vjs-big-play-centered" id="zwgr26VideoPlayer" playsinline controls></video>';
+				echo '</div></div>';
+			}
+		);
+	}
+
+	/**
+	 * Renders a single program row (link or disabled placeholder).
+	 *
+	 * @param array $partij {
+	 *     Party data.
+	 *
+	 *     @type string $naam Party name.
+	 *     @type string $url  Program URL (empty string if unavailable).
+	 * }
+	 * @return string Program row HTML.
+	 */
+	public static function programma_row( array $partij ): string {
+		if ( $partij['url'] ) {
+			$html  = '<a href="' . esc_url( $partij['url'] ) . '" class="zw-gr26-prow" target="_blank" rel="noopener noreferrer">';
+			$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+			$html .= '<span class="zw-gr26-prow__link-text">Lees programma</span>';
+			$html .= '</a>';
+			return $html;
+		}
+		$html  = '<div class="zw-gr26-prow zw-gr26-prow--disabled">';
+		$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
+		$html .= '<span class="zw-gr26-prow__link-text">Geen programma</span>';
+		$html .= '</div>';
+		return $html;
+	}
+
+	/**
 	 * Renders a news article card.
 	 *
 	 * @param array $item {

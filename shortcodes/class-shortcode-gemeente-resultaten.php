@@ -74,7 +74,7 @@ class Shortcode_Gemeente_Resultaten {
 		}
 
 		// Pass single-gemeente data to JS.
-		$json = wp_json_encode( $entry, JSON_UNESCAPED_UNICODE );
+		$json = wp_json_encode( $entry, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG );
 		wp_add_inline_script( 'zw-gr26', 'var zwGr26GemeenteResultaten=' . $json . ';', 'before' );
 
 		$is_2026       = ! empty( $entry['has_2026'] );
@@ -98,14 +98,7 @@ class Shortcode_Gemeente_Resultaten {
 		$html .= 'Zetelverdeling';
 		$html .= '</div>';
 		$html .= '<div class="zw-gr26-donut-area">';
-		$html .= '<div class="zw-gr26-donut" id="zwgr26GemDonut">';
-		$html .= '<div class="zw-gr26-donut-center">';
-		$html .= '<div class="zw-gr26-donut-total" id="zwgr26GemDonutTotal">'
-			. esc_html( (string) $totaal_zetels ) . '</div>';
-		$html .= '<div class="zw-gr26-donut-label">zetels</div>';
-		$html .= '<div class="zw-gr26-donut-coal-label" id="zwgr26GemDonutCoalLabel"></div>';
-		$html .= '<div class="zw-gr26-donut-majority-label">Meerderheid!</div>';
-		$html .= '</div></div>';
+		$html .= Renderer::donut_chart( 'zwgr26Gem', esc_html( (string) $totaal_zetels ) );
 
 		// Opkomst.
 		$html .= '<div class="zw-gr26-opkomst" id="zwgr26GemOpkomst">';
@@ -129,22 +122,14 @@ class Shortcode_Gemeente_Resultaten {
 		$html .= '<div class="zw-gr26-gem-resultaten__section-label" id="zwgr26GemTableLabel">';
 		$html .= $is_2026 ? 'Resultaten' : 'Huidig college';
 		$html .= '</div>';
-		$html .= '<table class="zw-gr26-tbl">';
-		$html .= '<thead><tr><th colspan="2">Partij</th><th>Zetels</th><th>+/&minus;</th></tr></thead>';
-		$html .= '<tbody id="zwgr26GemTbody"></tbody>';
-		$html .= '</table>';
+		$html .= Renderer::results_table( 'zwgr26GemTbody' );
 		$html .= '</div>'; // End table-col.
 
 		$html .= '</div>'; // End grid.
 
 		// Coalition toggle.
 		if ( $is_2026 ) {
-			$html .= '<button class="zw-gr26-coal-toggle" id="zwgr26GemCoalToggle" type="button">Bouw coalitie</button>';
-			$html .= '<div class="zw-gr26-coal-status" id="zwgr26GemCoalStatus">';
-			$html .= '<span class="zw-gr26-coal-status__text" id="zwgr26GemCoalStatusText">'
-				. 'Klik op partijen om een coalitie te vormen</span>';
-			$html .= '<button class="zw-gr26-coal-status__reset" id="zwgr26GemCoalReset" type="button">Wissen</button>';
-			$html .= '</div>';
+			$html .= Renderer::coalition_builder( 'zwgr26Gem' );
 		}
 
 		$html .= '</div>'; // End gem-resultaten.

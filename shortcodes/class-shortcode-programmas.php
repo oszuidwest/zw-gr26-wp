@@ -77,16 +77,11 @@ class Shortcode_Programmas {
 		$html .= '<nav class="zw-gr26-programma" aria-label="' . esc_attr( $atts['titel'] ) . '">';
 
 		// Municipality dropdown.
-		$html .= '<div class="zw-gr26-programma__select-wrap">';
-		$html .= '<select class="zw-gr26-programma__select" data-zw-gr26-programma-select>';
-		$html .= '<option value="">Kies je gemeente...</option>';
-
+		$dropdown_items = [];
 		foreach ( $gemeenten as $gemeente ) {
-			$id    = 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] );
-			$html .= '<option value="' . esc_attr( $id ) . '">' . esc_html( $gemeente['naam'] ) . '</option>';
+			$dropdown_items[ 'zw-gr26-prog-' . sanitize_title( $gemeente['naam'] ) ] = $gemeente['naam'];
 		}
-
-		$html .= '</select></div>';
+		$html .= Renderer::municipality_dropdown( $dropdown_items );
 
 		// Party lists per municipality.
 		foreach ( $gemeenten as $gemeente ) {
@@ -94,17 +89,7 @@ class Shortcode_Programmas {
 			$html .= '<div class="zw-gr26-programma__list" id="' . esc_attr( $id ) . '">';
 
 			foreach ( $gemeente['partijen'] as $partij ) {
-				if ( $partij['url'] ) {
-					$html .= '<a href="' . esc_url( $partij['url'] ) . '" class="zw-gr26-prow" target="_blank" rel="noopener noreferrer">';
-					$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-					$html .= '<span class="zw-gr26-prow__link-text">Lees programma</span>';
-					$html .= '</a>';
-				} else {
-					$html .= '<div class="zw-gr26-prow zw-gr26-prow--disabled">';
-					$html .= '<span class="zw-gr26-prow__partij">' . esc_html( $partij['naam'] ) . '</span>';
-					$html .= '<span class="zw-gr26-prow__link-text">Geen programma</span>';
-					$html .= '</div>';
-				}
+				$html .= Renderer::programma_row( $partij );
 			}
 
 			$html .= '</div>';

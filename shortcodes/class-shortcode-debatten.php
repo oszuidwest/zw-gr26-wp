@@ -132,28 +132,20 @@ class Shortcode_Debatten {
 		$videos = [];
 
 		foreach ( $this->debatten as $debat ) {
-			$coming_soon = empty( $debat['videoid'] );
-
-			$video = [
-				'titel'     => $debat['naam'],
-				'thumbnail' => $debat['thumbnail'],
-				'url'       => '',
-				'meta'      => $debat['datum'] . ' &bull; ' . $debat['kanaal'],
-			];
-
-			if ( ! $coming_soon && $library_id ) {
-				$resolved = $this->bunny->resolve_video_card( $library_id, $debat['videoid'], $video['thumbnail'] );
-
-				$video['thumbnail']  = $resolved['thumbnail'];
-				$video['poster']     = $resolved['poster'];
-				$video['url']        = $resolved['url'];
-				$video['stream_url'] = $resolved['stream_url'];
-				$coming_soon         = $resolved['binnenkort'];
-			}
+			$video = $this->bunny->resolve_video(
+				$library_id,
+				$debat['videoid'],
+				[
+					'titel'     => $debat['naam'],
+					'thumbnail' => $debat['thumbnail'],
+					'url'       => '',
+					'meta'      => $debat['datum'] . ' • ' . $debat['kanaal'],
+				]
+			);
 
 			$videos[] = [
 				'video'       => $video,
-				'coming_soon' => $coming_soon,
+				'coming_soon' => $video['binnenkort'],
 			];
 		}
 

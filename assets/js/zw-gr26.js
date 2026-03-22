@@ -256,6 +256,12 @@
 
             if (!isGhost) {
                 tr.addEventListener('click', () => onClick(tr));
+                tr.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onClick(tr);
+                    }
+                });
             }
 
             tr.appendChild(tdParty);
@@ -387,6 +393,8 @@
                 if (coalMode) {
                     drawCoalDonut(getSelectedRows());
                     rows.forEach((row, i) => {
+                        row.setAttribute('tabindex', '0');
+                        row.setAttribute('role', 'button');
                         row.classList.remove('coal-hint');
                         void row.offsetWidth;
                         setTimeout(
@@ -396,8 +404,11 @@
                     });
                 } else {
                     donutTotal.textContent = getTotalZetels();
-                    for (const row of rows)
+                    for (const row of rows) {
                         row.classList.remove('is-selected', 'coal-hint');
+                        row.removeAttribute('tabindex');
+                        row.removeAttribute('role');
+                    }
                     donutEl.classList.remove('has-majority');
                     container.classList.remove('has-majority');
                     hadMajority = false;
@@ -682,17 +693,38 @@
     });
 
     /* === STEMLOCATIES ACCORDION === */
+    function toggleStemRow(row) {
+        const parent = row.closest('.zw-gr26-stem__list');
+        const header = row.querySelector('.zw-gr26-stem__header');
+        parent.querySelectorAll('.zw-gr26-stem__row.open').forEach((other) => {
+            if (other !== row) {
+                other.classList.remove('open');
+                const otherHeader = other.querySelector(
+                    '.zw-gr26-stem__header',
+                );
+                if (otherHeader) {
+                    otherHeader.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+        row.classList.toggle('open');
+        if (header) {
+            header.setAttribute(
+                'aria-expanded',
+                row.classList.contains('open') ? 'true' : 'false',
+            );
+        }
+    }
+
     document.querySelectorAll('.zw-gr26-stem__row').forEach((row) => {
-        row.addEventListener('click', () => {
-            const parent = row.closest('.zw-gr26-stem__list');
-            parent
-                .querySelectorAll('.zw-gr26-stem__row.open')
-                .forEach((other) => {
-                    if (other !== row) {
-                        other.classList.remove('open');
-                    }
-                });
-            row.classList.toggle('open');
+        const header = row.querySelector('.zw-gr26-stem__header');
+        if (!header) return;
+        header.addEventListener('click', () => toggleStemRow(row));
+        header.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleStemRow(row);
+            }
         });
     });
 

@@ -52,6 +52,13 @@ class Bunny_API {
 	private const API_TIMEOUT = 30;
 
 	/**
+	 * Maximum number of pages to fetch from the Bunny API.
+	 *
+	 * @var int
+	 */
+	private const MAX_PAGES = 50;
+
+	/**
 	 * Prefix for WordPress transient keys.
 	 *
 	 * @var string
@@ -235,7 +242,7 @@ class Bunny_API {
 		$page    = 1;
 		$all     = [];
 
-		while ( true ) {
+		while ( $page <= self::MAX_PAGES ) {
 			$response = wp_remote_get(
 				add_query_arg(
 					[
@@ -417,6 +424,38 @@ class Bunny_API {
 			return '';
 		}
 		return $credentials['hostname'] . '/' . $video_id . '/playlist.m3u8';
+	}
+
+	/**
+	 * Resolves a video array in-place: adds poster, stream_url, and binnenkort from the API.
+	 *
+	 * The base $video array must contain at least 'titel', 'thumbnail', and 'url' keys.
+	 * Guards against empty video ID or missing library ID by returning the array unchanged
+	 * with binnenkort defaulting to true (coming soon).
+	 *
+	 * @param int    $library_id Bunny library ID (0 = skip resolution).
+	 * @param string $video_id   Video GUID (empty = skip resolution).
+	 * @param array  $video      Base video array to augment.
+	 * @return array Augmented video array with 'poster', 'stream_url', and 'binnenkort' added.
+	 */
+	public function resolve_video( int $library_id, string $video_id, array $video ): array {
+		$video['poster']     = '';
+		$video['stream_url'] = '';
+		$video['binnenkort'] = true;
+
+		if ( ! $video_id || ! $library_id ) {
+			return $video;
+		}
+
+		$resolved = $this->resolve_video_card( $library_id, $video_id, $video['thumbnail'] ?? '' );
+
+		$video['thumbnail']  = $resolved['thumbnail'];
+		$video['poster']     = $resolved['poster'];
+		$video['url']        = $resolved['url'];
+		$video['stream_url'] = $resolved['stream_url'];
+		$video['binnenkort'] = $resolved['binnenkort'];
+
+		return $video;
 	}
 
 	/**

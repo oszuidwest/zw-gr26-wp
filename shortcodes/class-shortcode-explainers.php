@@ -92,25 +92,15 @@ class Shortcode_Explainers {
 		$html .= '<div class="zw-gr26-explainer-carousel">';
 
 		foreach ( $this->explainers as $explainer ) {
-			$coming_soon = empty( $explainer['videoid'] );
-
-			$video = [
-				'titel'     => $explainer['naam'],
-				'thumbnail' => $explainer['thumbnail'],
-				'url'       => '',
-			];
-
-			if ( ! $coming_soon && $library_id ) {
-				$resolved = $this->bunny->resolve_video_card( $library_id, $explainer['videoid'], $video['thumbnail'] );
-
-				$video['thumbnail']  = $resolved['thumbnail'];
-				$video['poster']     = $resolved['poster'];
-				$video['url']        = $resolved['url'];
-				$video['stream_url'] = $resolved['stream_url'];
-				$coming_soon         = $resolved['binnenkort'];
-			}
-
-			$video['binnenkort'] = $coming_soon;
+			$video = $this->bunny->resolve_video(
+				$library_id,
+				$explainer['videoid'],
+				[
+					'titel'     => $explainer['naam'],
+					'thumbnail' => $explainer['thumbnail'],
+					'url'       => '',
+				]
+			);
 
 			$html .= $this->renderer->explainer_card( $video );
 		}
