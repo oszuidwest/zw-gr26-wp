@@ -17,7 +17,7 @@ Optional:
 
 ## Shortcodes
 
-All shortcodes are nested inside `[zw_gr26_pagina]` or `[zw_gr26_gemeente_pagina]` and only render within one of these wrappers.
+Most shortcodes are nested inside `[zw_gr26_pagina]` or `[zw_gr26_gemeente_pagina]`. The exception is `[zw_gr26_uitslag_tabel]`, which is standalone.
 
 ### `[zw_gr26_pagina]`
 
