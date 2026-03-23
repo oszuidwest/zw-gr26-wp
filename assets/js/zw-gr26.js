@@ -318,10 +318,17 @@
         let coalMode = false;
         let hadMajority = false;
 
+        /** @return {HTMLTableRowElement[]} Rows with the 'is-selected' class. */
         function getSelectedRows() {
             return rows.filter((row) => row.classList.contains('is-selected'));
         }
 
+        /**
+         * Sums the seat count of the given rows.
+         *
+         * @param {HTMLTableRowElement[]} selected Selected rows.
+         * @return {number} Total seats.
+         */
         function getSelectedSeats(selected) {
             return selected.reduce(
                 (sum, row) => sum + Number(row.dataset.zetels),
@@ -329,6 +336,11 @@
             );
         }
 
+        /**
+         * Redraws the coalition donut SVG from the selected rows.
+         *
+         * @param {HTMLTableRowElement[]} selected Selected rows.
+         */
         function drawCoalDonut(selected) {
             svgCoal.replaceChildren();
             const total = getTotalZetels();
@@ -351,6 +363,7 @@
             donutCoalLabel.textContent = `van ${total}`;
         }
 
+        /** Recalculates coalition totals, majority state, and confetti trigger. */
         function updateCoalition() {
             const total = getTotalZetels();
             const majorityThreshold = Math.floor(total / 2) + 1;
@@ -494,6 +507,12 @@
         let cache = [];
         let focusinHandler = null;
 
+        /**
+         * Checks whether an element is keyboard-tabbable.
+         *
+         * @param {HTMLElement} el Element to test.
+         * @return {boolean} True if the element can receive Tab focus.
+         */
         function isTabbable(el) {
             if (el.tabIndex < 0 || el.matches(':disabled')) {
                 return false;
@@ -511,12 +530,14 @@
             );
         }
 
+        /** Rebuilds the cache of tabbable elements inside the panel. */
         function refresh() {
             cache = [...panel.querySelectorAll(focusableSelector)].filter(
                 isTabbable,
             );
         }
 
+        // Wraps Tab/Shift+Tab to cycle within the cached elements.
         panel.addEventListener('keydown', (e) => {
             if (e.key !== 'Tab') return;
 
@@ -543,6 +564,7 @@
             cache[nextIndex].focus();
         });
 
+        /** Activates the focus trap by listening for focusin events outside the panel. */
         function activate() {
             refresh();
             if (focusinHandler) return;
@@ -557,6 +579,7 @@
             document.addEventListener('focusin', focusinHandler);
         }
 
+        /** Deactivates the focus trap by removing the focusin listener. */
         function deactivate() {
             if (focusinHandler) {
                 document.removeEventListener('focusin', focusinHandler);
@@ -700,6 +723,13 @@
     });
 
     /* === STEMLOCATIES ACCORDION === */
+    /**
+     * Toggles an accordion row open/closed, closing any sibling row first.
+     *
+     * @access private
+     *
+     * @param {HTMLElement} row The .zw-gr26-stem__row element to toggle.
+     */
     function toggleStemRow(row) {
         const parent = row.closest('.zw-gr26-stem__list');
         const header = row.querySelector('.zw-gr26-stem__header');
@@ -758,6 +788,12 @@
 
     /* === PODCAST COVER SHUFFLE === */
     if (typeof zwGr26PodcastInstances !== 'undefined') {
+        /**
+         * Preloads cover images so swaps are instant.
+         *
+         * @param {Object[]} covers Cover objects with src and src2x URLs.
+         * @return {Promise} Resolves when all images are loaded or errored.
+         */
         function preloadCovers(covers) {
             const loads = [];
             for (const c of covers) {
@@ -790,6 +826,12 @@
                     return;
                 }
 
+                /**
+                 * Picks n random unique covers from the pool.
+                 *
+                 * @param {number} n Number of covers to pick.
+                 * @return {Object[]} Selected cover objects.
+                 */
                 function pickCovers(n) {
                     const pool = [...covers];
                     const picked = [];
@@ -800,6 +842,7 @@
                     return picked;
                 }
 
+                /** Replaces the visible polaroid images with a random selection. */
                 function shuffleCovers() {
                     const chosen = pickCovers(imgs.length);
                     preloadCovers(chosen).then(() => {
@@ -943,6 +986,11 @@
 
             /* --- Modal content builders --- */
 
+            /**
+             * Resets the modal to its initial state for a municipality.
+             *
+             * @param {boolean} is2026 Whether 2026 results are available.
+             */
             function resetState(is2026) {
                 coal.reset(is2026);
                 modal.classList.toggle('is-wacht', !is2026);
@@ -951,6 +999,13 @@
                     : 'Huidig college';
             }
 
+            /**
+             * Populates the modal title and subtitle.
+             *
+             * @param {?Object}      data     Municipality result data.
+             * @param {string}       key      Municipality slug.
+             * @param {?HTMLElement}  tileName Tile name element for fallback.
+             */
             function renderHeader(data, key, tileName) {
                 modalTitle.textContent = data
                     ? data.naam
@@ -962,6 +1017,12 @@
                     : 'Huidige samenstelling gemeenteraad';
             }
 
+            /**
+             * Renders the turnout display inside the modal.
+             *
+             * @param {?Object} data   Municipality result data.
+             * @param {boolean} is2026 Whether 2026 results are available.
+             */
             function renderOpkomst(data, is2026) {
                 opkomstEl.textContent = '';
 
@@ -981,6 +1042,13 @@
                 }
             }
 
+            /**
+             * Renders the results and coalition donut SVGs.
+             *
+             * @param {Object[]} partijen Party data array.
+             * @param {boolean}  is2026   Whether 2026 results are available.
+             * @return {SVGSVGElement} The coalition SVG element.
+             */
             function renderDonut(partijen, is2026) {
                 donutEl.classList.remove('has-majority');
                 for (const svg of donutEl.querySelectorAll('svg')) {
@@ -1012,6 +1080,13 @@
                 return svgCoal;
             }
 
+            /**
+             * Renders the results table rows.
+             *
+             * @param {Object[]} partijen Party data array.
+             * @param {boolean}  is2026   Whether 2026 results are available.
+             * @return {HTMLTableRowElement[]} Created rows for coalition mode.
+             */
             function renderTable(partijen, is2026) {
                 return buildTableRows(tbody, partijen, is2026, (tr) => {
                     if (!coal.isCoalMode) return;
@@ -1034,6 +1109,11 @@
                 },
             };
 
+            /**
+             * Renders all modal content for a given municipality tile.
+             *
+             * @param {HTMLElement} tile The clicked .zw-gr26-tile element.
+             */
             function renderTile(tile) {
                 const key = tile.dataset.gemeente;
                 const data = zwGr26Resultaten[key] || null;
@@ -1051,6 +1131,11 @@
                 coal.setRows(rows, svgCoal);
             }
 
+            /**
+             * Renders a tile and opens the results modal.
+             *
+             * @param {HTMLElement} tile The clicked .zw-gr26-tile element.
+             */
             function openTile(tile) {
                 renderTile(tile);
                 openModal(
@@ -1060,6 +1145,12 @@
                 );
             }
 
+            /**
+             * Finds a municipality tile element by its data-gemeente slug.
+             *
+             * @param {string} gemeente Municipality slug.
+             * @return {?HTMLElement} The tile element, or null if not found.
+             */
             function findTileByGemeente(gemeente) {
                 const tiles = document.querySelectorAll(
                     '.zw-gr26-tile[data-gemeente]',

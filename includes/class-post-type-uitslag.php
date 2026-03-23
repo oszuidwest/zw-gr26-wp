@@ -437,7 +437,7 @@ class Post_Type_Uitslag {
 	/**
 	 * Gets all municipality post IDs keyed by slug.
 	 *
-	 * @return array<string, int>
+	 * @return array<string, int> Slug-to-post-ID map.
 	 */
 	private function get_municipality_posts(): array {
 		$posts = get_posts(

@@ -77,7 +77,7 @@ class Plugin {
 	/**
 	 * Returns the singleton instance, creating it on first call.
 	 *
-	 * @return self
+	 * @return self Singleton instance.
 	 */
 	public static function instance(): self {
 		if ( null === self::$instance ) {

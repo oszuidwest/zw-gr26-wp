@@ -36,7 +36,7 @@ class Rest_API {
 	}
 
 	/**
-	 * Register the REST route.
+	 * Registers the REST route.
 	 *
 	 * @return void
 	 */
@@ -45,7 +45,7 @@ class Rest_API {
 	}
 
 	/**
-	 * Register the uitslagen route.
+	 * Registers the uitslagen route.
 	 *
 	 * @return void
 	 */
@@ -100,9 +100,9 @@ class Rest_API {
 	}
 
 	/**
-	 * Handle the uitslagen request.
+	 * Handles the uitslagen request.
 	 *
-	 * @return \WP_REST_Response
+	 * @return \WP_REST_Response JSON response with election results keyed by slug.
 	 */
 	public function get_uitslagen(): \WP_REST_Response {
 		$results = $this->data->get_election_results();

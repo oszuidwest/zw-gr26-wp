@@ -21,11 +21,15 @@ class Admin_API_Results {
 
 	/**
 	 * API base URL.
+	 *
+	 * @var string
 	 */
 	private const API_BASE = 'https://platform.zuidwestkiest.nl/api/data/';
 
 	/**
 	 * Mapping of municipality slugs to API IDs.
+	 *
+	 * @var array<string, int>
 	 */
 	private const API_MAP = [
 		'woensdrecht'    => 21,
@@ -38,7 +42,7 @@ class Admin_API_Results {
 	];
 
 	/**
-	 * Register hooks.
+	 * Registers hooks.
 	 *
 	 * @return void
 	 */
@@ -47,7 +51,7 @@ class Admin_API_Results {
 	}
 
 	/**
-	 * Add the meta box to the gemeente_uitslag edit screen.
+	 * Adds the meta box to the gemeente_uitslag edit screen.
 	 *
 	 * @param \WP_Post $post Current post object.
 	 * @return void
@@ -69,7 +73,7 @@ class Admin_API_Results {
 	}
 
 	/**
-	 * Render the meta box content.
+	 * Renders the meta box content.
 	 *
 	 * @param \WP_Post $post Current post object.
 	 * @return void
@@ -152,7 +156,7 @@ class Admin_API_Results {
 	}
 
 	/**
-	 * Fetch municipality data from the API.
+	 * Fetches municipality data from the API.
 	 *
 	 * @param int $api_id API municipality ID.
 	 * @return array<string, mixed>|null Decoded JSON or null on failure.
@@ -179,10 +183,10 @@ class Admin_API_Results {
 	}
 
 	/**
-	 * Check if the API data contains 2026 results.
+	 * Checks if the API data contains 2026 results.
 	 *
 	 * @param array<string, mixed> $data API response data.
-	 * @return bool
+	 * @return bool True if any party has current-year seats.
 	 */
 	private function has_current_results( array $data ): bool {
 		foreach ( $data['parties'] ?? [] as $party ) {

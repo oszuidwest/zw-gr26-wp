@@ -248,7 +248,7 @@ class Shortcode_Stemlocaties {
 	 * Collects non-empty accessibility features into a label list.
 	 *
 	 * @param array $loc Single location data.
-	 * @return string[]
+	 * @return string[] Feature labels.
 	 */
 	private function collect_features( array $loc ): array {
 		$map = [

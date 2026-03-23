@@ -288,7 +288,7 @@ class Data_Provider {
 	 * Fetches and transforms polling stations for a single municipality.
 	 *
 	 * @param string $gemeente Municipality name.
-	 * @return array{contact: string, website: string, locaties: array}
+	 * @return array{contact: string, website: string, locaties: array} Municipality polling data.
 	 */
 	private function fetch_stemlocaties_for( string $gemeente ): array {
 		$empty = [
@@ -415,7 +415,7 @@ class Data_Provider {
 	 * Returns all municipalities (publish + draft) that have at least one
 	 * party with a programma_url, sorted alphabetically by municipality name.
 	 *
-	 * @return array<int, array{naam: string, partijen: array<int, array{naam: string, url: string}>}>
+	 * @return array<int, array{naam: string, partijen: array<int, array{naam: string, url: string}>}> Municipalities with program links.
 	 */
 	public function get_programmas(): array {
 		if ( ! post_type_exists( 'gemeente_uitslag' ) ) {
@@ -588,7 +588,7 @@ class Data_Provider {
 	 *
 	 * Results are cached for the duration of the request.
 	 *
-	 * @return array<int, array{slug: string, naam: string, url: string}>
+	 * @return array<int, array{slug: string, naam: string, url: string}> Gemeente page entries.
 	 */
 	public function get_gemeente_pages(): array {
 		if ( null !== self::$gemeente_pages ) {

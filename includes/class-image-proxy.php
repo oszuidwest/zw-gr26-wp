@@ -69,7 +69,7 @@ class Image_Proxy {
 	/**
 	 * Determines whether imgproxy is configured.
 	 *
-	 * @return bool
+	 * @return bool Whether imgproxy is configured.
 	 */
 	public function is_enabled(): bool {
 		return $this->enabled;

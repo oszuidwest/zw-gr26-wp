@@ -19,8 +19,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $zwgr26_plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
+
+/**
+ * Plugin version string, read from the plugin header.
+ */
 define( 'ZWGR26_VERSION', $zwgr26_plugin_data['Version'] );
+
+/**
+ * Absolute filesystem path to the plugin directory (with trailing slash).
+ */
 define( 'ZWGR26_PATH', plugin_dir_path( __FILE__ ) );
+
+/**
+ * URL to the plugin directory (with trailing slash).
+ */
 define( 'ZWGR26_URL', plugin_dir_url( __FILE__ ) );
 
 require_once ZWGR26_PATH . 'includes/class-assets.php';
