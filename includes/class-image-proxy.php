@@ -3,8 +3,8 @@
  * Image proxy (imgproxy) integration.
  *
  * Rewrites image URLs through an imgproxy service for on-the-fly resizing.
- * Uses the same WordPress options as the streekomroep-wp theme:
- * imgproxy_url, imgproxy_key, imgproxy_salt.
+ * Uses the same wp-config.php constants as the streekomroep-wp theme:
+ * IMGPROXY_URL, IMGPROXY_KEY, IMGPROXY_SALT.
  *
  * @package ZWGR26
  */
@@ -51,12 +51,12 @@ class Image_Proxy {
 	private string $salt_bin;
 
 	/**
-	 * Constructor — reads imgproxy credentials from WordPress options.
+	 * Constructor — reads imgproxy credentials from wp-config.php constants.
 	 */
 	public function __construct() {
-		$this->host = get_option( 'imgproxy_url', '' );
-		$key        = get_option( 'imgproxy_key', '' );
-		$salt       = get_option( 'imgproxy_salt', '' );
+		$this->host = defined( 'IMGPROXY_URL' ) ? IMGPROXY_URL : '';
+		$key        = defined( 'IMGPROXY_KEY' ) ? IMGPROXY_KEY : '';
+		$salt       = defined( 'IMGPROXY_SALT' ) ? IMGPROXY_SALT : '';
 
 		$this->enabled = ! empty( $this->host ) && ! empty( $key ) && ! empty( $salt );
 
