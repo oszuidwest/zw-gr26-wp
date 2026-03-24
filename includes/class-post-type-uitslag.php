@@ -333,13 +333,18 @@ class Post_Type_Uitslag {
 	/**
 	 * Sorts the partijen repeater rows alphabetically by party name.
 	 *
-	 * @param int $post_id Post ID.
+	 * ACF's acf/save_post hook passes string identifiers for non-post contexts
+	 * (e.g. "user_123", "term_45", "options"). We bail early for those.
+	 *
+	 * @param mixed $post_id Post ID or ACF pseudo-ID string.
 	 * @return void
 	 */
-	public function sort_partijen( int $post_id ): void {
-		if ( self::POST_TYPE !== get_post_type( $post_id ) ) {
+	public function sort_partijen( mixed $post_id ): void {
+		if ( ! is_numeric( $post_id ) || self::POST_TYPE !== get_post_type( (int) $post_id ) ) {
 			return;
 		}
+
+		$post_id = (int) $post_id;
 
 		$partijen = get_field( 'partijen', $post_id );
 		if ( ! is_array( $partijen ) || empty( $partijen ) ) {
