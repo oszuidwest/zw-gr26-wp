@@ -2,7 +2,7 @@ parameters:
   level: 6
   phpVersion: 80300
   paths:
-    - zw-gr26.php
+    - zw-gr26-wp.php
     - includes
     - shortcodes
   excludePaths:
