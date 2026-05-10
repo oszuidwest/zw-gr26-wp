@@ -3,7 +3,7 @@
     <description>WordPress Coding Standards for ZuidWest GR 2026 plugin</description>
 
     <!-- What to scan -->
-    <file>zw-gr26.php</file>
+    <file>zw-gr26-wp.php</file>
     <file>includes</file>
     <file>shortcodes</file>
 
