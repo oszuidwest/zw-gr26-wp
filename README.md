@@ -7,7 +7,7 @@ WordPress plugin for the 2026 municipal elections (*gemeenteraadsverkiezingen*) 
 ## Requirements
 
 - PHP 8.3+
-- WordPress 6.8+
+- WordPress 7.0+
 - [Advanced Custom Fields](https://www.advancedcustomfields.com/) (ACF)
 
 Optional:
