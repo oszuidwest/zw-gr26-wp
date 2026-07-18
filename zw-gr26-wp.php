@@ -7,7 +7,7 @@
  * Text Domain: zw-gr26
  * License: GPL-2.0-or-later
  * Requires PHP: 8.3
- * Requires at least: 6.8
+ * Requires at least: 7.0
  *
  * @package ZWGR26
  */
