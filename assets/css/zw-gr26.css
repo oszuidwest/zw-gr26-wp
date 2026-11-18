@@ -12,8 +12,8 @@
 
     /* Text */
     --zw-gr26-text: #32373c;
-    --zw-gr26-muted: #999;
-    --zw-gr26-text-light: #bbb;
+    --zw-gr26-muted: #666;
+    --zw-gr26-text-light: #707070;
 
     /* Backgrounds */
     --zw-gr26-bg: #f4f5f7;
@@ -710,7 +710,10 @@ a.zw-gr26-hero__nav-item:hover::before {
 
 .zw-gr26-prow--disabled {
     cursor: default;
-    opacity: 0.5;
+}
+
+.zw-gr26-prow--disabled .zw-gr26-prow__partij {
+    color: var(--zw-gr26-muted);
 }
 
 .zw-gr26-prow--disabled:hover {
@@ -718,7 +721,7 @@ a.zw-gr26-hero__nav-item:hover::before {
 }
 
 .zw-gr26-prow--disabled .zw-gr26-prow__link-text {
-    color: #72777c;
+    color: var(--zw-gr26-muted);
 }
 
 .zw-gr26-prow--disabled .zw-gr26-prow__link-text::after {
@@ -1210,8 +1213,16 @@ body.zw-gr26-modal-open {
 }
 
 .zw-gr26-tbl__ghost {
-    opacity: 0.4;
     pointer-events: none;
+}
+
+/* Fade the party dot only: fading the whole row drops the text below 4.5:1. */
+.zw-gr26-tbl__ghost td {
+    color: var(--zw-gr26-muted);
+}
+
+.zw-gr26-tbl__ghost .zw-gr26-tbl__dot {
+    opacity: 0.4;
 }
 
 .zw-gr26-tbl__ghost .zw-gr26-tbl__name {
@@ -1718,8 +1729,11 @@ body.zw-gr26-modal-open {
     opacity: 0.85;
 }
 
-.zw-gr26-podcast__btn--spotify {
+.zw-gr26-podcast__btn--spotify,
+.zw-gr26-podcast__btn--spotify:hover,
+.zw-gr26-podcast__btn--spotify:focus {
     background: #1db954;
+    color: #191414;
 }
 
 .zw-gr26-podcast__btn--apple {
