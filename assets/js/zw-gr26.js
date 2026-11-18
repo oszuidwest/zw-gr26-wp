@@ -200,6 +200,24 @@
     }
 
     /**
+     * Sets a coalition row's selection state. The `is-selected` class drives
+     * the styling and `aria-pressed` exposes the same state to assistive
+     * technology, so both are always changed together. Rows only expose a
+     * pressed state while they are interactive (role="button" in coalition mode).
+     *
+     * @access private
+     *
+     * @param {HTMLTableRowElement} row      Party row.
+     * @param {boolean}             selected Whether the party is in the coalition.
+     */
+    function setRowSelected(row, selected) {
+        row.classList.toggle('is-selected', selected);
+        if (row.getAttribute('role') === 'button') {
+            row.setAttribute('aria-pressed', String(selected));
+        }
+    }
+
+    /**
      * Builds table rows from party data. Disappeared parties (0 seats in 2026
      * while having had seats in 2022) are rendered as ghost rows with reduced
      * opacity and a strikethrough on the party name.
@@ -410,6 +428,10 @@
                     rows.forEach((row, i) => {
                         row.setAttribute('tabindex', '0');
                         row.setAttribute('role', 'button');
+                        setRowSelected(
+                            row,
+                            row.classList.contains('is-selected'),
+                        );
                         row.classList.remove('coal-hint');
                         void row.offsetWidth;
                         setTimeout(
@@ -420,9 +442,11 @@
                 } else {
                     donutTotal.textContent = getTotalZetels();
                     for (const row of rows) {
-                        row.classList.remove('is-selected', 'coal-hint');
+                        setRowSelected(row, false);
+                        row.classList.remove('coal-hint');
                         row.removeAttribute('tabindex');
                         row.removeAttribute('role');
+                        row.removeAttribute('aria-pressed');
                     }
                     donutEl.classList.remove('has-majority');
                     container.classList.remove('has-majority');
@@ -435,7 +459,7 @@
 
         if (coalReset) {
             coalReset.addEventListener('click', () => {
-                for (const row of rows) row.classList.remove('is-selected');
+                for (const row of rows) setRowSelected(row, false);
                 updateCoalition();
             });
         }
@@ -1090,7 +1114,7 @@
             function renderTable(partijen, is2026) {
                 return buildTableRows(tbody, partijen, is2026, (tr) => {
                     if (!coal.isCoalMode) return;
-                    tr.classList.toggle('is-selected');
+                    setRowSelected(tr, !tr.classList.contains('is-selected'));
                     coal.update();
                 });
             }
@@ -1264,7 +1288,7 @@
             // Render table rows.
             const gemRows = buildTableRows(gemTbody, partijen, is2026, (tr) => {
                 if (!coal.isCoalMode) return;
-                tr.classList.toggle('is-selected');
+                setRowSelected(tr, !tr.classList.contains('is-selected'));
                 coal.update();
             });
 

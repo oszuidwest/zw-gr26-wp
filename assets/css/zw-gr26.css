@@ -1361,7 +1361,8 @@ body.zw-gr26-modal-open {
 }
 
 .is-coal-mode .zw-gr26-tbl tbody tr.is-selected td:first-child::before {
-    content: "\2713  ";
+    /* Empty alt text keeps the checkmark out of the accessible name; aria-pressed carries the state. */
+    content: "\2713  " / "";
     font-size: 11px;
     font-weight: 700;
     color: var(--zw-gr26-blue);
